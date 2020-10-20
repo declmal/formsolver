@@ -1,56 +1,70 @@
+
+
 ##### Jacobi Matrix
 
 
 $$
-\boldsymbol{J} = \left(\begin{matrix}
-x_{0,0} & x_{0,1} & x_{0,2} \\
-x_{1,0} & x_{1,1} & x_{1,2} \\
-x_{2,0} & x_{2,1} & x_{2,2}
+{}^{0}\boldsymbol{J} = \left(\begin{matrix}
+{}^{0}x_{0,0} & {}^{0}x_{0,1} & {}^{0}x_{0,2} \\
+{}^{0}x_{1,0} & {}^{0}x_{1,1} & {}^{0}x_{1,2} \\
+{}^{0}x_{2,0} & {}^{0}x_{2,1} & {}^{0}x_{2,2}
 \end{matrix}\right)
 $$
 
 $$
-J_{ij} 
-= x_{i,j}
-= \frac{\partial x_{i}}{\partial r_{j}}
-= h_{n,i} X_{in}
+{}^{0}J_{ij} 
+= {}^{0}x_{i,j}
+= \frac{\partial \ {}^{0}x_{i}}{\partial \ r_{j}}
+= h_{n,i} \ {}^{0}X_{in}
 $$
 
 $$
-\det\boldsymbol{J} 
+\begin{align}
 
-= \epsilon_{ijk} \ x_{i,0} \ x_{j,1} \ x_{j,2} 
+\det {}^{0}\boldsymbol{J} 
 
-= (x_{1,0} x_{2,1} - x_{1,1} x_{2,0}) x_{0,2} +
-(x_{0,1} x_{2,0} - x_{0,0} x_{2,1}) x_{1,2} +
-(x_{0,0} x_{1,1} - x_{0,1} x_{1,0}) x_{2,2}
+&= \epsilon_{ijk} \ {}^{0}x_{i,0} \ {}^{0}x_{j,1} \ {}^{0}x_{j,2} \\
+
+&= ({}^{0}x_{1,0} \ {}^{0}x_{2,1} - {}^{0}x_{1,1} \ {}^{0}x_{2,0}) {}^{0}x_{0,2} +
+({}^{0}x_{0,1} \ {}^{0}x_{2,0} - {}^{0}x_{0,0} \ {}^{0}x_{2,1}) {}^{0}x_{1,2} +
+({}^{0}x_{0,0} \ {}^{0}x_{1,1} - {}^{0}x_{0,1} \ {}^{0}x_{1,0}) {}^{0}x_{2,2}
+
+\end{align}
 $$
 
 $$
-\boldsymbol{J}^{*} = 
+{}^{0}\boldsymbol{J}^{*} = 
 
 \left(\begin{matrix}
-x_{1,1} x_{2,2} - x_{1,2} x_{2,1} & x_{0,2} x_{2,1} - x_{0,1} x_{2,2} & x_{0,1} x_{1,2} - x_{0,2} x_{1,1} \\
-x_{1,2} x_{2,0} - x_{1,0} x_{2,2} & x_{0,0} x_{2,2} - x_{0,2} x_{2,0} & x_{0,2} x_{1,0} - x_{0,0} x_{1,2} \\
-x_{1,0} x_{2,1} - x_{1,1} x_{2,0} & x_{0,1} x_{2,0} - x_{0,0} x_{2,1} & x_{0,0} x_{1,1} - x_{0,1} x_{1,0}
+{}^{0}x_{1,1} \ {}^{0}x_{2,2} - {}^{0}x_{1,2} \ {}^{0}x_{2,1} & 
+{}^{0}x_{0,2} \ {}^{0}x_{2,1} - {}^{0}x_{0,1} \ {}^{0}x_{2,2} & 
+{}^{0}x_{0,1} \ {}^{0}x_{1,2} - {}^{0}x_{0,2} \ {}^{0}x_{1,1} \\
+
+{}^{0}x_{1,2} \ {}^{0}x_{2,0} - {}^{0}x_{1,0} \ {}^{0}x_{2,2} & 
+{}^{0}x_{0,0} \ {}^{0}x_{2,2} - {}^{0}x_{0,2} \ {}^{0}x_{2,0} & 
+{}^{0}x_{0,2} \ {}^{0}x_{1,0} - {}^{0}x_{0,0} \ {}^{0}x_{1,2} \\
+
+{}^{0}x_{1,0} \ {}^{0}x_{2,1} - {}^{0}x_{1,1} \ {}^{0}x_{2,0} & 
+{}^{0}x_{0,1} \ {}^{0}x_{2,0} - {}^{0}x_{0,0} \ {}^{0}x_{2,1} & 
+{}^{0}x_{0,0} \ {}^{0}x_{1,1} - {}^{0}x_{0,1} \ {}^{0}x_{1,0}
 \end{matrix}\right)
 $$
 
 $$
-\boldsymbol{J}^{-1} = 
-\frac{\boldsymbol{J^{*}}}{\det \boldsymbol{J}}
+{}^{0}\boldsymbol{J}^{-1} = 
+\frac{{}^{0}\boldsymbol{J^{*}}}{\det {}^{0}\boldsymbol{J}}
 $$
 
-##### Interpolation Derivative with Respect to Coord.
+##### Interpolation Derivative with Respect to Global Coordinate
 
 $$
 {}_{0}h_{n,j}
 = \frac{\partial \ h_{n}}{\partial \ {}^{0}x_{j}}
-= {}_{0}J_{jo}^{-1} \frac{\partial \ h_{n}}{\partial \ r_{o}}
-= {}_{0}J_{jo}^{-1} h_{n,o}
+= {}^{0}J_{jo}^{-1} \frac{\partial \ h_{n}}{\partial \ r_{o}}
+= {}^{0}J_{jo}^{-1} h_{n,o}
 $$
 
-##### Displacement Increment Interpolation
+##### Displacement Increment Derivative with Respect to Global Coordinate
 
 $$
 u_{i}
@@ -63,7 +77,7 @@ $$
 = {}_{0}h_{n,j} \ U_{in}
 $$
 
-##### Displacement Interpolation
+##### Displacement Derivative with Respect to Global Coordinate
 
 $$
 {}^{t}u_{i}
@@ -265,22 +279,6 @@ $$
 {}_{0}h_{m,0} \ {}_{0}^{t}u_{1,2} + {}_{0}h_{m,2} \ {}_{0}^{t}u_{1,0}& 
 {}_{0}h_{m,0} \ {}_{0}^{t}u_{2,2} + {}_{0}h_{m,2} \ {}_{0}^{t}u_{2,0}& ...& ...& ... \\
 \end{matrix}\right)
-$$
-
-
-$$
-\begin{align}
-\iiint_{{}^{0}\hat V} {}_{0}C_{ijrs} \ {}_{0}e_{rs} \ \delta \ {}_{0}e_{ij}
-
-=& \hat U_{kn} \ \delta \hat U_{pm} \iiint
-\Big( {}_{0}\hat J_{sl}^{-1} \hat h_{n,l} \delta_{kr} +
-{}_{0}\hat J_{rl}^{-1} \hat h_{n',l} \ {}_{0}\hat J_{sl'}^{-1} \hat h_{n,l'} \ {}^{t}\hat U_{kn'} \Big)
-{}_{0}C_{ijrs} \\
-&\Big( {}_{0}\hat J_{jl''}^{-1} \hat h_{m,l''} \delta_{ip} + 
-{}_{0}\hat J_{il''}^{-1} \hat h_{n'',l''} \ {}_{0}\hat J_{jl'''}^{-1} \hat h_{m,l'''} {}^{t}\hat U_{pn''} \Big)
-\Big|\det \boldsymbol{{}^{0}\hat J}\Big| \ \text{d}r_{1} \ \text{d}r_{2} \ \text{d}r_{3}
-
-\end{align}
 $$
 
 
