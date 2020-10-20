@@ -1,8 +1,20 @@
 cmake_minimum_required(VERSION 3.2)
 
+project(formsolver)
+
+# set compilation flags
+set(CMAKE_CXX_FLAGS "-std=c++11")
+
 # specify include directories
 include_directories("include")
 
-# compile executives
-find_package(CUDA REQUIRED)
-cuda_add_executable(test_bin tests/test_fem.cc)
+# find extern packages
+find_package(glog REQUIRED)
+
+# compile shared library
+set(LIB_FORM form)
+file(GLOB_RECURSE SRCS_FORM src/*.cc)
+add_library(${LIB_FORM} SHARED ${SRCS_FORM})
+
+# link libraries
+target_link_libraries(${LIB_FORM} PRIVATE glog::glog)
