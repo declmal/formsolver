@@ -387,45 +387,6 @@ x_{i} = \hat h_{n} \hat X_{in}
 $$
 
 **Jacobi Matrix**
-$$
-\boldsymbol{\hat J} = \left(\begin{matrix}
-x_{0,0} & x_{0,1} & x_{0,2} \\
-x_{1,0} & x_{1,1} & x_{1,2} \\
-x_{2,0} & x_{2,1} & x_{2,2}
-\end{matrix}\right)
-$$
-
-$$
-\hat J_{ij} 
-= x_{i,j}
-= \frac{\partial x_{i}}{\partial r_{j}}
-= \hat h_{n,i} \hat X_{in}
-$$
-
-$$
-\det\boldsymbol{\hat J} 
-
-= \epsilon_{ijk} \ x_{i,0} \ x_{j,1} \ x_{j,2} 
-
-= (x_{1,0} x_{2,1} - x_{1,1} x_{2,0}) x_{0,2} +
-(x_{0,1} x_{2,0} - x_{0,0} x_{2,1}) x_{1,2} +
-(x_{0,0} x_{1,1} - x_{0,1} x_{1,0}) x_{2,2}
-$$
-
-$$
-\boldsymbol{\hat J}^{*} = 
-
-\left(\begin{matrix}
-x_{1,1} x_{2,2} - x_{1,2} x_{2,1} & x_{0,2} x_{2,1} - x_{0,1} x_{2,2} & x_{0,1} x_{1,2} - x_{0,2} x_{1,1} \\
-x_{1,2} x_{2,0} - x_{1,0} x_{2,2} & x_{0,0} x_{2,2} - x_{0,2} x_{2,0} & x_{0,2} x_{1,0} - x_{0,0} x_{1,2} \\
-x_{1,0} x_{2,1} - x_{1,1} x_{2,0} & x_{0,1} x_{2,0} - x_{0,0} x_{2,1} & x_{0,0} x_{1,1} - x_{0,1} x_{1,0}
-\end{matrix}\right)
-$$
-
-$$
-\boldsymbol{\hat J}^{-1} = 
-\frac{1}{\det \boldsymbol{\hat J}} \boldsymbol{\hat J^{*}}
-$$
 
 **Derivative**
 $$
