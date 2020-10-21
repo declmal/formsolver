@@ -15,6 +15,7 @@ lib:
 	@mkdir -p build
 	@cd build && cmake .. && make
 	@mkdir -p lib
+	@mv build/libform.$(SHARED_LIBRARY_SUFFIX) lib
 
 test: lib
 	@mkdir -p build/tests
