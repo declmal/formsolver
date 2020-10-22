@@ -145,12 +145,12 @@ $$
 \end{align}
 $$
 
-##### Linear Strain Incremental Stiffness Matrices
+##### Linear Strain Incremental Stiffness Matrix
 
 [*Finite Element Procedures (2nd), P524, TABLE 6.2*]
 $$
 \iiint_{{}^{0}V} {}_{0}C_{ijrs} \ {}_{0}e_{rs} \ \delta \ {}_{0}e_{ij} \ \text{d} \ {}^{0}V =
-\sum_{e=1}^{E} \iiint_{{}^{0}\hat V} {}_{0}C_{ijrs} \ {}_{0}e_{rs} \ \delta \ {}_{0}e_{ij} \ \text{d} \ {}^{0}\hat V
+\sum_{e=0}^{E-1} \iiint_{{}^{0}\hat V} {}_{0}C_{ijrs} \ {}_{0}e_{rs} \ \delta \ {}_{0}e_{ij} \ \text{d} \ {}^{0}\hat V
 $$
 
 Since ${}_{0}C_{ijrs} = {}_{0}C_{ijsr} = {}_{0}C_{jirs}$
@@ -286,6 +286,75 @@ $$
 {}_{0}h_{m,0} \ {}_{0}^{t}u_{1,2} + {}_{0}h_{m,2} \ {}_{0}^{t}u_{1,0}& 
 {}_{0}h_{m,0} \ {}_{0}^{t}u_{2,2} + {}_{0}h_{m,2} \ {}_{0}^{t}u_{2,0}& ...& ...& ... \\
 \end{matrix}\right)
+$$
+
+##### Nonlinear Strain Tensor
+
+$$
+\begin{align}
+
+{}_{0}\eta_{ij}
+
+&= \frac{1}{2} {}_{0}u_{q,i} \ {}_{0}u_{q,j} \\
+
+&= \frac{1}{2} {}_{0}h_{n',i} \ {}_{0}h_{n,j} \ U_{qn'} \ U_{qn}
+
+\end{align}
+$$
+
+##### Virtual Nonlinear Strain Tensor
+
+$$
+\begin{align}
+
+\delta \ {}_{0}\eta_{ij}
+
+&= {}_{0}\eta_{ij,pm} \ \delta U_{pm} \\
+
+&= \frac{1}{2} {}_{0}h_{n',i} \ {}_{0}h_{n,j}
+\Big(
+U_{qn} \ \delta U_{qn'} +
+U_{qn'} \ \delta U_{qn}
+\Big)
+
+\end{align}
+$$
+
+##### Nonlinear Strain Incremental Stiffness Matrix
+
+[*Finite Element Procedures (2nd), P524, TABLE 6.2*]
+$$
+\iiint_{{}^{0}V} {}_{0}^{t}S_{ij} \ \delta \ {}_{0}\eta_{ij} \ \text{d} \ {}^{0}V =
+
+\sum_{e=0}^{E-1} \iiint_{{}^{0}\hat V} {}_{0}^{t}S_{ij} \ \delta \ {}_{0}\eta_{ij} \ \text{d} \ {}^{0}\hat V
+$$
+Since ${}_{0}^{t} S_{ij} = {}_{0}^{t} S_{ji}$
+$$
+\begin{align}
+
+{}_{0}^{t}S_{ij} \ \delta \ {}_{0}\eta_{ij}
+
+&= \delta U_{pm} \ {}_{0}h_{m,i} \ \delta_{pr} \ {}_{0}^{t}S_{ij} \ \delta_{rs} \ {}_{0}h_{n,j} \ \delta_{qs} \ U_{qn} \\
+
+&= 
+
+\end{align}
+$$
+Let
+$$
+a = 3m + p
+$$
+
+$$
+b = 3n + q
+$$
+
+$$
+k = 3r + i
+$$
+
+$$
+l = 3s + j
 $$
 
 
