@@ -1,4 +1,5 @@
 #include <fem/fe_matrix.h>
+#include <stdio.h>
 
 namespace fem {
 template <typename T>
@@ -47,7 +48,7 @@ template void matmul_n333(
 
 template <typename T>
 void det_33(const T* const a, T* const det) {
-  det[0] = 
+  det[0] =
     (a[3]*a[7] - a[4]*a[6]) * a[2] +
     (a[1]*a[6] - a[0]*a[7]) * a[5] +
     (a[0]*a[4] - a[1]*a[3]) * a[8];
