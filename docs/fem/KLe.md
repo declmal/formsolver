@@ -1,7 +1,14 @@
+##### Initial Global Coordinate Interpolation
+
+$$
+x_{i} = h_{n} X_{in}
+$$
+
 
 
 ##### Jacobi Matrix
 
+[*Finite Element Procedures (2nd), P346*]
 
 $$
 {}^{0}\boldsymbol{J} = \left(\begin{matrix}
@@ -15,7 +22,7 @@ $$
 {}^{0}J_{ij} 
 = {}^{0}x_{i,j}
 = \frac{\partial \ {}^{0}x_{i}}{\partial \ r_{j}}
-= h_{n,i} \ {}^{0}X_{in}
+= h_{n,j} \ {}^{0}X_{in}
 $$
 
 $$
@@ -214,6 +221,8 @@ U_{b} \\
 \end{align}
 $$
 where
+
+[*Finite Element Procedures (2nd), P555, TABLE 6.6*]
 $$
 \begin{align}
 
