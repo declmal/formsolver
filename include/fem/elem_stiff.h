@@ -5,17 +5,46 @@ namespace fem {
 /*!
  * \brief Determinant of Jacobian Matrix
  *
- * \param J input variable, Jacobi matrix, of shape (3, 3)
- * \param detJ output variable, determinant Jacobi matrix, of shape (1,)
+ * \param h input variable, interpolation derivative 
+ *  with respect to local natural coordinate, of shape (N, 3)
+ * \param X input variable, with respect to
+ *  inital (TL) or temporal (UL) global coordiante, of shape (3, N)
+ * \param N input variable, the number of nodes in an element
+ * \param J output variable, Jacobi matrix, with repect to 
+ *  inital (TL) or temporal (UL) global coordinate, of shape (3, 3)
+*/
+template <typename T>
+void jacobi(const T* const h, const T* const X, const unsigned int N, T* const J);
+
+/*!
+ * \brief Determinant of Jacobian Matrix
+ *
+ * \param J input variable, Jacobi matrix, with repect to 
+ *  inital (TL) or temporal (UL) global coordinate, of shape (3, 3)
+ * \param detJ output variable, determinant of Jacobi matrix, 
+ *  with respect to initial (TL) or temporal (UL) global coordinate, of shape (1,)
 */
 template <typename T>
 void det_jacobi(const T* const J, T* const detJ);
 
 /*!
+ * \brief Inversion of Jacobian Matrix
+ *
+ * \param J input variable, Jacobi matrix, with repect to 
+ *  inital (TL) or temporal (UL) global coordinate, of shape (3, 3)
+ * \param detJ intput variable, determinant of Jacobi matrix, 
+ *  with respect to initial (TL) or temporal (UL) global coordinate, of shape (1,)
+ * \param Jinv output variable, inversion of Jacobi matrix,
+ *  with respect to initial (TL) or temporal (UL) global coordinate, of shape (3,3)
+*/
+template <typename T>
+void inv_jacobi(const T* const J, const T* const detJ, T* const Jinv);
+
+/*!
  * \brief Interpolation Derivative with Respect to Global Coordinate
  *
- * \param Jinv input variable, inverse of Jacobi matrix with respect to
- *  initial (TL) or temporal (UL) global coordinate, of shape (3, 3)
+ * \param Jinv intput variable, inversion of Jacobi matrix,
+ *  with respect to initial (TL) or temporal (UL) global coordinate, of shape (3,3)
  * \param h input variable, interpolation derivative 
  *  with respect to local natural coordinate, of shape (N, 3)
  * \param N input variable, the number of nodes in an element
@@ -55,9 +84,6 @@ void disp_deriv_tl(
 template <typename T>
 void lin_trans_mat_tl(
   const T* const h0, const T* const u0t, const unsigned int N, T* const B0t_L);
-
-template <typename T>
-void nonlin_trans_mat_tl();
 } // namespace fem
 
 #endif // FEM_TRANS_MAT_H_
