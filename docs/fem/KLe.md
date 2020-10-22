@@ -4,8 +4,6 @@ $$
 x_{i} = h_{n} X_{in}
 $$
 
-
-
 ##### Jacobi Matrix
 
 [*Finite Element Procedures (2nd), P346*]

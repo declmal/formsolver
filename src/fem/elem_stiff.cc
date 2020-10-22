@@ -2,78 +2,6 @@
 
 namespace fem {
 template <typename T>
-void jacobi(const T* const h, const T* const X, const unsigned int N, T* const J) {
-  for (unsigned int i = 0; i < N; ++i) {
-  }
-}
-
-template <typename T>
-void det_jacobi(const T* const J, T* const detJ) {
-  detJ[0] = 
-    (J[3]*J[7] - J[4]*J[6]) * J[2] +
-    (J[1]*J[6] - J[0]*J[7]) * J[5] +
-    (J[0]*J[4] - J[1]*J[3]) * J[8];
-}
-
-template <typename T>
-void inv_jacobi(const T* const J, const T* const detJ, T* const Jinv) {
-  Jinv[0] = J[4]*J[8] - J[5]*J[7];
-  Jinv[1] = J[2]*J[7] - J[1]*J[8];
-  Jinv[2] = J[1]*J[5] - J[2]*J[4];
-  Jinv[3] = J[5]*J[6] - J[3]*J[8];
-  Jinv[4] = J[0]*J[8] - J[2]*J[6];
-  Jinv[5] = J[2]*J[3] - J[0]*J[5];
-  Jinv[6] = J[3]*J[7] - J[4]*J[6];
-  Jinv[7] = J[1]*J[6] - J[0]*J[7];
-  Jinv[8] = J[0]*J[4] - J[1]*J[3];
-  for (unsigned int i = 0; i < 8; ++i) {
-    Jinv /= detJ[0];
-  }
-}
-
-template <typename T>
-void intr_deriv(
-  const T* const Jinv, const T* const h, const unsigned int N, T* const htau) {
-  auto Htau = htau;
-  auto H = h;
-  for (unsigned int i = 0; i < N; ++i) {
-    Htau[0] = Jinv[0]*H[0] + Jinv[1]*H[1] + Jinv[2]*H[2];
-    Htau[1] = Jinv[3]*H[0] + Jinv[4]*H[1] + Jinv[5]*H[2];
-    Htau[2] = Jinv[6]*H[0] + Jinv[7]*H[1] + Jinv[8]*H[2];
-    H += 3;
-    Htau += 3;
-  }
-}
-
-template <typename T>
-void disp_deriv_tl(
-  const T* const h0, const T* const Ut, const unsigned int N, T* const u0t) {
-  auto u = u0t;
-  auto U0 = Ut;
-  auto U1 = U0 + N;
-  auto U2 = U1 + N;
-  auto H = h0;
-  for (unsigned int i = 0; i < 9; ++i) {
-    u0t[i] = (T)0;
-  }
-  for (unsigned int i = 0; i < N; ++i) {
-    u0t[0] += H[0] * U0[0];
-    u0t[1] += H[1] * U0[0];
-    u0t[2] += H[2] * U0[0];
-    U0 += 1;
-    u0t[3] += H[0] * U1[0];
-    u0t[4] += H[1] * U1[0];
-    u0t[5] += H[2] * U1[0];
-    U1 += 1;
-    u0t[6] += H[0] * U2[0];
-    u0t[7] += H[1] * U2[0];
-    u0t[8] += H[2] * U2[0];
-    U2 += 1;
-    H += 3;
-  }
-}
-
-template <typename T>
 void lin_trans_mat_tl(
   const T* const h0, const T* const u0t, const unsigned int N, T* const B0t_L) {
   auto _3N = 3 * N;
@@ -112,4 +40,7 @@ void lin_trans_mat_tl(
     H += 3;
   }
 }
+template void lin_trans_mat_tl(
+  const double* const h0, const double* const u0t,
+  const unsigned int N, double* const B0t_L);
 } // namespace fem
