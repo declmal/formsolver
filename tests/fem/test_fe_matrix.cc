@@ -336,6 +336,69 @@ void test_matmul2_3n6_66_63n_dp_cpu(bool layout=false, double tol=1e-6) {
   }
 }
 
+void test_matmul2_3n9_99_93n_dp_cpu(bool layout=false, double tol=1e-6) {
+  // init a
+  unsigned int N = 8;
+  unsigned int _3N = 3 * N;
+  unsigned int nEntryA = 9 * _3N;
+  unsigned int nBytesA = nEntryA * sizeof(double);
+  auto a = (double*)malloc(nBytesA);
+  init_rand<double>(a, nEntryA);
+  // init b
+  unsigned int nEntryB = 9 * 9;
+  unsigned int nBytesB = nEntryB * sizeof(double);
+  auto b = (double*)malloc(nBytesB);
+  init_rand<double>(b, nEntryB);
+  // init buffer
+  unsigned int nEntryBuffer = 9;
+  unsigned int nBytesBuffer = nEntryBuffer * sizeof(double);
+  auto buffer = (double*)malloc(nBytesBuffer);
+  // init c
+  unsigned int nEntryC = _3N * _3N;
+  unsigned int nBytesC = nEntryC * sizeof(double);
+  auto c = (double*)malloc(nBytesC);
+  // init d
+  unsigned int nEntryD = _3N * 9;
+  unsigned int nBytesD = nEntryD * sizeof(double);
+  auto d = (double*)malloc(nBytesD);
+  // init e
+  unsigned int nEntryE = _3N * _3N;
+  unsigned int nBytesE = nEntryE * sizeof(double);
+  auto e = (double*)malloc(nBytesE);
+  // execute
+  fem::matmul2_3n9_99_93n(a, b, N, buffer, c);
+  // validate
+  cblas_dgemm(
+    CblasRowMajor, CblasTrans, CblasNoTrans,
+    _3N, 9, 9, 1.0, a, _3N, b, 9, 0.0, d, 9);
+  cblas_dgemm(
+    CblasRowMajor, CblasNoTrans, CblasNoTrans,
+    _3N, _3N, 9, 1.0, d, 9, a, _3N, 0.0, e, _3N);
+  if (layout) {
+    LOG(INFO) << "matrix a layout";
+    print_mat_dp(a, 9, _3N);
+    LOG(INFO) << "matrix b layout";
+    print_mat_dp(b, 9, 9);
+    LOG(INFO) << "matrix c layout";
+    print_mat_dp(c, _3N, _3N);
+    LOG(INFO) << "matrix e layout";
+    print_mat_dp(e, _3N, _3N);
+  }
+  bool flag = validate_dp(c, e, _3N*_3N, tol);
+  // free
+  free(a);
+  free(b);
+  free(buffer);
+  free(c);
+  free(d);
+  free(e);
+  if (flag) {
+    LOG(INFO) << "test_matmul2_3n9_99_93n succeed";
+  } else {
+    LOG(FATAL) << "test_matmul2_3n9_99_93n failed";
+  }
+}
+
 int main(int argc, char* argv[]) {
   // log init
   google::InitGoogleLogging(argv[0]);
@@ -347,5 +410,6 @@ int main(int argc, char* argv[]) {
   test_inv_33_dp_cpu();
   test_mattile_diag_33_dp_cpu();
   test_matmul2_3n6_66_63n_dp_cpu();
+  test_matmul2_3n9_99_93n_dp_cpu();
   return 0;
 }

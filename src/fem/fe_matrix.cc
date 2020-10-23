@@ -128,4 +128,59 @@ void matmul2_3n6_66_63n(
 template void matmul2_3n6_66_63n(
   const double* const a, const double* const b, const unsigned int N, 
   double* const buffer, double* const c);
+
+template <typename T>
+void matmul2_3n9_99_93n(
+  const T* const a, const T* const b, const unsigned int N,
+  T* const buffer, T* const c) {
+  auto _3N = 3 * N;
+  auto a0 = a;
+  auto a1 = a0 + _3N;
+  auto a2 = a1 + _3N;
+  auto a3 = a2 + _3N;
+  auto a4 = a3 + _3N;
+  auto a5 = a4 + _3N;
+  auto a6 = a5 + _3N;
+  auto a7 = a6 + _3N;
+  auto a8 = a7 + _3N;
+  auto c_ = c;
+  for (unsigned int i = 0; i < _3N; ++i) {
+    buffer[0] = a0[i]*b[0] + a1[i]*b[9] + a2[i]*b[18] +
+                a3[i]*b[27] + a4[i]*b[36] + a5[i]*b[45] +
+                a6[i]*b[54] + a7[i]*b[63] + a8[i]*b[72];
+    buffer[1] = a0[i]*b[1] + a1[i]*b[10] + a2[i]*b[19] +
+                a3[i]*b[28] + a4[i]*b[37] + a5[i]*b[46] +
+                a6[i]*b[55] + a7[i]*b[64] + a8[i]*b[73];
+    buffer[2] = a0[i]*b[2] + a1[i]*b[11] + a2[i]*b[20] +
+                a3[i]*b[29] + a4[i]*b[38] + a5[i]*b[47] +
+                a6[i]*b[56] + a7[i]*b[65] + a8[i]*b[74];
+    buffer[3] = a0[i]*b[3] + a1[i]*b[12] + a2[i]*b[21] +
+                a3[i]*b[30] + a4[i]*b[39] + a5[i]*b[48] +
+                a6[i]*b[57] + a7[i]*b[66] + a8[i]*b[75];
+    buffer[4] = a0[i]*b[4] + a1[i]*b[13] + a2[i]*b[22] +
+                a3[i]*b[31] + a4[i]*b[40] + a5[i]*b[49] +
+                a6[i]*b[58] + a7[i]*b[67] + a8[i]*b[76];
+    buffer[5] = a0[i]*b[5] + a1[i]*b[14] + a2[i]*b[23] +
+                a3[i]*b[32] + a4[i]*b[41] + a5[i]*b[50] +
+                a6[i]*b[59] + a7[i]*b[68] + a8[i]*b[77];
+    buffer[6] = a0[i]*b[6] + a1[i]*b[15] + a2[i]*b[24] +
+                a3[i]*b[33] + a4[i]*b[42] + a5[i]*b[51] +
+                a6[i]*b[60] + a7[i]*b[69] + a8[i]*b[78];
+    buffer[7] = a0[i]*b[7] + a1[i]*b[16] + a2[i]*b[25] +
+                a3[i]*b[34] + a4[i]*b[43] + a5[i]*b[52] +
+                a6[i]*b[61] + a7[i]*b[70] + a8[i]*b[79];
+    buffer[8] = a0[i]*b[8] + a1[i]*b[17] + a2[i]*b[26] +
+                a3[i]*b[35] + a4[i]*b[44] + a5[i]*b[53] +
+                a6[i]*b[62] + a7[i]*b[71] + a8[i]*b[80];
+    for (unsigned int j = 0; j < _3N; ++j) {
+      c_[j] = buffer[0]*a0[j] + buffer[1]*a1[j] + buffer[2]*a2[j] +
+              buffer[3]*a3[j] + buffer[4]*a4[j] + buffer[5]*a5[j] +
+              buffer[6]*a6[j] + buffer[7]*a7[j] + buffer[8]*a8[j];
+    }
+    c_ += _3N;
+  }
+}
+template void matmul2_3n9_99_93n(
+  const double* const a, const double* const b, const unsigned int N, 
+  double* const buffer, double* const c);
 } // namespace fem

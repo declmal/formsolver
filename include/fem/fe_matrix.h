@@ -68,6 +68,21 @@ template <typename T>
 void matmul2_3n6_66_63n(
   const T* const a, const T* const b, const unsigned int N,
   T* const buffer, T* const c);
+
+/*!
+ * \brief Matrix Multiplication, cij = ali blk akj
+ *  i = 0,1,...,3N-1; j = 0,1,...,3N-1; k = 0,1,...,8, l = 0,1,...,8
+ *
+ * \param a input variable, matrix of shape (9, 3N)
+ * \param b input variable, matrix of shape (9, 9)
+ * \param N input variable, dimension variable
+ * \param buffer output variable, matrix of shape (9,)
+ * \param c output variable, matrix of shape (3N, 3N)
+*/
+template <typename T>
+void matmul2_3n9_99_93n(
+  const T* const a, const T* const b, const unsigned int N,
+  T* const buffer, T* const c);
 } // namespace fem
 
 #endif // FEM_FE_MATRIX_H_
