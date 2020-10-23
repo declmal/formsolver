@@ -198,21 +198,25 @@ $$
 
 &= \delta U_{a} \ 
 \Big(
-{}_{0}B^{L0}_{ka} + {}_{0}^{t}B^{L1}_{ka}
+{}_{0}B^{L0}_{ka} +
+{}_{0}^{t}B^{L1}_{ka}
 \Big) \ 
 {}_{0}C_{kl} \
 \Big(
-{}_{0}B^{L0}_{lb} + {}_{0}^{t}B^{L1}_{lb}
+{}_{0}B^{L0}_{lb} +
+{}_{0}^{t}B^{L1}_{lb}
 \Big) \
 U_{b} \\
 
 &= \delta\boldsymbol{U}^{T} \ 
 \Big(
-{}_{0}\boldsymbol{B}^{L0} + {}_{0}^{t}\boldsymbol{B}^{L1}
+{}_{0}\boldsymbol{B}^{L0} +
+{}_{0}^{t}\boldsymbol{B}^{L1}
 \Big)^{T} \ 
 {}_{0}\boldsymbol{C} \
 \Big(
-{}_{0}\boldsymbol{B}^{L0} + {}_{0}^{t}\boldsymbol{B}^{L1}
+{}_{0}\boldsymbol{B}^{L0} +
+{}_{0}^{t}\boldsymbol{B}^{L1}
 \Big) \
 \boldsymbol{U}
 
@@ -334,9 +338,7 @@ $$
 
 {}_{0}^{t}S_{ij} \ \delta \ {}_{0}\eta_{ij}
 
-&= \delta U_{pm} \ {}_{0}h_{m,i} \ \delta_{pr} \ {}_{0}^{t}S_{ij} \ \delta_{rs} \ {}_{0}h_{n,j} \ \delta_{qs} \ U_{qn} \\
-
-&= 
+&= \delta U_{pm} \ {}_{0}h_{m,i} \ \delta_{pr} \ {}_{0}^{t}S_{ij} \ \delta_{rs} \ {}_{0}h_{n,j} \ \delta_{qs} \ U_{qn}
 
 \end{align}
 $$
@@ -357,5 +359,22 @@ $$
 l = 3s + j
 $$
 
+Thus
+$$
+\begin{align}
 
+{}_{0}^{t}S_{ij} \ \delta \ {}_{0}\eta_{ij}
+
+&= \delta U_{a} \ 
+{}_{0}B^{NL}_{ka} \ {}_{0}^{t}S_{kl} \ {}_{0}B^{NL}_{lb} \ U_{b} \\
+
+&= \delta\boldsymbol{U}^{T} \ 
+\Big(
+{}_{0}\boldsymbol{B}^{NL}
+\Big)^{T} \ 
+{}_{0}^{t}\boldsymbol{S} \ {}_{0}\boldsymbol{B}^{NL} \ \boldsymbol{U}
+
+\end{align}
+$$
+Meta operator optimization
 
