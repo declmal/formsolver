@@ -72,4 +72,18 @@ void inv_33(const T* const a, const T* const det, T* const inv) {
 }
 template void inv_33(
   const double* const a, const double* const det, double* const inv);
+
+template <typename T>
+void mattile_diag_33(const T* const a, T* const tile) {
+  tile[0] = tile[30] = tile[60] = a[0];
+  tile[1] = tile[31] = tile[61] = a[1];
+  tile[2] = tile[32] = tile[62] = a[2];
+  tile[9] = tile[39] = tile[69] = a[3];
+  tile[10] = tile[40] = tile[70] = a[4];
+  tile[11] = tile[41] = tile[71] = a[5];
+  tile[18] = tile[48] = tile[78] = a[6];
+  tile[19] = tile[49] = tile[79] = a[7];
+  tile[20] = tile[50] = tile[80] = a[8];
+}
+template void mattile_diag_33(const double* const a, double* const tile);
 } // namespace fem

@@ -106,6 +106,29 @@ void test_inv_33_dp_cpu() {
   LOG(INFO) << "test_inv_33_cpu_succeed";
 }
 
+void test_mattile_diag_33_dp_cpu() {
+  // init a
+  unsigned int nEntryA = 3 * 3;
+  unsigned int nBytesA = nEntryA * sizeof(double);
+  auto a = (double*)malloc(nBytesA);
+  rand_init<double>(a, nEntryA);
+  LOG(INFO) << "matrix a layout";
+  print_mat<double>(a, 3, 3);
+  // init tile
+  unsigned int nEntryTile = 9 * 9;
+  unsigned int nBytesTile = nEntryTile * sizeof(double);
+  auto tile = (double*)malloc(nBytesTile);
+  // execute
+  fem::mattile_diag_33(a, tile);
+  LOG(INFO) << "matrix tile layout";
+  print_mat<double>(tile, 9, 9);
+  // free a
+  free(a);
+  // free tile
+  free(tile);
+  LOG(INFO) << "test_mattile_diag33_dp_cpu succeed";
+}
+
 int main(int argc, char* argv[]) {
   // log init
   google::InitGoogleLogging(argv[0]);
@@ -114,5 +137,6 @@ int main(int argc, char* argv[]) {
   test_matmul_n333_dp_cpu();
   test_matmul_3nn3_dp_cpu();
   test_inv_33_dp_cpu();
+  test_mattile_diag_33_dp_cpu();
   return 0;
 }

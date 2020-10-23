@@ -17,7 +17,7 @@ void lin_trans_mat_tl(
   const T* const h0, const T* const u0t, const unsigned int N, T* const B0t_L);
 
 /*!
- * \brief linear transformation matrix (Total Lagrangian Version)
+ * \brief nonlinear transformation matrix (Total Lagrangian Version)
  *
  * \param h0 input variable, interpolation derivative 
  *  with respect to initial global coordinate, of shape (N, 3)

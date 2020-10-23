@@ -27,7 +27,7 @@ template <typename T>
 void matmul_n333(const T* const a, const T* const b, const unsigned int N, T* const c);
 
 /*!
- * \brief Determinant of Jacobian Matrix
+ * \brief Determinant of 3x3 Matrix
  *
  * \param a input variable, matrix of shape (3, 3)
  * \param det output variable, determinant of matrix, of shape (1,)
@@ -36,7 +36,7 @@ template <typename T>
 void det_33(const T* const a, T* const det);
 
 /*!
- * \brief Inversion of Jacobian Matrix
+ * \brief Inversion of 3x3 Matrix
  *
  * \param a input variable, matrix of shape (3, 3)
  * \param det intput variable, determinant of matrix, of shape (1,)
@@ -44,6 +44,15 @@ void det_33(const T* const a, T* const det);
 */
 template <typename T>
 void inv_33(const T* const a, const T* const det, T* const inv);
+
+/*!
+ * \brief Diagnal Tile of 3x3 Matrix to 9x9
+ *
+ * \param a input variable, matrix of shape (3, 3)
+ * \param tile output variable, inversion matrix, of shape (9, 9),
+*/
+template <typename T>
+void mattile_diag_33(const T* const a, T* const tile);
 } // namespace fem
 
 #endif // FEM_FE_MATRIX_H_
