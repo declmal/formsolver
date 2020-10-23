@@ -78,6 +78,9 @@ template void inv_33(
 
 template <typename T>
 void mattile_diag_33(const T* const a, T* const tile) {
+  for (unsigned int i = 0; i < 81; ++i) {
+    tile[i] = (T)0;
+  }
   tile[0] = tile[30] = tile[60] = a[0];
   tile[1] = tile[31] = tile[61] = a[1];
   tile[2] = tile[32] = tile[62] = a[2];

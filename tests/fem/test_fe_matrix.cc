@@ -74,16 +74,17 @@ void test_matmul_n333_dp_cpu(bool layout=false, double tol=1e-6) {
     LOG(INFO) << "matrix d layout";
     print_mat_dp(d, N, 3);
   }
-  if (validate_dp(c, d, nEntryC, tol)) {
-    LOG(INFO) << "test_matmul_n333_dp_cpu succeed";
-  } else {
-    LOG(WARNING) << "test_matmul_n333_dp_cpu failed";
-  }
+  bool flag = validate_dp(c, d, nEntryC, tol);
   // free
   free(a);
   free(b);
   free(c);
   free(d);
+  if (flag) {
+    LOG(INFO) << "test_matmul_n333_dp_cpu succeed";
+  } else {
+    LOG(FATAL) << "test_matmul_n333_dp_cpu failed";
+  }
 }
 
 void test_matmul_3nn3_dp_cpu(bool layout=false, double tol=1e-6) {
@@ -122,16 +123,17 @@ void test_matmul_3nn3_dp_cpu(bool layout=false, double tol=1e-6) {
     LOG(INFO) << "matrix d layout";
     print_mat_dp(d, 3, 3);
   }
-  if (validate_dp(c, d, nEntryC, tol)) {
-    LOG(INFO) << "test_matmul_3nn3_dp_cpu succeed";
-  } else {
-    LOG(WARNING) << "test_matmul_3nn3_dp_cpu failed";
-  }
+  bool flag = validate_dp(c, d, nEntryC, tol);
   // free
   free(a);
   free(b);
   free(c);
   free(d);
+  if (flag) {
+    LOG(INFO) << "test_matmul_3nn3_dp_cpu succeed";
+  } else {
+    LOG(FATAL) << "test_matmul_3nn3_dp_cpu failed";
+  }
 }
 
 void test_inv_33_dp_cpu(bool layout=false, double tol=1e-6) {
@@ -155,13 +157,15 @@ void test_inv_33_dp_cpu(bool layout=false, double tol=1e-6) {
   unsigned int nEntryUnit = 3 * 3;
   unsigned int nBytesUnit = nEntryUnit * sizeof(double);
   auto unit = (double*)malloc(nBytesUnit);
-  init_unit<double>(unit, 3);
+  init_diag_unit<double>(unit, 3);
   // execute
   fem::det_33(a, det);
   if (abs(det[0]) < 1e-6) {
     free(a);
     free(det);
     free(inv);
+    free(mul);
+    free(unit);
     LOG(FATAL) << "singular matrix encountered, det: " << det[0];
   }
   fem::inv_33(a, det, inv);
@@ -179,40 +183,94 @@ void test_inv_33_dp_cpu(bool layout=false, double tol=1e-6) {
     LOG(INFO) << "matrix mul layout";
     print_mat_dp(mul, 3, 3);
   }
-  if (validate_dp(mul, unit, 9, tol)) {
-    LOG(INFO) << "test_inv_33_dp_cpu succeed";
-  } else {
-    LOG(WARNING) << "test_inv_33_dp_cpu failed";
-  }
+  bool flag = validate_dp(mul, unit, 9, tol);
   // free
   free(a);
   free(det);
   free(inv);
   free(mul);
   free(unit);
+  if (flag) {
+    LOG(INFO) << "test_inv_33_dp_cpu succeed";
+  } else {
+    LOG(FATAL) << "test_inv_33_dp_cpu failed";
+  }
 }
 
-void test_mattile_diag_33_dp_cpu() {
+void test_mattile_diag_33_dp_cpu(bool layout=false, double tol=1e-6) {
   // init a
   unsigned int nEntryA = 3 * 3;
   unsigned int nBytesA = nEntryA * sizeof(double);
   auto a = (double*)malloc(nBytesA);
   init_rand<double>(a, nEntryA);
-  LOG(INFO) << "matrix a layout";
-  print_mat_dp(a, 3, 3);
   // init tile
   unsigned int nEntryTile = 9 * 9;
   unsigned int nBytesTile = nEntryTile * sizeof(double);
   auto tile = (double*)malloc(nBytesTile);
+  // init I matrices
+  auto I0 = (double*)malloc(27*sizeof(double));
+  I0[0] = I0[10] = I0[20] = 1.0;
+  auto I1 = (double*)malloc(27*sizeof(double));
+  I1[3] = I1[13] = I1[23] = 1.0;
+  auto I2 = (double*)malloc(27*sizeof(double));
+  I2[6] = I2[16] = I2[26] = 1.0;
+  // init tmps
+  auto tmp = (double*)malloc(27*sizeof(double));
+  auto mul0 = (double*)malloc(81*sizeof(double));
+  auto mul1 = (double*)malloc(81*sizeof(double));
+  auto mul2 = (double*)malloc(81*sizeof(double));
+  // init add
+  auto add0 = (double*)malloc(81*sizeof(double));
+  auto add1 = (double*)malloc(81*sizeof(double));
   // execute
   fem::mattile_diag_33(a, tile);
-  LOG(INFO) << "matrix tile layout";
-  print_mat_dp(tile, 9, 9);
-  // free a
+  // validate
+  cblas_dgemm(
+    CblasRowMajor, CblasTrans, CblasNoTrans,
+    9, 3, 3, 1.0, I0, 9, a, 3, 0.0, tmp, 3);
+  cblas_dgemm(
+    CblasRowMajor, CblasNoTrans, CblasNoTrans,
+    9, 9, 3, 1.0, tmp, 3, I0, 9, 0.0, mul0, 9);
+  cblas_dgemm(
+    CblasRowMajor, CblasTrans, CblasNoTrans,
+    9, 3, 3, 1.0, I1, 9, a, 3, 0.0, tmp, 3);
+  cblas_dgemm(
+    CblasRowMajor, CblasNoTrans, CblasNoTrans,
+    9, 9, 3, 1.0, tmp, 3, I1, 9, 0.0, mul1, 9);
+  cblas_dgemm(
+    CblasRowMajor, CblasTrans, CblasNoTrans,
+    9, 3, 3, 1.0, I2, 9, a, 3, 0.0, tmp, 3);
+  cblas_dgemm(
+    CblasRowMajor, CblasNoTrans, CblasNoTrans,
+    9, 9, 3, 1.0, tmp, 3, I2, 9, 0.0, mul2, 9);
+  matadd<double>(mul0, mul1, 81, add0);
+  matadd<double>(add0, mul2, 81, add1);
+  if (layout) {
+    LOG(INFO) << "matrix a layout";
+    print_mat_dp(a, 3, 3);
+    LOG(INFO) << "matrix tile layout";
+    print_mat_dp(tile, 9, 9);
+    LOG(INFO) << "matrix add1 layout";
+    print_mat_dp(add1, 9, 9);
+  }
+  bool flag = validate_dp(tile, add1, 81, tol);
+  // free
   free(a);
-  // free tile
   free(tile);
-  LOG(INFO) << "test_mattile_diag33_dp_cpu succeed";
+  free(I0);
+  free(I1);
+  free(I2);
+  free(tmp);
+  free(mul0);
+  free(mul1);
+  free(mul2);
+  free(add0);
+  free(add1);
+  if (flag) {
+    LOG(INFO) << "test_mattile_diag33_dp_cpu succeed";
+  } else {
+    LOG(FATAL) << "test_mattile_diag33_dp_cpu failed";
+  }
 }
 
 void test_matmul2_3n6_66_63n_dp_cpu(bool layout=false, double tol=1e-6) {
@@ -263,11 +321,7 @@ void test_matmul2_3n6_66_63n_dp_cpu(bool layout=false, double tol=1e-6) {
     LOG(INFO) << "matrix e layout";
     print_mat_dp(e, _3N, _3N);
   }
-  if (validate_dp(c, e, _3N*_3N, tol)) {
-    LOG(INFO) << "test_matmul2_3n6_66_63n succeed";
-  } else {
-    LOG(WARNING) << "test_matmul2_3n6_66_63n failed";
-  }
+  bool flag = validate_dp(c, e, _3N*_3N, tol);
   // free
   free(a);
   free(b);
@@ -275,6 +329,11 @@ void test_matmul2_3n6_66_63n_dp_cpu(bool layout=false, double tol=1e-6) {
   free(c);
   free(d);
   free(e);
+  if (flag) {
+    LOG(INFO) << "test_matmul2_3n6_66_63n succeed";
+  } else {
+    LOG(FATAL) << "test_matmul2_3n6_66_63n failed";
+  }
 }
 
 int main(int argc, char* argv[]) {
@@ -286,7 +345,7 @@ int main(int argc, char* argv[]) {
   test_matmul_n333_dp_cpu();
   test_matmul_3nn3_dp_cpu();
   test_inv_33_dp_cpu();
-  // test_mattile_diag_33_dp_cpu();
+  test_mattile_diag_33_dp_cpu();
   test_matmul2_3n6_66_63n_dp_cpu();
   return 0;
 }

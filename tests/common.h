@@ -21,13 +21,20 @@ void init_arange(T* const data, const unsigned int size) {
 }
 
 template <typename T>
-void init_unit(T* const data, const unsigned int ndim) {
+void init_diag_unit(T* const data, const unsigned int ndim) {
   auto d_ = data;
   for (unsigned int i = 0; i < ndim; ++i) {
     for (unsigned int j = 0; j < ndim; ++j) {
       d_[j] = (T)(i==j ? 1 : 0);
     }
     d_ += ndim;
+  }
+}
+
+template <typename T>
+void init_zero(T* const data, const unsigned int size) {
+  for (unsigned int i = 0; i < size; ++i) {
+    data[i] = (T)0;
   }
 }
 
@@ -54,6 +61,14 @@ bool validate_dp(
     }
   }
   return true;
+}
+
+template <typename T>
+void matadd(
+  const T* const a, const T* const b, const unsigned int size, T* const c) {
+  for (unsigned int i = 0; i < size; ++i) {
+    c[i] = a[i] + b[i];
+  }
 }
 
 #endif // TESTS_COMMON_H_
