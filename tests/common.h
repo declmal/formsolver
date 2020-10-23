@@ -5,7 +5,7 @@
 #include <stdio.h>
 
 template <typename T>
-void init_rand_data(T* const data, const unsigned int size) {
+void rand_init(T* const data, const unsigned int size) {
   for (unsigned int i = 0; i < size; ++i) {
     data[i] = (T)(rand() & 0xFF) / 10.0;
   }
