@@ -209,10 +209,13 @@ void test_mattile_diag_33_dp_cpu(bool layout=false, double tol=1e-6) {
   auto tile = (double*)malloc(nBytesTile);
   // init I matrices
   auto I0 = (double*)malloc(27*sizeof(double));
+  init_zero<double>(I0, 27);
   I0[0] = I0[10] = I0[20] = 1.0;
   auto I1 = (double*)malloc(27*sizeof(double));
+  init_zero<double>(I1, 27);
   I1[3] = I1[13] = I1[23] = 1.0;
   auto I2 = (double*)malloc(27*sizeof(double));
+  init_zero<double>(I2, 27);
   I2[6] = I2[16] = I2[26] = 1.0;
   // init tmps
   auto tmp = (double*)malloc(27*sizeof(double));
