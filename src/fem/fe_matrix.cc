@@ -69,7 +69,7 @@ void inv_33(const T* const a, const T* const det, T* const inv) {
   inv[6] = a[3]*a[7] - a[4]*a[6];
   inv[7] = a[1]*a[6] - a[0]*a[7];
   inv[8] = a[0]*a[4] - a[1]*a[3];
-  for (unsigned int i = 0; i < 8; ++i) {
+  for (unsigned int i = 0; i < 9; ++i) {
     inv[i] /= det[0];
   }
 }

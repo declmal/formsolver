@@ -12,8 +12,6 @@ include_directories("../include")
 find_package(glog REQUIRED)
 find_package(BLAS REQUIRED)
 message("find BLAS libraries: " ${BLAS_LIBRARIES})
-find_package(LAPACK REQUIRED)
-message("find LAPACK libraries: " ${LAPACK_LIBRARIES})
 
 # locate libform
 find_file(LIB_FORM_PATH NAMES libform.so libform.dylib PATHS ../lib)

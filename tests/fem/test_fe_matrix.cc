@@ -1,6 +1,5 @@
 #include <math.h>
 #include <cblas.h>
-#include <lapack.h>
 #include <glog/logging.h>
 #include <fem/fe_matrix.h>
 #include "../common.h"
@@ -37,20 +36,6 @@ void test_matmul_cblas(bool layout=true) {
   free(a);
   free(b);
   free(c);
-}
-
-void test_inv_cblas(bool layout=true) {
-  // init a
-  auto a = (double*)malloc(9*sizeof(double));
-  init_arange<double>(a, 9);
-  // execute
-  if (layout) {
-    LOG(INFO) << "matrix a layout";
-    print_mat_dp(a, 3, 3);
-  }
-  
-  // free
-  free(a);
 }
 
 void test_matmul_n333_dp_cpu(bool layout=false, double tol=1e-6) {
@@ -137,7 +122,7 @@ void test_matmul_3nn3_dp_cpu(bool layout=false, double tol=1e-6) {
     LOG(INFO) << "matrix d layout";
     print_mat_dp(d, 3, 3);
   }
-  if (validate_dp(c, d, nEntryC)) {
+  if (validate_dp(c, d, nEntryC, tol)) {
     LOG(INFO) << "test_matmul_3nn3_dp_cpu succeed";
   } else {
     LOG(WARNING) << "test_matmul_3nn3_dp_cpu failed";
@@ -162,6 +147,15 @@ void test_inv_33_dp_cpu(bool layout=false, double tol=1e-6) {
   unsigned int nEntryInv = 3 * 3;
   unsigned int nBytesInv = nEntryInv * sizeof(double);
   auto inv = (double*)malloc(nBytesInv);
+  // init mul
+  unsigned int nEntryMul = 3 * 3;
+  unsigned int nBytesMul = nEntryMul * sizeof(double);
+  auto mul = (double*)malloc(nBytesMul);
+  // init unit
+  unsigned int nEntryUnit = 3 * 3;
+  unsigned int nBytesUnit = nEntryUnit * sizeof(double);
+  auto unit = (double*)malloc(nBytesUnit);
+  init_unit<double>(unit, 3);
   // execute
   fem::det_33(a, det);
   if (abs(det[0]) < 1e-6) {
@@ -172,6 +166,9 @@ void test_inv_33_dp_cpu(bool layout=false, double tol=1e-6) {
   }
   fem::inv_33(a, det, inv);
   // validate
+  cblas_dgemm(
+    CblasRowMajor, CblasNoTrans, CblasNoTrans,
+    3, 3, 3, 1.0, a, 3, inv, 3, 0.0, mul, 3);
   if (layout) {
     LOG(INFO) << "matrix a layout";
     print_mat_dp(a, 3, 3);
@@ -179,12 +176,20 @@ void test_inv_33_dp_cpu(bool layout=false, double tol=1e-6) {
     print_mat_dp(det, 1, 1);
     LOG(INFO) << "matrix inv layout";
     print_mat_dp(inv, 3, 3);
+    LOG(INFO) << "matrix mul layout";
+    print_mat_dp(mul, 3, 3);
+  }
+  if (validate_dp(mul, unit, 9, tol)) {
+    LOG(INFO) << "test_inv_33_dp_cpu succeed";
+  } else {
+    LOG(WARNING) << "test_inv_33_dp_cpu failed";
   }
   // free
   free(a);
   free(det);
   free(inv);
-  LOG(INFO) << "test_inv_33_cpu_succeed";
+  free(mul);
+  free(unit);
 }
 
 void test_mattile_diag_33_dp_cpu() {
@@ -258,7 +263,7 @@ void test_matmul2_3n6_66_63n_dp_cpu(bool layout=false, double tol=1e-6) {
     LOG(INFO) << "matrix e layout";
     print_mat_dp(e, _3N, _3N);
   }
-  if (validate_dp(c, e, _3N*_3N)) {
+  if (validate_dp(c, e, _3N*_3N, tol)) {
     LOG(INFO) << "test_matmul2_3n6_66_63n succeed";
   } else {
     LOG(WARNING) << "test_matmul2_3n6_66_63n failed";
@@ -280,7 +285,7 @@ int main(int argc, char* argv[]) {
   // test_matmul_cblas();
   test_matmul_n333_dp_cpu();
   test_matmul_3nn3_dp_cpu();
-  // test_inv_33_dp_cpu();
+  test_inv_33_dp_cpu();
   // test_mattile_diag_33_dp_cpu();
   test_matmul2_3n6_66_63n_dp_cpu();
   return 0;
