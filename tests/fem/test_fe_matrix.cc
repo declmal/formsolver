@@ -1,5 +1,6 @@
 #include <math.h>
-#include <cblas-openblas.h>
+#include <cblas.h>
+#include <lapack.h>
 #include <glog/logging.h>
 #include <fem/fe_matrix.h>
 #include "../common.h"
@@ -47,6 +48,7 @@ void test_inv_cblas(bool layout=true) {
     LOG(INFO) << "matrix a layout";
     print_mat_dp(a, 3, 3);
   }
+  
   // free
   free(a);
 }
