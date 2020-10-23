@@ -1,3 +1,6 @@
 build
 bin
 lib
+
+tests/config.cmake
+config.cmake
