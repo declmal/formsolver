@@ -86,4 +86,40 @@ void mattile_diag_33(const T* const a, T* const tile) {
   tile[20] = tile[50] = tile[80] = a[8];
 }
 template void mattile_diag_33(const double* const a, double* const tile);
+
+template <typename T>
+void matmul2_3n6_66_63n(
+  const T* const a, const T* const b, const unsigned int N,
+  T* const buffer, T* const c) {
+  auto _3N = 3 * N;
+  auto a0 = a;
+  auto a1 = a0 + _3N;
+  auto a2 = a1 + _3N;
+  auto a3 = a2 + _3N;
+  auto a4 = a3 + _3N;
+  auto a5 = a4 + _3N;
+  auto c_ = c;
+  for (unsigned int i = 0; i < _3N; ++i) {
+    buffer[0] = a0[i]*b[0] + a1[i]*b[6] + a2[i]*b[12] +
+                a3[i]*b[18] + a4[i]*b[24] + a5[i]*b[30];
+    buffer[1] = a0[i]*b[1] + a1[i]*b[7] + a2[i]*b[13] +
+                a3[i]*b[19] + a4[i]*b[25] + a5[i]*b[31];
+    buffer[2] = a0[i]*b[2] + a1[i]*b[8] + a2[i]*b[14] +
+                a3[i]*b[20] + a4[i]*b[26] + a5[i]*b[32];
+    buffer[3] = a0[i]*b[3] + a1[i]*b[9] + a2[i]*b[15] +
+                a3[i]*b[21] + a4[i]*b[27] + a5[i]*b[33];
+    buffer[4] = a0[i]*b[4] + a1[i]*b[10] + a2[i]*b[16] +
+                a3[i]*b[22] + a4[i]*b[28] + a5[i]*b[34];
+    buffer[5] = a0[i]*b[5] + a1[i]*b[11] + a2[i]*b[17] +
+                a3[i]*b[23] + a4[i]*b[29] + a5[i]*b[35];
+    for (unsigned int j = 0; j < _3N; ++j) {
+      c_[j] = buffer[0]*a0[j] + buffer[1]*a1[j] + buffer[2]*a2[j] +
+              buffer[3]*a3[j] + buffer[4]*a4[j] + buffer[5]*a5[j];
+    }
+    c_ += _3N;
+  }
+}
+template void matmul2_3n6_66_63n(
+  const double* const a, const double* const b, const unsigned int N, 
+  double* const buffer, double* const c);
 } // namespace fem

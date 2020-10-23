@@ -129,6 +129,46 @@ void test_mattile_diag_33_dp_cpu() {
   LOG(INFO) << "test_mattile_diag33_dp_cpu succeed";
 }
 
+void test_matmul2_3n6_66_63n_dp_cpu() {
+  // init a
+  unsigned int N = 8;
+  unsigned int _3N = 3 * N;
+  unsigned int nEntryA = 6 * _3N;
+  unsigned int nBytesA = nEntryA * sizeof(double);
+  auto a = (double*)malloc(nBytesA);
+  rand_init<double>(a, nEntryA);
+  LOG(INFO) << "matrix a layout";
+  print_mat<double>(a, 6, _3N);
+  // init b
+  unsigned int nEntryB = 6 * 6;
+  unsigned int nBytesB = nEntryB * sizeof(double);
+  auto b = (double*)malloc(nBytesB);
+  rand_init<double>(b, nEntryB);
+  LOG(INFO) << "matrix b layout";
+  print_mat<double>(b, 6, 6);
+  // init buffer
+  unsigned int nEntryBuffer = 6;
+  unsigned int nBytesBuffer = nEntryBuffer * sizeof(double);
+  auto buffer = (double*)malloc(nBytesBuffer);
+  // init c
+  unsigned int nEntryC = _3N * _3N;
+  unsigned int nBytesC = nEntryC * sizeof(double);
+  auto c = (double*)malloc(nBytesC);
+  // execute
+  fem::matmul2_3n6_66_63n(a, b, N, buffer, c);
+  LOG(INFO) << "matrix c layout";
+  print_mat<double>(c, _3N, _3N);
+  // free a
+  free(a);
+  // free b
+  free(b);
+  // free buffer
+  free(buffer);
+  // free c
+  free(c);
+  LOG(INFO) << "test_matmul2_3n6_66_63n succeed";
+}
+
 int main(int argc, char* argv[]) {
   // log init
   google::InitGoogleLogging(argv[0]);
@@ -138,5 +178,6 @@ int main(int argc, char* argv[]) {
   test_matmul_3nn3_dp_cpu();
   test_inv_33_dp_cpu();
   test_mattile_diag_33_dp_cpu();
+  test_matmul2_3n6_66_63n_dp_cpu();
   return 0;
 }
