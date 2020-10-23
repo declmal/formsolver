@@ -10,6 +10,8 @@ include_directories("../include")
 
 # find extern packages
 find_package(glog REQUIRED)
+find_package(BLAS REQUIRED)
+message("find BLAS libraries: " ${BLAS_LIBRARIES})
 
 # locate libform
 find_file(LIB_FORM_PATH NAMES libform.so libform.dylib PATHS ../lib)
@@ -21,5 +23,8 @@ foreach (SRC_FILE ${SRCS_FORM_TEST})
   get_filename_component(EXE_FILE ${SRC_FILE} NAME_WE)
   message("compling test case: " ${SRC_FILE} " to executive: " ${EXE_FILE})
   add_executable(${EXE_FILE} ${SRC_FILE})
-  target_link_libraries(${EXE_FILE} PRIVATE ${LIB_FORM} PRIVATE glog::glog)
+  target_link_libraries(${EXE_FILE} 
+                        PRIVATE ${LIB_FORM} 
+                        PRIVATE glog::glog
+                        PRIVATE ${BLAS_LIBRARIES})
 endforeach()

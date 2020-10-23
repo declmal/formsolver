@@ -6,9 +6,12 @@ template <typename T>
 void matmul_3nn3(
   const T* const a, const T* const b, const unsigned int N, T* const c) {
   auto a0_ = a;
-  auto b_ = b;
   auto a1_ = a0_ + N;
   auto a2_ = a1_ + N;
+  auto b_ = b;
+  for (unsigned int k = 0; k < 9; ++k) {
+    c[k] = 0; 
+  }
   for (unsigned int k = 0; k < N; ++k) {
     c[0] += a0_[0] * b_[0];
     c[1] += a0_[0] * b_[1];

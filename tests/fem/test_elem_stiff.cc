@@ -8,16 +8,16 @@ void test_lin_trans_mat_tl_dp_cpu() {
   unsigned int nEntryH0 = N * 3;
   unsigned int nBytesH0 = nEntryH0 * sizeof(double);
   auto h0 = (double*)malloc(nBytesH0);
-  rand_init<double>(h0, nEntryH0);
+  init_rand<double>(h0, nEntryH0);
   LOG(INFO) << "matrix h0 layout";
-  print_mat<double>(h0, N, 3);
+  print_mat_dp(h0, N, 3);
   // init u0t
   unsigned int nEntryU0t = 3 * 3;
   unsigned int nBytesU0t = nEntryU0t * sizeof(double);
   auto u0t = (double*)malloc(nBytesU0t);
-  rand_init<double>(u0t, nEntryU0t);
+  init_rand<double>(u0t, nEntryU0t);
   LOG(INFO) << "matrix u0t layout";
-  print_mat<double>(u0t, 3, 3);
+  print_mat_dp(u0t, 3, 3);
   // init B0t_L
   unsigned int nEntryB0t_L = 6 * 3 * N;
   unsigned int nBytesB0t_L = nEntryB0t_L * sizeof(double);
@@ -25,7 +25,7 @@ void test_lin_trans_mat_tl_dp_cpu() {
   // execute
   fem::lin_trans_mat_tl(h0, u0t, N, B0t_L);
   LOG(INFO) << "matrix B0t_L layout";
-  print_mat<double>(B0t_L, 6, 3*N);
+  print_mat_dp(B0t_L, 6, 3*N);
   // free h0
   free(h0);
   // free u0t
@@ -41,9 +41,9 @@ void test_nonlin_trans_mat_tl_dp_cpu() {
   unsigned int nEntryH0 = N * 3;
   unsigned int nBytesH0 = nEntryH0 * sizeof(double);
   auto h0 = (double*)malloc(nBytesH0);
-  rand_init<double>(h0, nEntryH0);
+  init_rand<double>(h0, nEntryH0);
   LOG(INFO) << "matrix h0 layout";
-  print_mat<double>(h0, N, 3);
+  print_mat_dp(h0, N, 3);
   // init B0_NL
   unsigned int nEntryB0_NL = 9 * 3 * N;
   unsigned int nBytesB0_NL = nEntryB0_NL * sizeof(double);
@@ -51,7 +51,7 @@ void test_nonlin_trans_mat_tl_dp_cpu() {
   // execute
   fem::nonlin_trans_mat_tl(h0, N, B0_NL);
   LOG(INFO) << "matrix B0t_L layout";
-  print_mat<double>(B0_NL, 9, 3*N);
+  print_mat_dp(B0_NL, 9, 3*N);
   // free h0
   free(h0);
   // free B0_NL
