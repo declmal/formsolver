@@ -2,35 +2,38 @@
 #include <cblas.h>
 #include <glog/logging.h>
 #include <fem/fe_matrix.h>
-#include "../common.h"
+#include "../common/common.h"
 
+template <typename T>
 void test_matmul_cblas(bool layout=true) {
   // init a
   unsigned int ra = 3;
   unsigned int ca = 2;
   unsigned int nEntryA = ra * ca;
-  auto a = (double*)malloc(nEntryA*sizeof(double));
-  init_arange<double>(a, nEntryA);
+  auto a = (T*)malloc(nEntryA*sizeof(T));
+  init_arange<T>(a, nEntryA);
   // init b
   unsigned int rb = 2;
   unsigned int cb = 2;
   unsigned int nEntryB = rb * cb;
-  auto b = (double*)malloc(nEntryB*sizeof(double));
-  init_arange<double>(b, nEntryB);
+  auto b = (T*)malloc(nEntryB*sizeof(T));
+  init_arange<T>(b, nEntryB);
   // init c
   unsigned int rc = ra;
   unsigned int cc = cb;
   unsigned int nEntryC = rc * cc;
-  auto c = (double*)malloc(nEntryC*sizeof(double));
+  auto c = (T*)malloc(nEntryC*sizeof(T));
   // execute
-  cblas_dgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans, rc, cc, ca, 1.0, a, ca, b, cb, 0.0, c, cc);
+  Matmul<T>::impl(
+      CblasRowMajor, CblasNoTrans, CblasNoTrans,
+      rc, cc, ca, (T)1.0, a, ca, b, cb, (T)0.0, c, cc);
   if (layout) {
     LOG(INFO) << "matrix a layout";
-    print_mat_dp(a, ra, ca);
+    print_mat<T>(a, ra, ca);
     LOG(INFO) << "matrix b layout";
-    print_mat_dp(b, rb, cb);
+    print_mat<T>(b, rb, cb);
     LOG(INFO) << "matrix c layout";
-    print_mat_dp(c, rc, cc);
+    print_mat<T>(c, rc, cc);
   }
   // free
   free(a);
@@ -38,126 +41,129 @@ void test_matmul_cblas(bool layout=true) {
   free(c);
 }
 
-void test_matmul_n333_dp_cpu(bool layout=false, double tol=1e-6) {
+template <typename T>
+void test_matmul_n333_cpu(bool layout=false, double tol=1e-6) {
   // init a
   unsigned int N = 8;
   unsigned int nEntryA = N * 3;
-  unsigned int nBytesA = nEntryA * sizeof(double);
-  auto a = (double*)malloc(nBytesA);
-  init_rand<double>(a, nEntryA);
+  unsigned int nBytesA = nEntryA * sizeof(T);
+  auto a = (T*)malloc(nBytesA);
+  init_rand<T>(a, nEntryA);
   // init b
   unsigned int nEntryB = 3 * 3;
-  unsigned int nBytesB = nEntryB * sizeof(double);
-  auto b = (double*)malloc(nBytesB);
-  init_rand<double>(b, nEntryB);
+  unsigned int nBytesB = nEntryB * sizeof(T);
+  auto b = (T*)malloc(nBytesB);
+  init_rand<T>(b, nEntryB);
   // init c
   unsigned int nEntryC = N * 3;
-  unsigned int nBytesC = nEntryC * sizeof(double);
-  auto c = (double*)malloc(nBytesC);
+  unsigned int nBytesC = nEntryC * sizeof(T);
+  auto c = (T*)malloc(nBytesC);
   // init d
   unsigned int nEntryD = N * 3;
-  unsigned int nBytesD = nEntryD * sizeof(double);
-  auto d = (double*)malloc(nBytesD);
+  unsigned int nBytesD = nEntryD * sizeof(T);
+  auto d = (T*)malloc(nBytesD);
   // execute
-  fem::matmul_n333<double>(a, b, N, c);
+  fem::matmul_n333<T>(a, b, N, c);
   // validate
-  cblas_dgemm(
+  Matmul<T>::impl(
     CblasRowMajor, CblasNoTrans, CblasNoTrans,
-    N, 3, 3, 1.0, a, 3, b, 3, 0.0, d, 3);
+    N, 3, 3, (T)1.0, a, 3, b, 3, (T)0.0, d, 3);
   if (layout) {
     LOG(INFO) << "matrix a layout";
-    print_mat_dp(a, N, 3);
+    print_mat<T>(a, N, 3);
     LOG(INFO) << "matrix b layout";
-    print_mat_dp(b, 3, 3);
+    print_mat<T>(b, 3, 3);
     LOG(INFO) << "matrix c layout";
-    print_mat_dp(c, N, 3);
+    print_mat<T>(c, N, 3);
     LOG(INFO) << "matrix d layout";
-    print_mat_dp(d, N, 3);
+    print_mat<T>(d, N, 3);
   }
-  bool flag = validate_dp(c, d, nEntryC, tol);
+  bool flag = validate<T>(c, d, nEntryC, tol);
   // free
   free(a);
   free(b);
   free(c);
   free(d);
   if (flag) {
-    LOG(INFO) << "test_matmul_n333_dp_cpu succeed";
+    LOG(INFO) << "test_matmul_n333_cpu succeed";
   } else {
-    LOG(FATAL) << "test_matmul_n333_dp_cpu failed";
+    LOG(FATAL) << "test_matmul_n333_cpu failed";
   }
 }
 
-void test_matmul_3nn3_dp_cpu(bool layout=false, double tol=1e-6) {
+template <typename T>
+void test_matmul_3nn3_cpu(bool layout=false, double tol=1e-6) {
   // init a
   unsigned int N = 8;
   unsigned int nEntryA = 3 * N;
-  unsigned int nBytesA = nEntryA * sizeof(double);
-  auto a = (double*)malloc(nBytesA);
-  init_rand<double>(a, nEntryA);
+  unsigned int nBytesA = nEntryA * sizeof(T);
+  auto a = (T*)malloc(nBytesA);
+  init_rand<T>(a, nEntryA);
   // init b
   unsigned int nEntryB = N * 3;
-  unsigned int nBytesB = nEntryB * sizeof(double);
-  auto b = (double*)malloc(nBytesB);
-  init_rand<double>(b, nEntryB);
+  unsigned int nBytesB = nEntryB * sizeof(T);
+  auto b = (T*)malloc(nBytesB);
+  init_rand<T>(b, nEntryB);
   // init c
   unsigned int nEntryC = 3 * 3;
-  unsigned int nBytesC = nEntryC * sizeof(double);
-  auto c = (double*)malloc(nBytesC);
+  unsigned int nBytesC = nEntryC * sizeof(T);
+  auto c = (T*)malloc(nBytesC);
   // init d
   unsigned int nEntryD = 3 * 3;
-  unsigned int nBytesD = nEntryD * sizeof(double);
-  auto d = (double*)malloc(nBytesD);
+  unsigned int nBytesD = nEntryD * sizeof(T);
+  auto d = (T*)malloc(nBytesD);
   // execute
-  fem::matmul_3nn3<double>(a, b, N, c);
+  fem::matmul_3nn3<T>(a, b, N, c);
   // validate
-  cblas_dgemm(
+  Matmul<T>::impl(
     CblasRowMajor, CblasNoTrans, CblasNoTrans,
-    3, 3, N, 1.0, a, N, b, 3, 0.0, d, 3);
+    3, 3, N, (T)1.0, a, N, b, 3, (T)0.0, d, 3);
   if (layout) {
     LOG(INFO) << "matrix a layout";
-    print_mat_dp(a, 3, N);
+    print_mat<T>(a, 3, N);
     LOG(INFO) << "matrix b layout";
-    print_mat_dp(b, N, 3);
+    print_mat<T>(b, N, 3);
     LOG(INFO) << "matrix c layout";
-    print_mat_dp(c, 3, 3);
+    print_mat<T>(c, 3, 3);
     LOG(INFO) << "matrix d layout";
-    print_mat_dp(d, 3, 3);
+    print_mat<T>(d, 3, 3);
   }
-  bool flag = validate_dp(c, d, nEntryC, tol);
+  bool flag = validate<T>(c, d, nEntryC, tol);
   // free
   free(a);
   free(b);
   free(c);
   free(d);
   if (flag) {
-    LOG(INFO) << "test_matmul_3nn3_dp_cpu succeed";
+    LOG(INFO) << "test_matmul_3nn3_cpu succeed";
   } else {
-    LOG(FATAL) << "test_matmul_3nn3_dp_cpu failed";
+    LOG(FATAL) << "test_matmul_3nn3_cpu failed";
   }
 }
 
-void test_inv_33_dp_cpu(bool layout=false, double tol=1e-6) {
+template <typename T>
+void test_inv_33_cpu(bool layout=false, double tol=1e-6) {
   // init a
   unsigned int nEntryA = 3 * 3;
-  unsigned int nBytesA = nEntryA * sizeof(double);
-  auto a = (double*)malloc(nBytesA);
-  init_rand<double>(a, nEntryA);
+  unsigned int nBytesA = nEntryA * sizeof(T);
+  auto a = (T*)malloc(nBytesA);
+  init_rand<T>(a, nEntryA);
   // init det
-  unsigned int nBytesDet = 1 * sizeof(double);
-  auto det = (double*)malloc(nBytesDet);
+  unsigned int nBytesDet = 1 * sizeof(T);
+  auto det = (T*)malloc(nBytesDet);
   // init inv
   unsigned int nEntryInv = 3 * 3;
-  unsigned int nBytesInv = nEntryInv * sizeof(double);
-  auto inv = (double*)malloc(nBytesInv);
+  unsigned int nBytesInv = nEntryInv * sizeof(T);
+  auto inv = (T*)malloc(nBytesInv);
   // init mul
   unsigned int nEntryMul = 3 * 3;
-  unsigned int nBytesMul = nEntryMul * sizeof(double);
-  auto mul = (double*)malloc(nBytesMul);
+  unsigned int nBytesMul = nEntryMul * sizeof(T);
+  auto mul = (T*)malloc(nBytesMul);
   // init unit
   unsigned int nEntryUnit = 3 * 3;
-  unsigned int nBytesUnit = nEntryUnit * sizeof(double);
-  auto unit = (double*)malloc(nBytesUnit);
-  init_diag_unit<double>(unit, 3);
+  unsigned int nBytesUnit = nEntryUnit * sizeof(T);
+  auto unit = (T*)malloc(nBytesUnit);
+  init_diag_unit<T>(unit, 3);
   // execute
   fem::det_33(a, det);
   if (abs(det[0]) < 1e-6) {
@@ -170,20 +176,20 @@ void test_inv_33_dp_cpu(bool layout=false, double tol=1e-6) {
   }
   fem::inv_33(a, det, inv);
   // validate
-  cblas_dgemm(
+  Matmul<T>::impl(
     CblasRowMajor, CblasNoTrans, CblasNoTrans,
-    3, 3, 3, 1.0, a, 3, inv, 3, 0.0, mul, 3);
+    3, 3, 3, (T)1.0, a, 3, inv, 3, (T)0.0, mul, 3);
   if (layout) {
     LOG(INFO) << "matrix a layout";
-    print_mat_dp(a, 3, 3);
+    print_mat<T>(a, 3, 3);
     LOG(INFO) << "matrix det layout";
-    print_mat_dp(det, 1, 1);
+    print_mat<T>(det, 1, 1);
     LOG(INFO) << "matrix inv layout";
-    print_mat_dp(inv, 3, 3);
+    print_mat<T>(inv, 3, 3);
     LOG(INFO) << "matrix mul layout";
-    print_mat_dp(mul, 3, 3);
+    print_mat<T>(mul, 3, 3);
   }
-  bool flag = validate_dp(mul, unit, 9, tol);
+  bool flag = validate<T>(mul, unit, 9, tol);
   // free
   free(a);
   free(det);
@@ -191,72 +197,73 @@ void test_inv_33_dp_cpu(bool layout=false, double tol=1e-6) {
   free(mul);
   free(unit);
   if (flag) {
-    LOG(INFO) << "test_inv_33_dp_cpu succeed";
+    LOG(INFO) << "test_inv_33_cpu succeed";
   } else {
-    LOG(FATAL) << "test_inv_33_dp_cpu failed";
+    LOG(FATAL) << "test_inv_33_cpu failed";
   }
 }
 
-void test_mattile_diag_33_dp_cpu(bool layout=false, double tol=1e-6) {
+template <typename T>
+void test_mattile_diag_33_cpu(bool layout=false, double tol=1e-6) {
   // init a
   unsigned int nEntryA = 3 * 3;
-  unsigned int nBytesA = nEntryA * sizeof(double);
-  auto a = (double*)malloc(nBytesA);
-  init_rand<double>(a, nEntryA);
+  unsigned int nBytesA = nEntryA * sizeof(T);
+  auto a = (T*)malloc(nBytesA);
+  init_rand<T>(a, nEntryA);
   // init tile
   unsigned int nEntryTile = 9 * 9;
-  unsigned int nBytesTile = nEntryTile * sizeof(double);
-  auto tile = (double*)malloc(nBytesTile);
+  unsigned int nBytesTile = nEntryTile * sizeof(T);
+  auto tile = (T*)malloc(nBytesTile);
   // init I matrices
-  auto I0 = (double*)malloc(27*sizeof(double));
-  init_zero<double>(I0, 27);
+  auto I0 = (T*)malloc(27*sizeof(T));
+  init_zero<T>(I0, 27);
   I0[0] = I0[10] = I0[20] = 1.0;
-  auto I1 = (double*)malloc(27*sizeof(double));
-  init_zero<double>(I1, 27);
+  auto I1 = (T*)malloc(27*sizeof(T));
+  init_zero<T>(I1, 27);
   I1[3] = I1[13] = I1[23] = 1.0;
-  auto I2 = (double*)malloc(27*sizeof(double));
-  init_zero<double>(I2, 27);
+  auto I2 = (T*)malloc(27*sizeof(T));
+  init_zero<T>(I2, 27);
   I2[6] = I2[16] = I2[26] = 1.0;
   // init tmps
-  auto tmp = (double*)malloc(27*sizeof(double));
-  auto mul0 = (double*)malloc(81*sizeof(double));
-  auto mul1 = (double*)malloc(81*sizeof(double));
-  auto mul2 = (double*)malloc(81*sizeof(double));
+  auto tmp = (T*)malloc(27*sizeof(T));
+  auto mul0 = (T*)malloc(81*sizeof(T));
+  auto mul1 = (T*)malloc(81*sizeof(T));
+  auto mul2 = (T*)malloc(81*sizeof(T));
   // init add
-  auto add0 = (double*)malloc(81*sizeof(double));
-  auto add1 = (double*)malloc(81*sizeof(double));
+  auto add0 = (T*)malloc(81*sizeof(T));
+  auto add1 = (T*)malloc(81*sizeof(T));
   // execute
-  fem::mattile_diag_33(a, tile);
+  fem::mattile_diag_33<T>(a, tile);
   // validate
-  cblas_dgemm(
+  Matmul<T>::impl(
     CblasRowMajor, CblasTrans, CblasNoTrans,
-    9, 3, 3, 1.0, I0, 9, a, 3, 0.0, tmp, 3);
-  cblas_dgemm(
+    9, 3, 3, (T)1.0, I0, 9, a, 3, (T)0.0, tmp, 3);
+  Matmul<T>::impl(
     CblasRowMajor, CblasNoTrans, CblasNoTrans,
-    9, 9, 3, 1.0, tmp, 3, I0, 9, 0.0, mul0, 9);
-  cblas_dgemm(
+    9, 9, 3, (T)1.0, tmp, 3, I0, 9, (T)0.0, mul0, 9);
+  Matmul<T>::impl(
     CblasRowMajor, CblasTrans, CblasNoTrans,
-    9, 3, 3, 1.0, I1, 9, a, 3, 0.0, tmp, 3);
-  cblas_dgemm(
+    9, 3, 3, (T)1.0, I1, 9, a, 3, (T)0.0, tmp, 3);
+  Matmul<T>::impl(
     CblasRowMajor, CblasNoTrans, CblasNoTrans,
-    9, 9, 3, 1.0, tmp, 3, I1, 9, 0.0, mul1, 9);
-  cblas_dgemm(
+    9, 9, 3, (T)1.0, tmp, 3, I1, 9, (T)0.0, mul1, 9);
+  Matmul<T>::impl(
     CblasRowMajor, CblasTrans, CblasNoTrans,
-    9, 3, 3, 1.0, I2, 9, a, 3, 0.0, tmp, 3);
-  cblas_dgemm(
+    9, 3, 3, (T)1.0, I2, 9, a, 3, (T)0.0, tmp, 3);
+  Matmul<T>::impl(
     CblasRowMajor, CblasNoTrans, CblasNoTrans,
-    9, 9, 3, 1.0, tmp, 3, I2, 9, 0.0, mul2, 9);
-  matadd<double>(mul0, mul1, 81, add0);
-  matadd<double>(add0, mul2, 81, add1);
+    9, 9, 3, (T)1.0, tmp, 3, I2, 9, (T)0.0, mul2, 9);
+  matadd<T>(mul0, mul1, 81, add0);
+  matadd<T>(add0, mul2, 81, add1);
   if (layout) {
     LOG(INFO) << "matrix a layout";
-    print_mat_dp(a, 3, 3);
+    print_mat<T>(a, 3, 3);
     LOG(INFO) << "matrix tile layout";
-    print_mat_dp(tile, 9, 9);
+    print_mat<T>(tile, 9, 9);
     LOG(INFO) << "matrix add1 layout";
-    print_mat_dp(add1, 9, 9);
+    print_mat<T>(add1, 9, 9);
   }
-  bool flag = validate_dp(tile, add1, 81, tol);
+  bool flag = validate<T>(tile, add1, 81, tol);
   // free
   free(a);
   free(tile);
@@ -270,61 +277,62 @@ void test_mattile_diag_33_dp_cpu(bool layout=false, double tol=1e-6) {
   free(add0);
   free(add1);
   if (flag) {
-    LOG(INFO) << "test_mattile_diag33_dp_cpu succeed";
+    LOG(INFO) << "test_mattile_diag33_cpu succeed";
   } else {
-    LOG(FATAL) << "test_mattile_diag33_dp_cpu failed";
+    LOG(FATAL) << "test_mattile_diag33_cpu failed";
   }
 }
 
-void test_matmul2_3n6_66_63n_dp_cpu(bool layout=false, double tol=1e-6) {
+template <typename T>
+void test_matmul2_3n6_66_63n_cpu(bool layout=false, double tol=1e-6) {
   // init a
   unsigned int N = 8;
   unsigned int _3N = 3 * N;
   unsigned int nEntryA = 6 * _3N;
-  unsigned int nBytesA = nEntryA * sizeof(double);
-  auto a = (double*)malloc(nBytesA);
-  init_rand<double>(a, nEntryA);
+  unsigned int nBytesA = nEntryA * sizeof(T);
+  auto a = (T*)malloc(nBytesA);
+  init_rand<T>(a, nEntryA);
   // init b
   unsigned int nEntryB = 6 * 6;
-  unsigned int nBytesB = nEntryB * sizeof(double);
-  auto b = (double*)malloc(nBytesB);
-  init_rand<double>(b, nEntryB);
+  unsigned int nBytesB = nEntryB * sizeof(T);
+  auto b = (T*)malloc(nBytesB);
+  init_rand<T>(b, nEntryB);
   // init buffer
   unsigned int nEntryBuffer = 6;
-  unsigned int nBytesBuffer = nEntryBuffer * sizeof(double);
-  auto buffer = (double*)malloc(nBytesBuffer);
+  unsigned int nBytesBuffer = nEntryBuffer * sizeof(T);
+  auto buffer = (T*)malloc(nBytesBuffer);
   // init c
   unsigned int nEntryC = _3N * _3N;
-  unsigned int nBytesC = nEntryC * sizeof(double);
-  auto c = (double*)malloc(nBytesC);
+  unsigned int nBytesC = nEntryC * sizeof(T);
+  auto c = (T*)malloc(nBytesC);
   // init d
   unsigned int nEntryD = _3N * 6;
-  unsigned int nBytesD = nEntryD * sizeof(double);
-  auto d = (double*)malloc(nBytesD);
+  unsigned int nBytesD = nEntryD * sizeof(T);
+  auto d = (T*)malloc(nBytesD);
   // init e
   unsigned int nEntryE = _3N * _3N;
-  unsigned int nBytesE = nEntryE * sizeof(double);
-  auto e = (double*)malloc(nBytesE);
+  unsigned int nBytesE = nEntryE * sizeof(T);
+  auto e = (T*)malloc(nBytesE);
   // execute
   fem::matmul2_3n6_66_63n(a, b, N, buffer, c);
   // validate
-  cblas_dgemm(
+  Matmul<T>::impl(
     CblasRowMajor, CblasTrans, CblasNoTrans,
-    _3N, 6, 6, 1.0, a, _3N, b, 6, 0.0, d, 6);
-  cblas_dgemm(
+    _3N, 6, 6, (T)1.0, a, _3N, b, 6, (T)0.0, d, 6);
+  Matmul<T>::impl(
     CblasRowMajor, CblasNoTrans, CblasNoTrans,
-    _3N, _3N, 6, 1.0, d, 6, a, _3N, 0.0, e, _3N);
+    _3N, _3N, 6, (T)1.0, d, 6, a, _3N, (T)0.0, e, _3N);
   if (layout) {
     LOG(INFO) << "matrix a layout";
-    print_mat_dp(a, 6, _3N);
+    print_mat<T>(a, 6, _3N);
     LOG(INFO) << "matrix b layout";
-    print_mat_dp(b, 6, 6);
+    print_mat<T>(b, 6, 6);
     LOG(INFO) << "matrix c layout";
-    print_mat_dp(c, _3N, _3N);
+    print_mat<T>(c, _3N, _3N);
     LOG(INFO) << "matrix e layout";
-    print_mat_dp(e, _3N, _3N);
+    print_mat<T>(e, _3N, _3N);
   }
-  bool flag = validate_dp(c, e, _3N*_3N, tol);
+  bool flag = validate<T>(c, e, _3N*_3N, tol);
   // free
   free(a);
   free(b);
@@ -333,61 +341,62 @@ void test_matmul2_3n6_66_63n_dp_cpu(bool layout=false, double tol=1e-6) {
   free(d);
   free(e);
   if (flag) {
-    LOG(INFO) << "test_matmul2_3n6_66_63n succeed";
+    LOG(INFO) << "test_matmul2_3n6_66_63n_cpu succeed";
   } else {
-    LOG(FATAL) << "test_matmul2_3n6_66_63n failed";
+    LOG(FATAL) << "test_matmul2_3n6_66_63n_cpu failed";
   }
 }
 
-void test_matmul2_3n9_99_93n_dp_cpu(bool layout=false, double tol=1e-6) {
+template <typename T>
+void test_matmul2_3n9_99_93n_cpu(bool layout=false, double tol=1e-6) {
   // init a
   unsigned int N = 8;
   unsigned int _3N = 3 * N;
   unsigned int nEntryA = 9 * _3N;
-  unsigned int nBytesA = nEntryA * sizeof(double);
-  auto a = (double*)malloc(nBytesA);
-  init_rand<double>(a, nEntryA);
+  unsigned int nBytesA = nEntryA * sizeof(T);
+  auto a = (T*)malloc(nBytesA);
+  init_rand<T>(a, nEntryA);
   // init b
   unsigned int nEntryB = 9 * 9;
-  unsigned int nBytesB = nEntryB * sizeof(double);
-  auto b = (double*)malloc(nBytesB);
-  init_rand<double>(b, nEntryB);
+  unsigned int nBytesB = nEntryB * sizeof(T);
+  auto b = (T*)malloc(nBytesB);
+  init_rand<T>(b, nEntryB);
   // init buffer
   unsigned int nEntryBuffer = 9;
-  unsigned int nBytesBuffer = nEntryBuffer * sizeof(double);
-  auto buffer = (double*)malloc(nBytesBuffer);
+  unsigned int nBytesBuffer = nEntryBuffer * sizeof(T);
+  auto buffer = (T*)malloc(nBytesBuffer);
   // init c
   unsigned int nEntryC = _3N * _3N;
-  unsigned int nBytesC = nEntryC * sizeof(double);
-  auto c = (double*)malloc(nBytesC);
+  unsigned int nBytesC = nEntryC * sizeof(T);
+  auto c = (T*)malloc(nBytesC);
   // init d
   unsigned int nEntryD = _3N * 9;
-  unsigned int nBytesD = nEntryD * sizeof(double);
-  auto d = (double*)malloc(nBytesD);
+  unsigned int nBytesD = nEntryD * sizeof(T);
+  auto d = (T*)malloc(nBytesD);
   // init e
   unsigned int nEntryE = _3N * _3N;
-  unsigned int nBytesE = nEntryE * sizeof(double);
-  auto e = (double*)malloc(nBytesE);
+  unsigned int nBytesE = nEntryE * sizeof(T);
+  auto e = (T*)malloc(nBytesE);
   // execute
   fem::matmul2_3n9_99_93n(a, b, N, buffer, c);
   // validate
-  cblas_dgemm(
+  Matmul<T>::impl(
     CblasRowMajor, CblasTrans, CblasNoTrans,
-    _3N, 9, 9, 1.0, a, _3N, b, 9, 0.0, d, 9);
-  cblas_dgemm(
+    _3N, 9, 9, (T)1.0, a, _3N, b, 9, (T)0.0, d, 9);
+  Matmul<T>::impl(
     CblasRowMajor, CblasNoTrans, CblasNoTrans,
-    _3N, _3N, 9, 1.0, d, 9, a, _3N, 0.0, e, _3N);
+    _3N, _3N, 9, (T)1.0, d, 9, a, _3N, (T)0.0, e, _3N);
   if (layout) {
     LOG(INFO) << "matrix a layout";
-    print_mat_dp(a, 9, _3N);
+    print_mat<T>(a, 9, _3N);
     LOG(INFO) << "matrix b layout";
-    print_mat_dp(b, 9, 9);
+    print_mat<T>(b, 9, 9);
     LOG(INFO) << "matrix c layout";
-    print_mat_dp(c, _3N, _3N);
+    print_mat<T>(c, _3N, _3N);
     LOG(INFO) << "matrix e layout";
-    print_mat_dp(e, _3N, _3N);
+    print_mat<T>(e, _3N, _3N);
   }
-  bool flag = validate_dp(c, e, _3N*_3N, tol);
+  bool flag = validate<T>(c, e, _3N*_3N, tol);
   // free
   free(a);
   free(b);
@@ -396,9 +405,9 @@ void test_matmul2_3n9_99_93n_dp_cpu(bool layout=false, double tol=1e-6) {
   free(d);
   free(e);
   if (flag) {
-    LOG(INFO) << "test_matmul2_3n9_99_93n succeed";
+    LOG(INFO) << "test_matmul2_3n9_99_93n_cpu succeed";
   } else {
-    LOG(FATAL) << "test_matmul2_3n9_99_93n failed";
+    LOG(FATAL) << "test_matmul2_3n9_99_93n_cpu failed";
   }
 }
 
@@ -406,13 +415,22 @@ int main(int argc, char* argv[]) {
   // log init
   google::InitGoogleLogging(argv[0]);
   FLAGS_logtostderr = 1;
-  // tests
-  // test_matmul_cblas();
-  test_matmul_n333_dp_cpu();
-  test_matmul_3nn3_dp_cpu();
-  test_inv_33_dp_cpu();
-  test_mattile_diag_33_dp_cpu();
-  test_matmul2_3n6_66_63n_dp_cpu();
-  test_matmul2_3n9_99_93n_dp_cpu();
+  // double precison tests
+  test_matmul_cblas<double>(false);
+  test_matmul_n333_cpu<double>();
+  test_matmul_3nn3_cpu<double>();
+  test_inv_33_cpu<double>();
+  test_mattile_diag_33_cpu<double>();
+  test_matmul2_3n6_66_63n_cpu<double>();
+  test_matmul2_3n9_99_93n_cpu<double>();
+  LOG(INFO) << "double precision test passed";
+  // single precision tests
+  test_matmul_cblas<float>(false);
+  test_matmul_n333_cpu<float>();
+  test_matmul_3nn3_cpu<float>();
+  test_inv_33_cpu<float>();
+  test_mattile_diag_33_cpu<float>();
+  test_matmul2_3n6_66_63n_cpu<float>();
+  test_matmul2_3n9_99_93n_cpu<float>();
   return 0;
 }

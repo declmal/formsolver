@@ -2,7 +2,7 @@
 
 namespace fem {
 template <typename T>
-void brick3d_shp_deri(const T* const r, T* const h) {
+void brickn8_shp_deri(const T* const r, T* const h) {
   auto a0 = (T)1 + r[0];
   auto m0 = (T)1 - r[0];
   auto a1 = (T)1 + r[1];
@@ -46,5 +46,6 @@ void brick3d_shp_deri(const T* const r, T* const h) {
   h[11] = v;
   h[23] = -v;
 }
-template void brick3d_shp_deri(const double* const r, double* const h);
+template void brickn8_shp_deri(const double* const r, double* const h);
+template void brickn8_shp_deri(const float* const r, float* const h);
 } // namespace fem

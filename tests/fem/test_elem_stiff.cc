@@ -1,69 +1,75 @@
 #include <glog/logging.h>
 #include <fem/elem_stiff.h>
-#include "../common.h"
+#include "../common/common.h"
 
-void test_lin_trans_mat_tl_dp_cpu() {
+template <typename T>
+void test_lin_trans_mat_tl_cpu(bool layout=true) {
   // init h0
   unsigned int N = 8;
   unsigned int nEntryH0 = N * 3;
-  unsigned int nBytesH0 = nEntryH0 * sizeof(double);
-  auto h0 = (double*)malloc(nBytesH0);
-  init_rand<double>(h0, nEntryH0);
-  LOG(INFO) << "matrix h0 layout";
-  print_mat_dp(h0, N, 3);
+  unsigned int nBytesH0 = nEntryH0 * sizeof(T);
+  auto h0 = (T*)malloc(nBytesH0);
+  init_rand<T>(h0, nEntryH0);
   // init u0t
   unsigned int nEntryU0t = 3 * 3;
-  unsigned int nBytesU0t = nEntryU0t * sizeof(double);
-  auto u0t = (double*)malloc(nBytesU0t);
-  init_rand<double>(u0t, nEntryU0t);
-  LOG(INFO) << "matrix u0t layout";
-  print_mat_dp(u0t, 3, 3);
+  unsigned int nBytesU0t = nEntryU0t * sizeof(T);
+  auto u0t = (T*)malloc(nBytesU0t);
+  init_rand<T>(u0t, nEntryU0t);
   // init B0t_L
   unsigned int nEntryB0t_L = 6 * 3 * N;
-  unsigned int nBytesB0t_L = nEntryB0t_L * sizeof(double);
-  auto B0t_L = (double*)malloc(nBytesB0t_L);
+  unsigned int nBytesB0t_L = nEntryB0t_L * sizeof(T);
+  auto B0t_L = (T*)malloc(nBytesB0t_L);
   // execute
   fem::lin_trans_mat_tl(h0, u0t, N, B0t_L);
-  LOG(INFO) << "matrix B0t_L layout";
-  print_mat_dp(B0t_L, 6, 3*N);
-  // free h0
+  if (layout) {
+    LOG(INFO) << "matrix h0 layout";
+    print_mat<T>(h0, N, 3);
+    LOG(INFO) << "matrix u0t layout";
+    print_mat<T>(u0t, 3, 3);
+    LOG(INFO) << "matrix B0t_L layout";
+    print_mat<T>(B0t_L, 6, 3*N);
+  }
+  // free
   free(h0);
-  // free u0t
   free(u0t);
-  // free B0t_L
   free(B0t_L);
-  LOG(INFO) << "test_lin_trans_mat_tl_dp_cpu succeed";
+  LOG(INFO) << "test_lin_trans_mat_tl_cpu succeed";
 }
 
-void test_nonlin_trans_mat_tl_dp_cpu() {
+template <typename T>
+void test_nonlin_trans_mat_tl_cpu(bool layout=true) {
   // init h0
   unsigned int N = 8;
   unsigned int nEntryH0 = N * 3;
-  unsigned int nBytesH0 = nEntryH0 * sizeof(double);
-  auto h0 = (double*)malloc(nBytesH0);
-  init_rand<double>(h0, nEntryH0);
-  LOG(INFO) << "matrix h0 layout";
-  print_mat_dp(h0, N, 3);
+  unsigned int nBytesH0 = nEntryH0 * sizeof(T);
+  auto h0 = (T*)malloc(nBytesH0);
+  init_rand<T>(h0, nEntryH0);
   // init B0_NL
   unsigned int nEntryB0_NL = 9 * 3 * N;
-  unsigned int nBytesB0_NL = nEntryB0_NL * sizeof(double);
-  auto B0_NL = (double*)malloc(nBytesB0_NL);
+  unsigned int nBytesB0_NL = nEntryB0_NL * sizeof(T);
+  auto B0_NL = (T*)malloc(nBytesB0_NL);
   // execute
   fem::nonlin_trans_mat_tl(h0, N, B0_NL);
-  LOG(INFO) << "matrix B0t_L layout";
-  print_mat_dp(B0_NL, 9, 3*N);
-  // free h0
+  if (layout) {
+    LOG(INFO) << "matrix h0 layout";
+    print_mat<T>(h0, N, 3);
+    LOG(INFO) << "matrix B0t_L layout";
+    print_mat<T>(B0_NL, 9, 3*N);
+  }
+  // free
   free(h0);
-  // free B0_NL
   free(B0_NL);
-  LOG(INFO) << "test_nonlin_trans_mat_tl_dp_cpu succeed";
+  LOG(INFO) << "test_nonlin_trans_mat_tl_cpu succeed";
 }
 
 int main(int argc, char* argv[]) {
   // log init
   google::InitGoogleLogging(argv[0]);
   FLAGS_logtostderr = 1;
-  // tests
-  test_lin_trans_mat_tl_dp_cpu();
-  test_nonlin_trans_mat_tl_dp_cpu();
+  // double precision tests
+  test_lin_trans_mat_tl_cpu<double>(false);
+  test_nonlin_trans_mat_tl_cpu<double>(false);
+  // float precision tests
+  test_lin_trans_mat_tl_cpu<float>(false);
+  test_nonlin_trans_mat_tl_cpu<float>(false);
 }
