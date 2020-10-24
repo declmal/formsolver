@@ -31,7 +31,9 @@ int main(int argc, char* argv[]) {
   FLAGS_logtostderr = 1;
   // double precison tests
   test_brickn8_shp_deri_cpu<double>(false);
+  LOG(INFO) << "double precision test passed";
   // single precision tests
   test_brickn8_shp_deri_cpu<float>(false);
+  LOG(INFO) << "single precision test passed";
   return 0;
 }

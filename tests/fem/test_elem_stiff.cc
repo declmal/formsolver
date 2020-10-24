@@ -69,7 +69,9 @@ int main(int argc, char* argv[]) {
   // double precision tests
   test_lin_trans_mat_tl_cpu<double>(false);
   test_nonlin_trans_mat_tl_cpu<double>(false);
+  LOG(INFO) << "double precision test passed";
   // float precision tests
   test_lin_trans_mat_tl_cpu<float>(false);
   test_nonlin_trans_mat_tl_cpu<float>(false);
+  LOG(INFO) << "single precision test passed";
 }

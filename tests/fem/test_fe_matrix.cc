@@ -432,5 +432,6 @@ int main(int argc, char* argv[]) {
   test_mattile_diag_33_cpu<float>();
   test_matmul2_3n6_66_63n_cpu<float>();
   test_matmul2_3n9_99_93n_cpu<float>();
+  LOG(INFO) << "single precision test passed";
   return 0;
 }

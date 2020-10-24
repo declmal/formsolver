@@ -35,8 +35,9 @@ T dlegendre(T x) {
 template <typename T, unsigned int N>
 void legendre_roots(T* const roots, double tol=1e-20) {
   unsigned int b = ((N-1)>>1) + 1;
+  unsigned int M = N>>1;
   roots[b-1] = (T)0;
-  for (unsigned int i = 1; i <= N>>1; ++i) {
+  for (unsigned int i = 1; i <= M; ++i) {
     T x = (T)cos(
       M_PI * (T)(i-0.25) / (T)(N+0.5)
     );
@@ -49,7 +50,7 @@ void legendre_roots(T* const roots, double tol=1e-20) {
       error = (double)abs(dx);
     }
     roots[i-1] = -x;
-    roots[i-1+b] = x;
+    roots[M-i+b] = x;
   }
 }
 
