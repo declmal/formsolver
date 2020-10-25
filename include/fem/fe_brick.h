@@ -1,7 +1,9 @@
-#ifndef FEM_FE_ELEMENT_H_
-#define FEM_FE_ELEMENT_H_
+#ifndef FEM_FE_BRICK_H_
+#define FEM_FE_BRICK_H_
 
-#include <common/gauss_legendre.h>
+#include <fem/fe_element.h>
+#include <fem/elem_stiff.h>
+#include <iostream>
 
 namespace fem {
 template <typename T, int R> struct BrickInterpFact {
@@ -211,33 +213,36 @@ template <typename T, unsigned int N> void brick_interp_deriv(
 }
 
 template <
-  typename T, unsigned int N0, unsigned int N1, 
-  unsigned int N2, unsigned int N> struct BrickInterpDerivBuf {
-  constexpr static auto NI = N0 * N1 * N2;
-  T h[NI*N*3];
-  constexpr BrickInterpDerivBuf() {
+  typename T, unsigned int N0, unsigned int N1, unsigned int N2, unsigned int N> 
+struct BrickInterpProp : public ElementVolInterpProp<T, N0*N1*N2, N> {
+  constexpr BrickInterpProp() : ElementVolInterpProp<T, N0*N1*N2, N>() {
+    // init hbuf
+    auto NI = N0 * N1 * N2;
     GaussRoots3D<T, N0, N1, N2> gr;
     T* r = gr.roots;
-    T* h_ = h;
+    T* h = this->hbuf;
     for (unsigned int i = 0; i < NI; ++i) {
-      brick_interp_deriv<T, N>(h_, r[0], r[1], r[2]);
+      brick_interp_deriv<T, N>(h, r[0], r[1], r[2]);
       r += 3;
-      h_ += NI;
+      h += NI;
+    }
+    // init weights
+    GaussWeights3D<T, N0, N1, N2> gw;
+    for (unsigned int i = 0; i < NI; ++i) {
+      this->weights[i] = gw.weights[i];
     }
   }
-};
-
-template <
-  typename T, unsigned int N0, unsigned int N1, 
-  unsigned int N2, unsigned int N> struct BrickInterpProp {
-  BrickInterpDerivBuf<T, N0, N1, N2, N> buf;
-  GaussWeights3D<T, N0, N1, N2> gw;
 };
 
 template <typename T> using C3D8InterpProp = BrickInterpProp<T, 2, 2, 2, 8>;
 template <typename T> using C3D8RInterpProp = BrickInterpProp<T, 1, 1, 1, 8>;
 template <typename T> using C3D20InterpProp = BrickInterpProp<T, 3, 3, 3, 20>;
 template <typename T> using C3D20RInterpProp = BrickInterpProp<T, 2, 2, 2, 20>;
+
+template <typename T> class C3D8 : public ElementVol<T, 8, 8> {
+  public:
+    C3D8InterpProp<T> iprop;
+};
 } // namespace fem
 
-#endif // FEM_FE_ELEMENT_H_
+#endif // FEM_FE_BRICK_H_

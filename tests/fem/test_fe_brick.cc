@@ -128,20 +128,31 @@ void test_brick_interp_deriv(bool layout=false, double tol=1e-6) {
 
 template <
   typename T, unsigned int N0, unsigned int N1, unsigned int N2, 
-  unsigned int N> void test_brick_interp_deriv_buf(bool layout=true) {
-  fem::BrickInterpDerivBuf<T, N0, N1, N2, N> buf;
+  unsigned int N> void test_brick_interp_prop(bool layout=true) {
+  fem::BrickInterpProp<T, N0, N1, N2, N> prop;
   if (layout) {
     LOG(INFO) << "tensor buf.h layout";
     auto NI = N0 * N1 * N2;
-    T* h = buf.h;
+    T* h = prop.hbuf;
     for (unsigned i = 0; i < NI; ++i) {
       LOG(INFO) << "tensor buf.h[" << i << "] layout";
       print_mat<T>(h, N, 3);
       h += NI;
     }
   }
-  LOG(INFO) << "test_brick_interp_deriv_buf succeed, dtype: "
+  LOG(INFO) << "test_brick_interp_prop succeed, dtype: "
     << typeid(T).name();
+}
+
+template <
+  typename T, unsigned int NI, unsigned int N,
+  template<typename> class EType>
+void test_brick_elem_stiff_cpu(bool layout=true, double tol=1e-6) {
+  EType<T> elem;
+  // init Ke
+  unsigned nEntryKe = N * 3 * N * 3;
+  auto Ke = (T*)malloc(nEntryKe*sizeof(T));
+  elem.form_elem_stiff(Ke);
 }
 
 int main(int argc, char* argv[]) {
@@ -152,19 +163,21 @@ int main(int argc, char* argv[]) {
   test_brick_interp_sum<double, 8>();
   test_brick_interp_deriv<double, 8>();
   test_brick_interp_sum<double, 20>();
-  test_brick_interp_deriv_buf<double, 2, 2, 2, 8>();
-  test_brick_interp_deriv_buf<double, 1, 1, 1, 8>();
-  test_brick_interp_deriv_buf<double, 3, 3, 3, 20>();
-  test_brick_interp_deriv_buf<double, 2, 2, 2, 20>();
+  test_brick_interp_prop<double, 2, 2, 2, 8>();
+  test_brick_interp_prop<double, 1, 1, 1, 8>();
+  test_brick_interp_prop<double, 3, 3, 3, 20>();
+  test_brick_interp_prop<double, 2, 2, 2, 20>();
+  test_brick_elem_stiff_cpu<double, 8, 8, fem::C3D8>();
   LOG(INFO) << "double precision test passed";
   // single precision tests
   test_brick_interp_sum<float, 8>();
   test_brick_interp_deriv<float, 8>();
   test_brick_interp_sum<float, 20>();
-  test_brick_interp_deriv_buf<float, 2, 2, 2, 8>();
-  test_brick_interp_deriv_buf<float, 1, 1, 1, 8>();
-  test_brick_interp_deriv_buf<float, 3, 3, 3, 20>();
-  test_brick_interp_deriv_buf<float, 2, 2, 2, 20>();
+  test_brick_interp_prop<float, 2, 2, 2, 8>();
+  test_brick_interp_prop<float, 1, 1, 1, 8>();
+  test_brick_interp_prop<float, 3, 3, 3, 20>();
+  test_brick_interp_prop<float, 2, 2, 2, 20>();
+  test_brick_elem_stiff_cpu<float, 8, 8, fem::C3D8>();
   LOG(INFO) << "single precision test passed";
   return 0;
 }
