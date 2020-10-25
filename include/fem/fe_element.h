@@ -1,6 +1,8 @@
 #ifndef FEM_FE_ELEMENT_H_
 #define FEM_FE_ELEMENT_H_
 
+#include <common/gauss_legendre.h>
+
 namespace fem {
 /*!
  * \brief 3-d Isoparametric 8-node Element Shape Function Derivatives
@@ -21,23 +23,7 @@ namespace fem {
  *         [1,-1,-1]]
  */
 template <typename T>
-void brickn8_shp_deri(const T* const r, T* const h);
-
-/*!
- * \brief Gausss-Legendre Integration for Isoparametric 3d Brick Element
- *
- * \param r output variable, interpolation points, of shape (3, 8)
- * \param w output variable, interpolation weights, of shape (8,)
- */
-template <typename T>
-void brickn8_gauss_i2(T* const r, T* const w) {
-  for (unsigned int i = 0; i < 2; ++i) {
-    for (unsigned int j = 0; j < 2; ++j) {
-      for (unsigned int k = 0; k < 2; ++k) {
-      }
-    }
-  }
-}
+void c3d8_shp_deri(const T* const r, T* const h);
 } // namespace fem
 
 #endif // FEM_FE_ELEMENT_H_

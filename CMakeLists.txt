@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.2)
 project(formsolver)
 
 # set compilation flags
-set(CMAKE_CXX_FLAGS "-std=c++11")
+set(CMAKE_CXX_FLAGS "-std=c++14")
 
 # specify include directories
 include_directories("include")

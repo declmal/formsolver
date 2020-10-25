@@ -9,7 +9,7 @@ elseif(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/config.cmake)
 endif()
 
 # set compilation flags
-set(CMAKE_CXX_FLAGS "-std=c++11")
+set(CMAKE_CXX_FLAGS "-std=c++14")
 
 # specify include directories
 include_directories("../include")

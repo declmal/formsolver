@@ -1,6 +1,7 @@
 #include <glog/logging.h>
 #include <common/gauss_legendre.h>
 #include "common.h"
+#include <stdio.h>
 
 template <typename T, unsigned int N>
 struct ValidateGauss {
@@ -488,30 +489,62 @@ struct ValidateGauss<T, 16> {
   }
 };
 
+// template <typename T, unsigned int N>
+// void test_gauss_interp(bool layout=true, double tol=1e-6) {
+  // // init roots
+  // auto roots = (T*)malloc(N*sizeof(T));
+  // // init weigths
+  // auto weights = (T*)malloc(N*sizeof(T));
+  // // execute
+  // gauss_interp<T, N>(roots, weights, tol);
+  // // validate
+  // if (layout) {
+    // LOG(INFO) << "matrix roots layout";
+    // print_mat<T>(roots, N, 1);
+    // LOG(INFO) << "matrix weights layout";
+    // print_mat<T>(weights, N, 1);
+  // }
+  // bool flag = ValidateGauss<T, N>::impl(roots, weights, tol);
+  // // free
+  // free(roots);
+  // free(weights);
+  // if (flag) {
+    // LOG(INFO) << "test_gauss_interp succeed";
+  // } else {
+    // LOG(FATAL) << "test_gauss_interp failed";
+  // }
+// }
+
 template <typename T, unsigned int N>
-void test_gauss_interp(bool layout=true, double tol=1e-6) {
-  // init roots
-  auto roots = (T*)malloc(N*sizeof(T));
-  // init weigths
-  auto weights = (T*)malloc(N*sizeof(T));
-  // execute
-  gauss_interp<T, N>(roots, weights, tol);
-  // validate
+void test_gauss_1d(bool layout=true, double tol=1e-6) {
+  Gauss1D<T, N> g;
   if (layout) {
     LOG(INFO) << "matrix roots layout";
-    print_mat<T>(roots, N, 1);
+    print_mat<T>(g.roots, N, 1);
     LOG(INFO) << "matrix weights layout";
-    print_mat<T>(weights, N, 1);
+    print_mat<T>(g.weights, N, 1);
   }
-  bool flag = ValidateGauss<T, N>::impl(roots, weights, tol);
-  // free
-  free(roots);
-  free(weights);
+  bool flag = ValidateGauss<T, N>::impl(g.roots, g.weights, tol);
   if (flag) {
-    LOG(INFO) << "test_gauss_interp succeed";
+    LOG(INFO) << "test_gauss_1d succeed, type: " 
+      << typeid(T).name() << ", N: " << N;
   } else {
-    LOG(FATAL) << "test_gauss_interp failed";
+    LOG(FATAL) << "test_gauss_1d failed, type: " 
+      << typeid(T).name() << ", N: " << N;
   }
+}
+
+template <typename T, unsigned int N0, unsigned int N1, unsigned int N2>
+void test_gauss_3d(bool layout=true) {
+  Gauss3D<T, N0, N1, N2> g;
+  if (layout) {
+    LOG(INFO) << "matrix roots layout";
+    print_mat<T>(g.r, N0*N1*N2, 3);
+    LOG(INFO) << "matrix weights layout";
+    print_mat<T>(g.w, N0*N1*N2, 1);
+  }
+  LOG(INFO) << "test_gauss_3d succeed, type: " << typeid(T).name() 
+    << ", N0: " << N0 << ", N1: " << N1 << ", N2: " << N2;
 }
 
 int main(int argc, char* argv[]) {
@@ -519,38 +552,41 @@ int main(int argc, char* argv[]) {
   google::InitGoogleLogging(argv[0]);
   FLAGS_logtostderr = 1;
   // double precision tests
-  test_gauss_interp<double, 2>(false);
-  test_gauss_interp<double, 3>(false);
-  test_gauss_interp<double, 4>(false);
-  test_gauss_interp<double, 5>(false);
-  test_gauss_interp<double, 6>(false);
-  test_gauss_interp<double, 7>(false);
-  test_gauss_interp<double, 8>(false);
-  test_gauss_interp<double, 9>(false);
-  test_gauss_interp<double, 10>(false);
-  test_gauss_interp<double, 11>(false);
-  test_gauss_interp<double, 12>(false, 1e-3);
-  test_gauss_interp<double, 13>(false);
-  test_gauss_interp<double, 14>(false);
-  test_gauss_interp<double, 15>(false);
-  test_gauss_interp<double, 16>(false);
+  test_gauss_1d<double, 2>(false);
+  test_gauss_1d<double, 3>(false);
+  test_gauss_1d<double, 4>(false);
+  test_gauss_1d<double, 5>(false);
+  test_gauss_1d<double, 6>(false);
+  test_gauss_1d<double, 7>(false);
+  test_gauss_1d<double, 8>(false);
+  test_gauss_1d<double, 9>(false);
+  test_gauss_1d<double, 10>(false);
+  test_gauss_1d<double, 11>(false);
+  test_gauss_1d<double, 12>(false, 1e-3);
+  test_gauss_1d<double, 13>(false);
+  test_gauss_1d<double, 14>(false);
+  test_gauss_1d<double, 15>(false);
+  test_gauss_1d<double, 16>(false);
+  test_gauss_3d<double, 4, 3, 2>();
   LOG(INFO) << "double precision test passed";
   // single precision tests
-  test_gauss_interp<float, 2>(false);
-  test_gauss_interp<float, 3>(false);
-  test_gauss_interp<float, 4>(false);
-  test_gauss_interp<float, 5>(false);
-  test_gauss_interp<float, 6>(false);
-  test_gauss_interp<float, 7>(false);
-  test_gauss_interp<float, 8>(false);
-  test_gauss_interp<float, 9>(false);
-  test_gauss_interp<float, 10>(false);
-  test_gauss_interp<float, 11>(false);
-  test_gauss_interp<float, 12>(false, 1e-3);
-  test_gauss_interp<float, 13>(false, 1e-5);
-  test_gauss_interp<float, 14>(false, 1e-5);
-  test_gauss_interp<float, 15>(false, 1e-5);
-  test_gauss_interp<float, 16>(false);
+  test_gauss_1d<float, 2>(false);
+  test_gauss_1d<float, 3>(false);
+  test_gauss_1d<float, 4>(false);
+  test_gauss_1d<float, 5>(false);
+  test_gauss_1d<float, 6>(false);
+  test_gauss_1d<float, 7>(false);
+  test_gauss_1d<float, 8>(false);
+  test_gauss_1d<float, 9>(false);
+  test_gauss_1d<float, 10>(false);
+  test_gauss_1d<float, 11>(false);
+  test_gauss_1d<float, 12>(false, 1e-3);
+  test_gauss_1d<float, 13>(false, 1e-5);
+  test_gauss_1d<float, 14>(false, 1e-5);
+  test_gauss_1d<float, 15>(false, 1e-5);
+  test_gauss_1d<float, 16>(false);
+  test_gauss_3d<float, 4, 3, 2>();
+  LOG(INFO) << "double precision test passed";
   LOG(INFO) << "single precision test passed";
   return 0;
 }

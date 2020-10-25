@@ -3,7 +3,7 @@
 #include "../common/common.h"
 
 template <typename T>
-void test_brickn8_shp_deri_cpu(bool layout=true) {
+void test_c3d8_shp_deri_cpu(bool layout=true) {
   // init r
   unsigned int nEntryR = 3;
   auto r = (T*)malloc(nEntryR*sizeof(T));
@@ -12,7 +12,7 @@ void test_brickn8_shp_deri_cpu(bool layout=true) {
   unsigned int nEntryH = 8 * 3;
   auto h = (T*)malloc(nEntryH*sizeof(T));
   // execute
-  fem::brickn8_shp_deri<T>(r, h);
+  fem::c3d8_shp_deri<T>(r, h);
   if (layout) {
     LOG(INFO) << "matrix r layout";
     print_mat<T>(r, 3, 1);
@@ -22,7 +22,7 @@ void test_brickn8_shp_deri_cpu(bool layout=true) {
   // free
   free(r);
   free(h);
-  LOG(INFO) << "test_brickn8_shp_deri_cpu succeed";
+  LOG(INFO) << "test_c3d8_shp_deri_cpu succeed";
 }
 
 int main(int argc, char* argv[]) {
@@ -30,10 +30,10 @@ int main(int argc, char* argv[]) {
   google::InitGoogleLogging(argv[0]);
   FLAGS_logtostderr = 1;
   // double precison tests
-  test_brickn8_shp_deri_cpu<double>(false);
+  test_c3d8_shp_deri_cpu<double>(false);
   LOG(INFO) << "double precision test passed";
   // single precision tests
-  test_brickn8_shp_deri_cpu<float>(false);
+  test_c3d8_shp_deri_cpu<float>(false);
   LOG(INFO) << "single precision test passed";
   return 0;
 }
