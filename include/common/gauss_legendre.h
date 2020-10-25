@@ -3,8 +3,7 @@
 
 #include <math.h>
 
-template <typename T, unsigned int N>
-struct Legendre {
+template <typename T, unsigned int N> struct Legendre {
   static inline T impl(T x) {
     return (
       (T)(2*N-1) * x * Legendre<T,N-1>::impl(x) -
@@ -12,21 +11,18 @@ struct Legendre {
     ) / (T)N;
   }
 }; 
-template <typename T>
-struct Legendre<T, 1> {
+template <typename T> struct Legendre<T, 1> {
   static inline T impl(T x) {
     return x;
   }
 };
-template <typename T>
-struct Legendre<T, 0> {
+template <typename T> struct Legendre<T, 0> {
   static inline T impl(T x) {
     return (T)1;
   }
 };
 
-template <typename T, unsigned int N>
-T dlegendre(T x) {
+template <typename T, unsigned int N> T dlegendre(T x) {
   return (T)N/(pow(x,2)-(T)1) * (
     x*Legendre<T,N>::impl(x) - Legendre<T,N-1>::impl(x)
   );
@@ -64,8 +60,8 @@ T dlegendre(T x) {
   // }
 // }
 
-template <typename T, unsigned int N>
-void legendre_roots(T roots[], const double tol=1e-20) {
+template <typename T, unsigned int N> void legendre_roots(
+  T roots[], const double tol=1e-20) {
   unsigned int b = ((N-1)>>1) + 1;
   unsigned int M = N>>1;
   roots[b-1] = (T)0;
@@ -86,8 +82,7 @@ void legendre_roots(T roots[], const double tol=1e-20) {
   }
 }
 
-template <typename T, unsigned int N>
-struct Gauss1D {
+template <typename T, unsigned int N> struct Gauss1D {
   T roots[N];
   T weights[N];
   constexpr static double tol = 1e-20;
