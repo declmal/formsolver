@@ -228,7 +228,6 @@ template <typename T, unsigned int N> void brick_interp_deriv(
   T* const h, T r0, T r1, T r2) {
   BrickInterpDeriv<T, N-1, N>::interp_deriv(h, r0, r1, r2);
 }
-
 } // namespace fem
 
 #endif // FEM_FE_ELEMENT_H_

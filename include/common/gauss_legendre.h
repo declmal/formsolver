@@ -4,27 +4,27 @@
 #include <math.h>
 
 template <typename T, unsigned int N> struct Legendre {
-  static inline T impl(T x) {
+  static inline T legendre(T x) {
     return (
-      (T)(2*N-1) * x * Legendre<T,N-1>::impl(x) -
-      (T)(N-1) * Legendre<T,N-2>::impl(x)
+      (T)(2*N-1) * x * Legendre<T,N-1>::legendre(x) -
+      (T)(N-1) * Legendre<T,N-2>::legendre(x)
     ) / (T)N;
   }
 }; 
 template <typename T> struct Legendre<T, 1> {
-  static inline T impl(T x) {
+  static inline T legendre(T x) {
     return x;
   }
 };
 template <typename T> struct Legendre<T, 0> {
-  static inline T impl(T x) {
+  static inline T legendre(T x) {
     return (T)1;
   }
 };
 
 template <typename T, unsigned int N> T dlegendre(T x) {
   return (T)N/(pow(x,2)-(T)1) * (
-    x*Legendre<T,N>::impl(x) - Legendre<T,N-1>::impl(x)
+    x*Legendre<T,N>::legendre(x) - Legendre<T,N-1>::legendre(x)
   );
 }
 
@@ -40,7 +40,7 @@ template <typename T, unsigned int N> T dlegendre(T x) {
     // auto error = 10 * tol;
     // unsigned int iters = 0;
     // while ((error > tol) && (iters < 1000)) {
-      // auto dx = -Legendre<T,N>::impl(x) / dlegendre<T,N>(x);
+      // auto dx = -Legendre<T,N>::legendre(x) / dlegendre<T,N>(x);
       // x += dx;
       // iters += 1;
       // error = (double)abs(dx);
@@ -72,7 +72,7 @@ template <typename T, unsigned int N> void legendre_roots(
     auto error = 10 * tol;
     unsigned int iters = 0;
     while ((error > tol) && (iters < 1000)) {
-      auto dx = -Legendre<T,N>::impl(x) / dlegendre<T,N>(x);
+      auto dx = -Legendre<T,N>::legendre(x) / dlegendre<T,N>(x);
       x += dx;
       iters += 1;
       error = (double)abs(dx);
