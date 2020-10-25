@@ -126,6 +126,24 @@ void test_brick_interp_deriv(bool layout=false, double tol=1e-6) {
   }
 }
 
+template <
+  typename T, unsigned int N0, unsigned int N1, unsigned int N2, 
+  unsigned int N> void test_brick_interp_deriv_buf(bool layout=true) {
+  fem::BrickInterpDerivBuf<T, N0, N1, N2, N> buf;
+  if (layout) {
+    LOG(INFO) << "tensor buf.h layout";
+    auto NI = N0 * N1 * N2;
+    T* h = buf.h;
+    for (unsigned i = 0; i < NI; ++i) {
+      LOG(INFO) << "tensor buf.h[" << i << "] layout";
+      print_mat<T>(h, N, 3);
+      h += NI;
+    }
+  }
+  LOG(INFO) << "test_brick_interp_deriv_buf succeed, dtype: "
+    << typeid(T).name();
+}
+
 int main(int argc, char* argv[]) {
   // log init
   google::InitGoogleLogging(argv[0]);
@@ -134,11 +152,19 @@ int main(int argc, char* argv[]) {
   test_brick_interp_sum<double, 8>();
   test_brick_interp_deriv<double, 8>();
   test_brick_interp_sum<double, 20>();
+  test_brick_interp_deriv_buf<double, 2, 2, 2, 8>();
+  test_brick_interp_deriv_buf<double, 1, 1, 1, 8>();
+  test_brick_interp_deriv_buf<double, 3, 3, 3, 20>();
+  test_brick_interp_deriv_buf<double, 2, 2, 2, 20>();
   LOG(INFO) << "double precision test passed";
   // single precision tests
   test_brick_interp_sum<float, 8>();
   test_brick_interp_deriv<float, 8>();
   test_brick_interp_sum<float, 20>();
+  test_brick_interp_deriv_buf<float, 2, 2, 2, 8>();
+  test_brick_interp_deriv_buf<float, 1, 1, 1, 8>();
+  test_brick_interp_deriv_buf<float, 3, 3, 3, 20>();
+  test_brick_interp_deriv_buf<float, 2, 2, 2, 20>();
   LOG(INFO) << "single precision test passed";
   return 0;
 }

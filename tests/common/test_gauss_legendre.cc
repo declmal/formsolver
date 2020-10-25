@@ -489,42 +489,17 @@ struct ValidateGauss<T, 16> {
   }
 };
 
-// template <typename T, unsigned int N>
-// void test_gauss_interp(bool layout=true, double tol=1e-6) {
-  // // init roots
-  // auto roots = (T*)malloc(N*sizeof(T));
-  // // init weigths
-  // auto weights = (T*)malloc(N*sizeof(T));
-  // // execute
-  // gauss_interp<T, N>(roots, weights, tol);
-  // // validate
-  // if (layout) {
-    // LOG(INFO) << "matrix roots layout";
-    // print_mat<T>(roots, N, 1);
-    // LOG(INFO) << "matrix weights layout";
-    // print_mat<T>(weights, N, 1);
-  // }
-  // bool flag = ValidateGauss<T, N>::impl(roots, weights, tol);
-  // // free
-  // free(roots);
-  // free(weights);
-  // if (flag) {
-    // LOG(INFO) << "test_gauss_interp succeed";
-  // } else {
-    // LOG(FATAL) << "test_gauss_interp failed";
-  // }
-// }
-
 template <typename T, unsigned int N>
 void test_gauss_1d(bool layout=true, double tol=1e-6) {
-  Gauss1D<T, N> g;
+  GaussRoots1D<T, N> gr;
+  GaussWeights1D<T, N> gw;
   if (layout) {
     LOG(INFO) << "matrix roots layout";
-    print_mat<T>(g.roots, N, 1);
+    print_mat<T>(gr.roots, N, 1);
     LOG(INFO) << "matrix weights layout";
-    print_mat<T>(g.weights, N, 1);
+    print_mat<T>(gw.weights, N, 1);
   }
-  bool flag = ValidateGauss<T, N>::impl(g.roots, g.weights, tol);
+  bool flag = ValidateGauss<T, N>::impl(gr.roots, gw.weights, tol);
   if (flag) {
     LOG(INFO) << "test_gauss_1d succeed, type: " 
       << typeid(T).name() << ", N: " << N;
@@ -536,12 +511,13 @@ void test_gauss_1d(bool layout=true, double tol=1e-6) {
 
 template <typename T, unsigned int N0, unsigned int N1, unsigned int N2>
 void test_gauss_3d(bool layout=true) {
-  Gauss3D<T, N0, N1, N2> g;
+  GaussRoots3D<T, N0, N1, N2> gr;
+  GaussWeights3D<T, N0, N1, N2> gw;
   if (layout) {
     LOG(INFO) << "matrix roots layout";
-    print_mat<T>(g.r, N0*N1*N2, 3);
+    print_mat<T>(gr.roots, N0*N1*N2, 3);
     LOG(INFO) << "matrix weights layout";
-    print_mat<T>(g.w, N0*N1*N2, 1);
+    print_mat<T>(gw.weights, N0*N1*N2, 1);
   }
   LOG(INFO) << "test_gauss_3d succeed, type: " << typeid(T).name() 
     << ", N0: " << N0 << ", N1: " << N1 << ", N2: " << N2;

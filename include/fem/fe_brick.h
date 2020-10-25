@@ -4,25 +4,6 @@
 #include <common/gauss_legendre.h>
 
 namespace fem {
-/*!
- * \brief 3-d Isoparametric 8-node Element Shape Function Derivatives
- *
- * \param r input variable, natural coordinates of point, of shape (3,)
- * \param h output variable, shape function derivatives, of shape (3, 8)
- *  shape function derivatives at point r = [r0,r1,r2]
- *  h[j][n] = dhn/drj, j = 0,1,2
- *  hn(r0,r1,r2) = Gn0(r0) * Gn1(r1) * Gn2(r2)
- *  Gnj(rj) = 0.5 * (1+Rnj*rj)
- *  Rnj = [[1,1,1],
- *         [-1,1,1],
- *         [-1,-1,1],
- *         [1,-1,1],
- *         [1,1,-1],
- *         [-1,1,-1],
- *         [-1,-1,-1],
- *         [1,-1,-1]]
- */
-
 template <typename T, int R> struct BrickInterpFact {
   static inline T compute(T r);
   static inline T compute_deriv_1st(T r);
@@ -228,6 +209,35 @@ template <typename T, unsigned int N> void brick_interp_deriv(
   T* const h, T r0, T r1, T r2) {
   BrickInterpDeriv<T, N-1, N>::interp_deriv(h, r0, r1, r2);
 }
+
+template <
+  typename T, unsigned int N0, unsigned int N1, 
+  unsigned int N2, unsigned int N> struct BrickInterpDerivBuf {
+  constexpr static auto NI = N0 * N1 * N2;
+  T h[NI*N*3];
+  constexpr BrickInterpDerivBuf() {
+    GaussRoots3D<T, N0, N1, N2> gr;
+    T* r = gr.roots;
+    T* h_ = h;
+    for (unsigned int i = 0; i < NI; ++i) {
+      brick_interp_deriv<T, N>(h_, r[0], r[1], r[2]);
+      r += 3;
+      h_ += NI;
+    }
+  }
+};
+
+template <
+  typename T, unsigned int N0, unsigned int N1, 
+  unsigned int N2, unsigned int N> struct BrickInterpProp {
+  BrickInterpDerivBuf<T, N0, N1, N2, N> buf;
+  GaussWeights3D<T, N0, N1, N2> gw;
+};
+
+template <typename T> using C3D8InterpProp = BrickInterpProp<T, 2, 2, 2, 8>;
+template <typename T> using C3D8RInterpProp = BrickInterpProp<T, 1, 1, 1, 8>;
+template <typename T> using C3D20InterpProp = BrickInterpProp<T, 3, 3, 3, 20>;
+template <typename T> using C3D20RInterpProp = BrickInterpProp<T, 2, 2, 2, 20>;
 } // namespace fem
 
 #endif // FEM_FE_ELEMENT_H_
