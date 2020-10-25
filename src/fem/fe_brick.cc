@@ -1,4 +1,4 @@
-#include <fem/fe_element.h>
+#include <fem/fe_brick.h>
 
 namespace fem {
 template <typename T>

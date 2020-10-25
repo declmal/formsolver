@@ -1,5 +1,5 @@
 #include <glog/logging.h>
-#include <fem/fe_element.h>
+#include <fem/fe_brick.h>
 #include "../common/common.h"
 
 template <typename T>
