@@ -46,7 +46,7 @@ struct BrickInterpCoord {
   const static int R2;
 };
 
-#define FORM_MACRO_BrickInterpCoord(i,x,y,z) \
+#define FORM_REGISTER_BRICKINTERPCOORD(i,x,y,z) \
   template <> \
   struct BrickInterpCoord<i> { \
     const static int R0 = x; \
@@ -54,26 +54,26 @@ struct BrickInterpCoord {
     const static int R2 = z; \
   };
 
-FORM_MACRO_BrickInterpCoord(0,1,1,1)
-FORM_MACRO_BrickInterpCoord(1,-1,1,1)
-FORM_MACRO_BrickInterpCoord(2,-1,-1,1)
-FORM_MACRO_BrickInterpCoord(3,1,-1,1)
-FORM_MACRO_BrickInterpCoord(4,1,1,-1)
-FORM_MACRO_BrickInterpCoord(5,-1,1,-1)
-FORM_MACRO_BrickInterpCoord(6,-1,-1,-1)
-FORM_MACRO_BrickInterpCoord(7,1,-1,-1)
-FORM_MACRO_BrickInterpCoord(8,0,1,1)
-FORM_MACRO_BrickInterpCoord(9,-1,0,1)
-FORM_MACRO_BrickInterpCoord(10,0,-1,1)
-FORM_MACRO_BrickInterpCoord(11,1,0,1)
-FORM_MACRO_BrickInterpCoord(12,0,1,-1)
-FORM_MACRO_BrickInterpCoord(13,-1,0,-1)
-FORM_MACRO_BrickInterpCoord(14,0,-1,-1)
-FORM_MACRO_BrickInterpCoord(15,1,0,-1)
-FORM_MACRO_BrickInterpCoord(16,0,1,0)
-FORM_MACRO_BrickInterpCoord(17,-1,0,0)
-FORM_MACRO_BrickInterpCoord(18,0,-1,0)
-FORM_MACRO_BrickInterpCoord(19,1,0,0)
+FORM_REGISTER_BRICKINTERPCOORD(0,1,1,1)
+FORM_REGISTER_BRICKINTERPCOORD(1,-1,1,1)
+FORM_REGISTER_BRICKINTERPCOORD(2,-1,-1,1)
+FORM_REGISTER_BRICKINTERPCOORD(3,1,-1,1)
+FORM_REGISTER_BRICKINTERPCOORD(4,1,1,-1)
+FORM_REGISTER_BRICKINTERPCOORD(5,-1,1,-1)
+FORM_REGISTER_BRICKINTERPCOORD(6,-1,-1,-1)
+FORM_REGISTER_BRICKINTERPCOORD(7,1,-1,-1)
+FORM_REGISTER_BRICKINTERPCOORD(8,0,1,1)
+FORM_REGISTER_BRICKINTERPCOORD(9,-1,0,1)
+FORM_REGISTER_BRICKINTERPCOORD(10,0,-1,1)
+FORM_REGISTER_BRICKINTERPCOORD(11,1,0,1)
+FORM_REGISTER_BRICKINTERPCOORD(12,0,1,-1)
+FORM_REGISTER_BRICKINTERPCOORD(13,-1,0,-1)
+FORM_REGISTER_BRICKINTERPCOORD(14,0,-1,-1)
+FORM_REGISTER_BRICKINTERPCOORD(15,1,0,-1)
+FORM_REGISTER_BRICKINTERPCOORD(16,0,1,0)
+FORM_REGISTER_BRICKINTERPCOORD(17,-1,0,0)
+FORM_REGISTER_BRICKINTERPCOORD(18,0,-1,0)
+FORM_REGISTER_BRICKINTERPCOORD(19,1,0,0)
 
 template <typename T, unsigned int I>
 struct BrickInterpMono {
@@ -129,7 +129,7 @@ struct BrickInterpPoly<T,I,8> {
   }
 };
 
-#define FORM_MACRO_BrickInterpPoly_N20_LOWER(i,j,k,l) \
+#define FORM_REGISTER_BRICKINTERPPOLY_N20_LOWER(i,j,k,l) \
   template <typename T> \
   struct BrickInterpPoly<T,i,20> { \
     static inline T compute(T r0, T r1, T r2) { \
@@ -162,16 +162,16 @@ struct BrickInterpPoly<T,I,8> {
     } \
   };
 
-FORM_MACRO_BrickInterpPoly_N20_LOWER(0,8,11,16)
-FORM_MACRO_BrickInterpPoly_N20_LOWER(1,8,9,17)
-FORM_MACRO_BrickInterpPoly_N20_LOWER(2,9,10,18)
-FORM_MACRO_BrickInterpPoly_N20_LOWER(3,10,11,19)
-FORM_MACRO_BrickInterpPoly_N20_LOWER(4,12,15,16)
-FORM_MACRO_BrickInterpPoly_N20_LOWER(5,12,13,17)
-FORM_MACRO_BrickInterpPoly_N20_LOWER(6,13,14,18)
-FORM_MACRO_BrickInterpPoly_N20_LOWER(7,14,15,19)
+FORM_REGISTER_BRICKINTERPPOLY_N20_LOWER(0,8,11,16)
+FORM_REGISTER_BRICKINTERPPOLY_N20_LOWER(1,8,9,17)
+FORM_REGISTER_BRICKINTERPPOLY_N20_LOWER(2,9,10,18)
+FORM_REGISTER_BRICKINTERPPOLY_N20_LOWER(3,10,11,19)
+FORM_REGISTER_BRICKINTERPPOLY_N20_LOWER(4,12,15,16)
+FORM_REGISTER_BRICKINTERPPOLY_N20_LOWER(5,12,13,17)
+FORM_REGISTER_BRICKINTERPPOLY_N20_LOWER(6,13,14,18)
+FORM_REGISTER_BRICKINTERPPOLY_N20_LOWER(7,14,15,19)
 
-#define FORM_MACRO_BrickInterpPoly_N20_HIGHER(i) \
+#define FORM_REGISTER_BRICKINTERPPOLY_N20_HIGHER(i) \
 template <typename T> \
   struct BrickInterpPoly<T,i,20> { \
   static inline T compute(T r0, T r1, T r2) { \
@@ -188,18 +188,18 @@ template <typename T> \
   } \
 };
 
-FORM_MACRO_BrickInterpPoly_N20_HIGHER(8)
-FORM_MACRO_BrickInterpPoly_N20_HIGHER(9)
-FORM_MACRO_BrickInterpPoly_N20_HIGHER(10)
-FORM_MACRO_BrickInterpPoly_N20_HIGHER(11)
-FORM_MACRO_BrickInterpPoly_N20_HIGHER(12)
-FORM_MACRO_BrickInterpPoly_N20_HIGHER(13)
-FORM_MACRO_BrickInterpPoly_N20_HIGHER(14)
-FORM_MACRO_BrickInterpPoly_N20_HIGHER(15)
-FORM_MACRO_BrickInterpPoly_N20_HIGHER(16)
-FORM_MACRO_BrickInterpPoly_N20_HIGHER(17)
-FORM_MACRO_BrickInterpPoly_N20_HIGHER(18)
-FORM_MACRO_BrickInterpPoly_N20_HIGHER(19)
+FORM_REGISTER_BRICKINTERPPOLY_N20_HIGHER(8)
+FORM_REGISTER_BRICKINTERPPOLY_N20_HIGHER(9)
+FORM_REGISTER_BRICKINTERPPOLY_N20_HIGHER(10)
+FORM_REGISTER_BRICKINTERPPOLY_N20_HIGHER(11)
+FORM_REGISTER_BRICKINTERPPOLY_N20_HIGHER(12)
+FORM_REGISTER_BRICKINTERPPOLY_N20_HIGHER(13)
+FORM_REGISTER_BRICKINTERPPOLY_N20_HIGHER(14)
+FORM_REGISTER_BRICKINTERPPOLY_N20_HIGHER(15)
+FORM_REGISTER_BRICKINTERPPOLY_N20_HIGHER(16)
+FORM_REGISTER_BRICKINTERPPOLY_N20_HIGHER(17)
+FORM_REGISTER_BRICKINTERPPOLY_N20_HIGHER(18)
+FORM_REGISTER_BRICKINTERPPOLY_N20_HIGHER(19)
 
 template <typename T, unsigned int I, unsigned int N> struct BrickInterpDeriv {
   static inline void interp_deriv(T* const h, T r0, T r1, T r2) {
@@ -255,19 +255,19 @@ template <typename T>
 using C3D20RIProp = BrickIProp<T,2,2,2,20>;
 
 template <typename T>
-class C3D8 : public Element<T,8,8> {
+class C3D8 : public Element<T,8,8,C3D8IProp> {
 };
 
 // template <typename T>
-// class C3D8R : public Element<T,1,8> {
+// class C3D8R : public Element<T,1,8,C3D8RIProp> {
 // };
 
 template <typename T>
-class C3D20 : public Element<T,27,20> {
+class C3D20 : public Element<T,27,20,C3D20IProp> {
 };
 
 template <typename T>
-class C3D20R : public Element<T,8,20> {
+class C3D20R : public Element<T,8,20,C3D20RIProp> {
 };
 } // namespace fem
 

@@ -155,7 +155,7 @@ void test_brick_elem_stiff_cpu(bool layout=true, double tol=1e-6) {
   EType<T> elem;
   IPropType<T> iprop;
   // execute
-  elem.form_elem_stiff_cpu(iprop);
+  elem.form_elem_stiff_cpu();
   // validate
   bool flag = true;
   if (flag) {

@@ -14,13 +14,15 @@ struct ElementIProp {
   // }
 };
 
-template <typename T, unsigned int NI, unsigned int N>
+template <
+  typename T, unsigned int NI, unsigned int N,
+  template <typename> class IPropType>
 class Element {
   public:
+    static IPropType<T> iprop;
     void init_coordinate(const T* const data, const unsigned int size);
     void init_coordinate();
-    virtual void form_elem_stiff_cpu(
-      const ElementIProp<T,NI,N> iprop);
+    virtual void form_elem_stiff_cpu();
   private:
     /*!
      * \brief Global Node Id List, of shape (N,)
@@ -40,12 +42,11 @@ class Element {
     T Ke[9*N*N];
 };
 
-#define REGISTER_ELEMENT(T, NI, N) \
+#define FORM_REGISTER_ELEMENT(T, NI, N, IPropType) \
   template \
-  void Element<T,NI,N>::form_elem_stiff_cpu( \
-    const ElementIProp<T,NI,N> iprop); \
+  void Element<T,NI,N,IPropType>::form_elem_stiff_cpu(); \
   template \
-  void Element<T,NI,N>::init_coordinate( \
+  void Element<T,NI,N,IPropType>::init_coordinate( \
     const T* const data, const unsigned int size);
 } // namespace fem
 
