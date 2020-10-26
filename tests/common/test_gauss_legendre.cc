@@ -10,7 +10,7 @@ struct ValidateGauss {
 };
 
 template <typename T>
-struct ValidateGauss<T, 2> {
+struct ValidateGauss<T,2> {
   static bool impl(
     const T* const roots, const T* const weights, double tol=1e-6) {
     const static T ref_r[2] = {
@@ -28,7 +28,7 @@ struct ValidateGauss<T, 2> {
 };
 
 template <typename T>
-struct ValidateGauss<T, 3> {
+struct ValidateGauss<T,3> {
   static bool impl(
     const T* const roots, const T* const weights, double tol=1e-6) {
     const static T ref_r[3] = {
@@ -48,7 +48,7 @@ struct ValidateGauss<T, 3> {
 };
 
 template <typename T>
-struct ValidateGauss<T, 4> {
+struct ValidateGauss<T,4> {
   static bool impl(
     const T* const roots, const T* const weights, double tol=1e-6) {
     const static T ref_r[4] = {
@@ -70,7 +70,7 @@ struct ValidateGauss<T, 4> {
 };
 
 template <typename T>
-struct ValidateGauss<T, 5> {
+struct ValidateGauss<T,5> {
   static bool impl(
     const T* const roots, const T* const weights, double tol=1e-6) {
     const static T ref_r[5] = {
@@ -94,7 +94,7 @@ struct ValidateGauss<T, 5> {
 };
 
 template <typename T>
-struct ValidateGauss<T, 6> {
+struct ValidateGauss<T,6> {
   static bool impl(
     const T* const roots, const T* const weights, double tol=1e-6) {
     const static T ref_r[6] = {
@@ -120,7 +120,7 @@ struct ValidateGauss<T, 6> {
 };
 
 template <typename T>
-struct ValidateGauss<T, 7> {
+struct ValidateGauss<T,7> {
   static bool impl(
     const T* const roots, const T* const weights, double tol=1e-6) {
     const static T ref_r[7] = {
@@ -148,7 +148,7 @@ struct ValidateGauss<T, 7> {
 };
 
 template <typename T>
-struct ValidateGauss<T, 8> {
+struct ValidateGauss<T,8> {
   static bool impl(
     const T* const roots, const T* const weights, double tol=1e-6) {
     const static T ref_r[8] = {
@@ -178,7 +178,7 @@ struct ValidateGauss<T, 8> {
 };
 
 template <typename T>
-struct ValidateGauss<T, 9> {
+struct ValidateGauss<T,9> {
   static bool impl(
     const T* const roots, const T* const weights, double tol=1e-6) {
     const static T ref_r[9] = {
@@ -210,7 +210,7 @@ struct ValidateGauss<T, 9> {
 };
 
 template <typename T>
-struct ValidateGauss<T, 10> {
+struct ValidateGauss<T,10> {
   static bool impl(
     const T* const roots, const T* const weights, double tol=1e-6) {
     const static T ref_r[10] = {
@@ -244,7 +244,7 @@ struct ValidateGauss<T, 10> {
 };
 
 template <typename T>
-struct ValidateGauss<T, 11> {
+struct ValidateGauss<T,11> {
   static bool impl(
     const T* const roots, const T* const weights, double tol=1e-6) {
     const static T ref_r[11] = {
@@ -280,7 +280,7 @@ struct ValidateGauss<T, 11> {
 };
 
 template <typename T>
-struct ValidateGauss<T, 12> {
+struct ValidateGauss<T,12> {
   static bool impl(
     const T* const roots, const T* const weights, double tol=1e-6) {
     const static T ref_r[12] = {
@@ -318,7 +318,7 @@ struct ValidateGauss<T, 12> {
 };
 
 template <typename T>
-struct ValidateGauss<T, 13> {
+struct ValidateGauss<T,13> {
   static bool impl(
     const T* const roots, const T* const weights, double tol=1e-6) {
     const static T ref_r[13] = {
@@ -358,7 +358,7 @@ struct ValidateGauss<T, 13> {
 };
 
 template <typename T>
-struct ValidateGauss<T, 14> {
+struct ValidateGauss<T,14> {
   static bool impl(
     const T* const roots, const T* const weights, double tol=1e-6) {
     const static T ref_r[14] = {
@@ -400,7 +400,7 @@ struct ValidateGauss<T, 14> {
 };
 
 template <typename T>
-struct ValidateGauss<T, 15> {
+struct ValidateGauss<T,15> {
   static bool impl(
     const T* const roots, const T* const weights, double tol=1e-6) {
     const static T ref_r[15] = {
@@ -444,7 +444,7 @@ struct ValidateGauss<T, 15> {
 };
 
 template <typename T>
-struct ValidateGauss<T, 16> {
+struct ValidateGauss<T,16> {
   static bool impl(
     const T* const roots, const T* const weights, double tol=1e-6) {
     const static T ref_r[16] = {
@@ -491,35 +491,35 @@ struct ValidateGauss<T, 16> {
 
 template <typename T, unsigned int N>
 void test_gauss_1d(bool layout=true, double tol=1e-6) {
-  GaussRoots1D<T, N> gr;
-  GaussWeights1D<T, N> gw;
+  GaussRoots1D<T,N> gr;
+  GaussWeights1D<T,N> gw;
   if (layout) {
     LOG(INFO) << "matrix roots layout";
     print_mat<T>(gr.roots, N, 1);
     LOG(INFO) << "matrix weights layout";
     print_mat<T>(gw.weights, N, 1);
   }
-  bool flag = ValidateGauss<T, N>::impl(gr.roots, gw.weights, tol);
+  bool flag = ValidateGauss<T,N>::impl(gr.roots, gw.weights, tol);
   if (flag) {
-    LOG(INFO) << "test_gauss_1d succeed, type: " 
+    LOG(INFO) << "test_gauss_1d succeed, T: " 
       << typeid(T).name() << ", N: " << N;
   } else {
-    LOG(FATAL) << "test_gauss_1d failed, type: " 
+    LOG(FATAL) << "test_gauss_1d failed, T: " 
       << typeid(T).name() << ", N: " << N;
   }
 }
 
 template <typename T, unsigned int N0, unsigned int N1, unsigned int N2>
 void test_gauss_3d(bool layout=true) {
-  GaussRoots3D<T, N0, N1, N2> gr;
-  GaussWeights3D<T, N0, N1, N2> gw;
+  GaussRoots3D<T,N0,N1,N2> gr;
+  GaussWeights3D<T,N0,N1,N2> gw;
   if (layout) {
     LOG(INFO) << "matrix roots layout";
     print_mat<T>(gr.roots, N0*N1*N2, 3);
     LOG(INFO) << "matrix weights layout";
     print_mat<T>(gw.weights, N0*N1*N2, 1);
   }
-  LOG(INFO) << "test_gauss_3d succeed, type: " << typeid(T).name() 
+  LOG(INFO) << "test_gauss_3d succeed, T: " << typeid(T).name() 
     << ", N0: " << N0 << ", N1: " << N1 << ", N2: " << N2;
 }
 
@@ -528,40 +528,40 @@ int main(int argc, char* argv[]) {
   google::InitGoogleLogging(argv[0]);
   FLAGS_logtostderr = 1;
   // double precision tests
-  test_gauss_1d<double, 2>(false);
-  test_gauss_1d<double, 3>(false);
-  test_gauss_1d<double, 4>(false);
-  test_gauss_1d<double, 5>(false);
-  test_gauss_1d<double, 6>(false);
-  test_gauss_1d<double, 7>(false);
-  test_gauss_1d<double, 8>(false);
-  test_gauss_1d<double, 9>(false);
-  test_gauss_1d<double, 10>(false);
-  test_gauss_1d<double, 11>(false);
-  test_gauss_1d<double, 12>(false, 1e-3);
-  test_gauss_1d<double, 13>(false);
-  test_gauss_1d<double, 14>(false);
-  test_gauss_1d<double, 15>(false);
-  test_gauss_1d<double, 16>(false);
-  test_gauss_3d<double, 4, 3, 2>();
+  test_gauss_1d<double,2>(false);
+  test_gauss_1d<double,3>(false);
+  test_gauss_1d<double,4>(false);
+  test_gauss_1d<double,5>(false);
+  test_gauss_1d<double,6>(false);
+  test_gauss_1d<double,7>(false);
+  test_gauss_1d<double,8>(false);
+  test_gauss_1d<double,9>(false);
+  test_gauss_1d<double,10>(false);
+  test_gauss_1d<double,11>(false);
+  test_gauss_1d<double,12>(false, 1e-3);
+  test_gauss_1d<double,13>(false);
+  test_gauss_1d<double,14>(false);
+  test_gauss_1d<double,15>(false);
+  test_gauss_1d<double,16>(false);
+  test_gauss_3d<double,4,3,2>();
   LOG(INFO) << "double precision test passed";
   // single precision tests
-  test_gauss_1d<float, 2>(false);
-  test_gauss_1d<float, 3>(false);
-  test_gauss_1d<float, 4>(false);
-  test_gauss_1d<float, 5>(false);
-  test_gauss_1d<float, 6>(false);
-  test_gauss_1d<float, 7>(false);
-  test_gauss_1d<float, 8>(false);
-  test_gauss_1d<float, 9>(false);
-  test_gauss_1d<float, 10>(false);
-  test_gauss_1d<float, 11>(false);
-  test_gauss_1d<float, 12>(false, 1e-3);
-  test_gauss_1d<float, 13>(false, 1e-5);
-  test_gauss_1d<float, 14>(false, 1e-5);
-  test_gauss_1d<float, 15>(false, 1e-5);
-  test_gauss_1d<float, 16>(false);
-  test_gauss_3d<float, 4, 3, 2>();
+  test_gauss_1d<float,2>(false);
+  test_gauss_1d<float,3>(false);
+  test_gauss_1d<float,4>(false);
+  test_gauss_1d<float,5>(false);
+  test_gauss_1d<float,6>(false);
+  test_gauss_1d<float,7>(false);
+  test_gauss_1d<float,8>(false);
+  test_gauss_1d<float,9>(false);
+  test_gauss_1d<float,10>(false);
+  test_gauss_1d<float,11>(false);
+  test_gauss_1d<float,12>(false, 1e-3);
+  test_gauss_1d<float,13>(false, 1e-5);
+  test_gauss_1d<float,14>(false, 1e-5);
+  test_gauss_1d<float,15>(false, 1e-5);
+  test_gauss_1d<float,16>(false);
+  test_gauss_3d<float,4,3,2>();
   LOG(INFO) << "double precision test passed";
   LOG(INFO) << "single precision test passed";
   return 0;

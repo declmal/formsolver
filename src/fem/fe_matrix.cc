@@ -28,10 +28,12 @@ void matmul_3nn3(
     b_ += 3;
   }
 }
-template void matmul_3nn3(
+template
+void matmul_3nn3(
   const double* const a, const double* const b,
   const unsigned int N, double* const c);
-template void matmul_3nn3(
+template
+void matmul_3nn3(
   const float* const a, const float* const b,
   const unsigned int N, float* const c);
 
@@ -48,10 +50,12 @@ void matmul_n333(
     c_ += 3;
   }
 }
-template void matmul_n333(
+template
+void matmul_n333(
   const double* const a, const double* const b,
   const unsigned int N, double* const c);
-template void matmul_n333(
+template
+void matmul_n333(
   const float* const a, const float* const b,
   const unsigned int N, float* const c);
 
@@ -62,8 +66,10 @@ void det_33(const T* const a, T* const det) {
     (a[1]*a[6] - a[0]*a[7]) * a[5] +
     (a[0]*a[4] - a[1]*a[3]) * a[8];
 }
-template void det_33(const double* const a, double* const det);
-template void det_33(const float* const a, float* const det);
+template
+void det_33(const double* const a, double* const det);
+template
+void det_33(const float* const a, float* const det);
 
 template <typename T>
 void inv_33(const T* const a, const T* const det, T* const inv) {
@@ -80,10 +86,10 @@ void inv_33(const T* const a, const T* const det, T* const inv) {
     inv[i] /= det[0];
   }
 }
-template void inv_33(
-  const double* const a, const double* const det, double* const inv);
-template void inv_33(
-  const float* const a, const float* const det, float* const inv);
+template
+void inv_33(const double* const a, const double* const det, double* const inv);
+template
+void inv_33(const float* const a, const float* const det, float* const inv);
 
 template <typename T>
 void mattile_diag_33(const T* const a, T* const tile) {
@@ -100,8 +106,10 @@ void mattile_diag_33(const T* const a, T* const tile) {
   tile[19] = tile[49] = tile[79] = a[7];
   tile[20] = tile[50] = tile[80] = a[8];
 }
-template void mattile_diag_33(const double* const a, double* const tile);
-template void mattile_diag_33(const float* const a, float* const tile);
+template
+void mattile_diag_33(const double* const a, double* const tile);
+template
+void mattile_diag_33(const float* const a, float* const tile);
 
 template <typename T>
 void matmul2_3n6_66_63n(
@@ -135,10 +143,12 @@ void matmul2_3n6_66_63n(
     c_ += _3N;
   }
 }
-template void matmul2_3n6_66_63n(
+template
+void matmul2_3n6_66_63n(
   const double* const a, const double* const b, const unsigned int N, 
   double* const buffer, double* const c);
-template void matmul2_3n6_66_63n(
+template
+void matmul2_3n6_66_63n(
   const float* const a, const float* const b, const unsigned int N, 
   float* const buffer, float* const c);
 
@@ -193,10 +203,12 @@ void matmul2_3n9_99_93n(
     c_ += _3N;
   }
 }
-template void matmul2_3n9_99_93n(
+template
+void matmul2_3n9_99_93n(
   const double* const a, const double* const b, const unsigned int N, 
   double* const buffer, double* const c);
-template void matmul2_3n9_99_93n(
+template
+void matmul2_3n9_99_93n(
   const float* const a, const float* const b, const unsigned int N, 
   float* const buffer, float* const c);
 } // namespace fem

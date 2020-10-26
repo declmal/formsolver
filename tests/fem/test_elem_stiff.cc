@@ -33,7 +33,7 @@ void test_lin_trans_mat_tl_cpu(bool layout=true) {
   free(h0);
   free(u0t);
   free(B0t_L);
-  LOG(INFO) << "test_lin_trans_mat_tl_cpu succeed";
+  LOG(INFO) << "test_lin_trans_mat_tl_cpu succeed, T: " << typeid(T).name();
 }
 
 template <typename T>
@@ -59,7 +59,7 @@ void test_nonlin_trans_mat_tl_cpu(bool layout=true) {
   // free
   free(h0);
   free(B0_NL);
-  LOG(INFO) << "test_nonlin_trans_mat_tl_cpu succeed";
+  LOG(INFO) << "test_nonlin_trans_mat_tl_cpu succeed, T: " << typeid(T).name();
 }
 
 int main(int argc, char* argv[]) {

@@ -2,21 +2,24 @@
 #include <fem/fe_brick.h>
 #include "../common/common.h"
 
-template <typename T, unsigned int I, unsigned int N> struct BrickInterpSum {
+template <typename T, unsigned int I, unsigned int N>
+struct BrickInterpSum {
   static inline T interp_sum(T r0, T r1, T r2) {
     return
-      BrickInterpSum<T, I-1, N>::interp_sum(r0, r1, r2) +
-      fem::BrickInterpPoly<T, I, N>::compute(r0, r1, r2);
+      BrickInterpSum<T,I-1,N>::interp_sum(r0, r1, r2) +
+      fem::BrickInterpPoly<T,I,N>::compute(r0, r1, r2);
   }
 };
-template <typename T, unsigned int N> struct BrickInterpSum<T, 0, N> {
+template <typename T, unsigned int N>
+struct BrickInterpSum<T, 0, N> {
   static inline T interp_sum(T r0, T r1, T r2) {
-    return fem::BrickInterpPoly<T, 0, N>::compute(r0, r1, r2);
+    return fem::BrickInterpPoly<T,0,N>::compute(r0, r1, r2);
   }
 };
 
-template <typename T, unsigned int N> T brick_interp_sum(T r0, T r1, T r2) {
-  return BrickInterpSum<T, N-1, N>::interp_sum(r0, r1, r2);
+template <typename T, unsigned int N>
+T brick_interp_sum(T r0, T r1, T r2) {
+  return BrickInterpSum<T,N-1,N>::interp_sum(r0, r1, r2);
 }
 
 template <typename T, unsigned int N>
@@ -24,7 +27,7 @@ void test_brick_interp_sum(bool layout=false, double tol=1e-6) {
   T r0 = rand_gen<T>(-1, 1);
   T r1 = rand_gen<T>(-1, 1);
   T r2 = rand_gen<T>(-1, 1);
-  auto res = brick_interp_sum<T, N>(r0, r1, r2);
+  auto res = brick_interp_sum<T,N>(r0, r1, r2);
   bool flag = (double)(res-1) <= tol;
   if (layout) {
     LOG(INFO) << "natural coordinates, r0: " 
@@ -43,7 +46,8 @@ template <typename T, unsigned int N>
 struct BrickInterpDerivValidate {
   static inline void interp_deriv(T* const h, T r0, T r1, T r2);
 };
-template <typename T> struct BrickInterpDerivValidate<T, 8> {
+template <typename T>
+struct BrickInterpDerivValidate<T,8> {
   static inline void interp_deriv(T* const h, T r0, T r1, T r2) {
     auto a0 = (T)1 + r0;
     auto m0 = (T)1 - r0;
@@ -102,9 +106,9 @@ void test_brick_interp_deriv(bool layout=false, double tol=1e-6) {
   unsigned int nEntryH2 = N * 3;
   auto h1 = (T*)malloc(nEntryH2*sizeof(T));
   // execute
-  fem::brick_interp_deriv<T, N>(h0, r0, r1, r2);
+  fem::brick_interp_deriv<T,N>(h0, r0, r1, r2);
   // validate
-  BrickInterpDerivValidate<T, N>::interp_deriv(h1, r0, r1, r2);
+  BrickInterpDerivValidate<T,N>::interp_deriv(h1, r0, r1, r2);
   if (layout) {
     LOG(INFO) << "natural coordinates, r0: " 
       << r0 << ", r1: " << r1 << ", r2: " << r2;
@@ -127,9 +131,9 @@ void test_brick_interp_deriv(bool layout=false, double tol=1e-6) {
 }
 
 template <
-  typename T, unsigned int N0, unsigned int N1, unsigned int N2, 
-  unsigned int N> void test_brick_interp_prop(bool layout=true) {
-  fem::BrickInterpProp<T, N0, N1, N2, N> prop;
+  typename T, unsigned int N0, unsigned int N1, unsigned int N2, unsigned int N> 
+void test_brick_interp_prop(bool layout=true) {
+  fem::BrickIProp<T,N0,N1,N2,N> prop;
   if (layout) {
     LOG(INFO) << "tensor buf.h layout";
     auto NI = N0 * N1 * N2;
@@ -146,13 +150,33 @@ template <
 
 template <
   typename T, unsigned int NI, unsigned int N,
-  template<typename> class EType>
+  template <typename> class EType, template <typename> class IPropType>
 void test_brick_elem_stiff_cpu(bool layout=true, double tol=1e-6) {
   EType<T> elem;
-  // init Ke
-  unsigned nEntryKe = N * 3 * N * 3;
-  auto Ke = (T*)malloc(nEntryKe*sizeof(T));
-  elem.form_elem_stiff(Ke);
+  IPropType<T> iprop;
+  // init Ke0
+  unsigned nEntryKe0 = N * 3 * N * 3;
+  auto Ke0 = (T*)malloc(nEntryKe0*sizeof(T));
+  // init Ke1
+  auto Ke1 = (T*)malloc(nEntryKe0*sizeof(T));
+  // execute
+  elem.form_elem_stiff(Ke0, iprop);
+  // validate
+  bool flag = true;
+  // free Ke
+  free(Ke0);
+  free(Ke1);
+  if (flag) {
+    LOG(INFO) << "test_brick_elem_stiff_cpu succeed, dtype: " 
+      << typeid(T).name() << ", N: " << N
+      << ", Etype: " << typeid(EType<T>).name()
+      << ", EPropType: " << typeid(IPropType<T>).name();
+  } else {
+    LOG(FATAL) << "test_brick_elem_stiff_cpu fail, dtype: "
+      << typeid(T).name() << ", N: " << N
+      << ", Etype: " << typeid(EType<T>).name()
+      << ", EPropType: " << typeid(IPropType<T>).name();
+  }
 }
 
 int main(int argc, char* argv[]) {
@@ -160,24 +184,24 @@ int main(int argc, char* argv[]) {
   google::InitGoogleLogging(argv[0]);
   FLAGS_logtostderr = 1;
   // double precison tests
-  test_brick_interp_sum<double, 8>();
-  test_brick_interp_deriv<double, 8>();
+  test_brick_interp_sum<double,8>();
+  test_brick_interp_deriv<double,8>();
   test_brick_interp_sum<double, 20>();
-  test_brick_interp_prop<double, 2, 2, 2, 8>();
-  test_brick_interp_prop<double, 1, 1, 1, 8>();
-  test_brick_interp_prop<double, 3, 3, 3, 20>();
-  test_brick_interp_prop<double, 2, 2, 2, 20>();
-  test_brick_elem_stiff_cpu<double, 8, 8, fem::C3D8>();
+  test_brick_interp_prop<double,2,2,2,8>();
+  test_brick_interp_prop<double,1,1,1,8>();
+  test_brick_interp_prop<double,3,3,3,20>();
+  test_brick_interp_prop<double,2,2,2,20>();
+  test_brick_elem_stiff_cpu<double,8,8, fem::C3D8, fem::C3D8IProp>();
   LOG(INFO) << "double precision test passed";
   // single precision tests
-  test_brick_interp_sum<float, 8>();
-  test_brick_interp_deriv<float, 8>();
-  test_brick_interp_sum<float, 20>();
-  test_brick_interp_prop<float, 2, 2, 2, 8>();
-  test_brick_interp_prop<float, 1, 1, 1, 8>();
-  test_brick_interp_prop<float, 3, 3, 3, 20>();
-  test_brick_interp_prop<float, 2, 2, 2, 20>();
-  test_brick_elem_stiff_cpu<float, 8, 8, fem::C3D8>();
+  test_brick_interp_sum<float,8>();
+  test_brick_interp_deriv<float,8>();
+  test_brick_interp_sum<float,20>();
+  test_brick_interp_prop<float,2,2,2,8>();
+  test_brick_interp_prop<float,1,1,1,8>();
+  test_brick_interp_prop<float,3,3,3,20>();
+  test_brick_interp_prop<float,2,2,2,20>();
+  test_brick_elem_stiff_cpu<float,8,8, fem::C3D8, fem::C3D8IProp>();
   LOG(INFO) << "single precision test passed";
   return 0;
 }

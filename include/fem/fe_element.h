@@ -5,19 +5,20 @@
 
 namespace fem {
 template <typename T, unsigned int NI, unsigned int N>
-struct ElementVolInterpProp {
+struct ElementVolIProp {
   T hbuf[NI*N*3];
   T weights[NI];
   // unsigned int num_nodes;
-  // constexpr ElementVolInterpProp() {
+  // constexpr ElementVolIProp() {
     // num_nodes = N;
   // }
 };
 
-template <typename T, unsigned int NI, unsigned int N> class ElementVol {
+template <typename T, unsigned int NI, unsigned int N>
+class ElementVol {
   public:
-    static ElementVolInterpProp<T, NI, N> iprop;
-    virtual void form_elem_stiff(const T* const Ke);
+    virtual void form_elem_stiff(
+      const T* const Ke, const ElementVolIProp<T,NI,N> iprop);
 };
 } // namespace fem
 

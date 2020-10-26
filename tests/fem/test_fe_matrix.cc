@@ -25,8 +25,8 @@ void test_matmul_cblas(bool layout=true) {
   auto c = (T*)malloc(nEntryC*sizeof(T));
   // execute
   Matmul<T>::impl(
-      CblasRowMajor, CblasNoTrans, CblasNoTrans,
-      rc, cc, ca, (T)1.0, a, ca, b, cb, (T)0.0, c, cc);
+    CblasRowMajor, CblasNoTrans, CblasNoTrans,
+    rc, cc, ca, (T)1.0, a, ca, b, cb, (T)0.0, c, cc);
   if (layout) {
     LOG(INFO) << "matrix a layout";
     print_mat<T>(a, ra, ca);
@@ -85,9 +85,9 @@ void test_matmul_n333_cpu(bool layout=false, double tol=1e-6) {
   free(c);
   free(d);
   if (flag) {
-    LOG(INFO) << "test_matmul_n333_cpu succeed";
+    LOG(INFO) << "test_matmul_n333_cpu succeed, T: " << typeid(T).name();
   } else {
-    LOG(FATAL) << "test_matmul_n333_cpu failed";
+    LOG(FATAL) << "test_matmul_n333_cpu failed, T: " << typeid(T).name();
   }
 }
 
@@ -135,9 +135,9 @@ void test_matmul_3nn3_cpu(bool layout=false, double tol=1e-6) {
   free(c);
   free(d);
   if (flag) {
-    LOG(INFO) << "test_matmul_3nn3_cpu succeed";
+    LOG(INFO) << "test_matmul_3nn3_cpu succeed, T: " << typeid(T).name();
   } else {
-    LOG(FATAL) << "test_matmul_3nn3_cpu failed";
+    LOG(FATAL) << "test_matmul_3nn3_cpu failed, T: " << typeid(T).name();
   }
 }
 
@@ -197,10 +197,10 @@ void test_inv_33_cpu(bool layout=false, double tol=1e-6) {
   free(mul);
   free(unit);
   if (flag) {
-    LOG(INFO) << "test_inv_33_cpu succeed";
+    LOG(INFO) << "test_inv_33_cpu succeed, T: " << typeid(T).name();
   } else {
-    LOG(FATAL) << "test_inv_33_cpu failed";
-  }
+    LOG(FATAL) << "test_inv_33_cpu failed, T: " << typeid(T).name();
+   }
 }
 
 template <typename T>
@@ -277,9 +277,9 @@ void test_mattile_diag_33_cpu(bool layout=false, double tol=1e-6) {
   free(add0);
   free(add1);
   if (flag) {
-    LOG(INFO) << "test_mattile_diag33_cpu succeed";
+    LOG(INFO) << "test_mattile_diag33_cpu succeed, T: " << typeid(T).name();
   } else {
-    LOG(FATAL) << "test_mattile_diag33_cpu failed";
+    LOG(FATAL) << "test_mattile_diag33_cpu failed, T: " << typeid(T).name();
   }
 }
 
@@ -341,9 +341,9 @@ void test_matmul2_3n6_66_63n_cpu(bool layout=false, double tol=1e-6) {
   free(d);
   free(e);
   if (flag) {
-    LOG(INFO) << "test_matmul2_3n6_66_63n_cpu succeed";
+    LOG(INFO) << "test_matmul2_3n6_66_63n_cpu succeed, T: " << typeid(T).name();
   } else {
-    LOG(FATAL) << "test_matmul2_3n6_66_63n_cpu failed";
+    LOG(FATAL) << "test_matmul2_3n6_66_63n_cpu failed, T: " << typeid(T).name();
   }
 }
 
@@ -405,9 +405,9 @@ void test_matmul2_3n9_99_93n_cpu(bool layout=false, double tol=1e-6) {
   free(d);
   free(e);
   if (flag) {
-    LOG(INFO) << "test_matmul2_3n9_99_93n_cpu succeed";
+    LOG(INFO) << "test_matmul2_3n9_99_93n_cpu succeed, T: " << typeid(T).name();
   } else {
-    LOG(FATAL) << "test_matmul2_3n9_99_93n_cpu failed";
+    LOG(FATAL) << "test_matmul2_3n9_99_93n_cpu failed, T: " << typeid(T).name();
   }
 }
 

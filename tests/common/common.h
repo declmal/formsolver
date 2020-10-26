@@ -7,15 +7,17 @@
 #include <glog/logging.h>
 #include <cblas.h>
 
-#define DP_ZERO 1e-7
+#define DP_ZERO 1e-6
 
-template <typename T> void init_rand(T* const data, const unsigned int size) {
+template <typename T>
+void init_rand(T* const data, const unsigned int size) {
   for (unsigned int i = 0; i < size; ++i) {
     data[i] = (T)(rand() & 0xFF) / 10.0;
   }
 }
 
-template <typename T> void init_arange(T* const data, const unsigned int size) {
+template <typename T>
+void init_arange(T* const data, const unsigned int size) {
   for (unsigned int i = 0; i < size; ++i) {
     data[i] = (T)(2*i + 1);
   }
@@ -32,18 +34,21 @@ void init_diag_unit(T* const data, const unsigned int ndim) {
   }
 }
 
-template <typename T> void init_zero(T* const data, const unsigned int size) {
+template <typename T>
+void init_zero(T* const data, const unsigned int size) {
   for (unsigned int i = 0; i < size; ++i) {
     data[i] = (T)0;
   }
 }
 
-template <typename T> T rand_gen(const T low, const T high) {
+template <typename T>
+T rand_gen(const T low, const T high) {
   T rnd = static_cast<T>(rand())/static_cast<T>(RAND_MAX);
   return low + rnd*(high-low);
 }
 
-template <typename T> void print_mat(
+template <typename T>
+void print_mat(
   const T* const a, const unsigned int nrow, const unsigned int ncol) {
   auto a_ = a;
   for (unsigned int i = 0; i < nrow; ++i) {
@@ -56,7 +61,8 @@ template <typename T> void print_mat(
   std::cout << std::endl;
 }
 
-template <typename T> bool validate(
+template <typename T>
+bool validate(
   const T* const a, const T* const b,
   const unsigned int size, double tol=1e-6) {
   for (unsigned int i = 0; i < size; ++i) {
@@ -73,14 +79,16 @@ template <typename T> bool validate(
   return true;
 }
 
-template <typename T> void matadd(
+template <typename T>
+void matadd(
   const T* const a, const T* const b, const unsigned int size, T* const c) {
   for (unsigned int i = 0; i < size; ++i) {
     c[i] = a[i] + b[i];
   }
 }
 
-template <typename T> struct Matmul {
+template <typename T>
+struct Matmul {
   static inline void impl(
     CBLAS_ORDER order, CBLAS_TRANSPOSE trans_a, CBLAS_TRANSPOSE trans_b,
     const unsigned int M, const unsigned int N, const unsigned int K,
@@ -88,7 +96,8 @@ template <typename T> struct Matmul {
     const unsigned int ldb, const double beta, T* c, 
     const unsigned int ldc);
 };
-template <> struct Matmul<double> {
+template <>
+struct Matmul<double> {
   static inline void impl(
     CBLAS_ORDER order, CBLAS_TRANSPOSE trans_a, CBLAS_TRANSPOSE trans_b,
     const unsigned int M, const unsigned int N, const unsigned int K,
@@ -99,7 +108,8 @@ template <> struct Matmul<double> {
       order, trans_a, trans_b, M, N, K, alpha, a, lda, b, ldb, beta, c, ldc);
   }
 };
-template <> struct Matmul<float> {
+template <>
+struct Matmul<float> {
   static inline void impl(
     CBLAS_ORDER order, CBLAS_TRANSPOSE trans_a, CBLAS_TRANSPOSE trans_b,
     const unsigned int M, const unsigned int N, const unsigned int K,

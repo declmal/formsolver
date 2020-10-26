@@ -41,10 +41,12 @@ void lin_trans_mat_tl(
     H += 3;
   }
 }
-template void lin_trans_mat_tl(
+template
+void lin_trans_mat_tl(
   const double* const h0, const double* const u0t,
   const unsigned int N, double* const B0t_L);
-template void lin_trans_mat_tl(
+template
+void lin_trans_mat_tl(
   const float* const h0, const float* const u0t,
   const unsigned int N, float* const B0t_L);
 
@@ -82,8 +84,10 @@ void nonlin_trans_mat_tl(
     H += 3;
   }
 }
-template void nonlin_trans_mat_tl(
+template
+void nonlin_trans_mat_tl(
   const double* const h0, const unsigned int N, double* const B0_NL);
-template void nonlin_trans_mat_tl(
+template
+void nonlin_trans_mat_tl(
   const float* const h0, const unsigned int N, float* const B0_NL);
 } // namespace fem
