@@ -1,6 +1,5 @@
-#include <fem/fe_element.h>
-#include <fem/fe_matrix.h>
-#include <fem/fe_brick.h>
+#include <fem/element/element.h>
+#include <fem/iprop/brick_iprop.h>
 #include <fem/formulator/total_lagrangian.h>
 #include <common/common.h>
 #include <iostream> // for debug

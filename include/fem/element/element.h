@@ -1,7 +1,5 @@
-#ifndef FEM_FE_ELEMENT_H_
-#define FEM_FE_ELEMENT_H_
-
-#include <fem/formulator/formulator.h>
+#ifndef FEM_ELEMENT_ELEMENT_H_
+#define FEM_ELEMENT_ELEMENT_H_
 
 namespace fem {
 #define FORM_REGISTER_ELEMENT_TEMPLATE() \
@@ -45,4 +43,4 @@ class Element {
     const T* const data, const unsigned int size);
 } // namespace fem
 
-#endif // FEM_FE_ELEMENT_H_
+#endif // FEM_ELEMENT_ELEMENT_H_

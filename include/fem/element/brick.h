@@ -1,8 +1,8 @@
-#ifndef FEM_FE_BRICK_H_
-#define FEM_FE_BRICK_H_
+#ifndef FEM_ELEMENT_BRICK_H_
+#define FEM_ELEMENT_BRICK_H_
 
 #include <fem/iprop/brick_iprop.h>
-#include <fem/fe_element.h>
+#include <fem/element/element.h>
 
 namespace fem {
 template <
@@ -26,4 +26,4 @@ class C3D20R : public Element<T,20,C3D20RIProp,FormType> {
 };
 } // namespace fem
 
-#endif // FEM_FE_BRICK_H_
+#endif // FEM_ELEMENT_BRICK_H_
