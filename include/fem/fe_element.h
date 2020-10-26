@@ -4,15 +4,9 @@
 #include <fem/formulator/formulator.h>
 
 namespace fem {
-template <typename T, unsigned int NI, unsigned int N>
-struct ElementIProp {
-  T hbuf[NI*N*3];
-  T weights[NI];
-};
-
 #define FORM_REGISTER_ELEMENT_TEMPLATE() \
   template < \
-    typename T, unsigned int NI, unsigned int N, \
+    typename T, unsigned int N, \
     template <typename> class IPropType, \
     template <typename> class FormType>
 
@@ -43,11 +37,11 @@ class Element {
     T Ke[9*N*N];
 };
 
-#define FORM_REGISTER_ELEMENT(T, NI, N, IPropType, FormType) \
+#define FORM_REGISTER_ELEMENT(T, N, IPropType, FormType) \
   template \
-  void Element<T,NI,N,IPropType,FormType>::form_elem_stiff(); \
+  void Element<T,N,IPropType,FormType>::form_elem_stiff(); \
   template \
-  void Element<T,NI,N,IPropType,FormType>::init_coordinate( \
+  void Element<T,N,IPropType,FormType>::init_coordinate( \
     const T* const data, const unsigned int size);
 } // namespace fem
 
