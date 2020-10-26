@@ -1,5 +1,6 @@
 #include <glog/logging.h>
 #include <fem/fe_brick.h>
+#include <fem/formulator/total_lagrangian.h>
 #include "../common/common.h"
 
 template <typename T, unsigned int I, unsigned int N>
@@ -149,25 +150,24 @@ void test_brick_interp_prop(bool layout=true) {
 }
 
 template <
-  typename T, unsigned int NI, unsigned int N,
-  template <typename> class EType, template <typename> class IPropType>
+  typename T,
+  template <typename> class Form3DType,
+  template <
+    typename, template <typename> class
+  > class BrickType
+>
 void test_brick_elem_stiff_cpu(bool layout=true, double tol=1e-6) {
-  EType<T> elem;
-  IPropType<T> iprop;
+  BrickType<T,Form3DType> elem;
   // execute
-  elem.form_elem_stiff_cpu();
+  elem.form_elem_stiff();
   // validate
   bool flag = true;
   if (flag) {
     LOG(INFO) << "test_brick_elem_stiff_cpu succeed, dtype: " 
-      << typeid(T).name() << ", N: " << N
-      << ", Etype: " << typeid(EType<T>).name()
-      << ", EPropType: " << typeid(IPropType<T>).name();
+      << typeid(T).name(); 
   } else {
     LOG(FATAL) << "test_brick_elem_stiff_cpu fail, dtype: "
-      << typeid(T).name() << ", N: " << N
-      << ", Etype: " << typeid(EType<T>).name()
-      << ", EPropType: " << typeid(IPropType<T>).name();
+      << typeid(T).name();
   }
 }
 
@@ -183,10 +183,10 @@ int main(int argc, char* argv[]) {
   test_brick_interp_prop<double,1,1,1,8>();
   test_brick_interp_prop<double,3,3,3,20>();
   test_brick_interp_prop<double,2,2,2,20>();
-  test_brick_elem_stiff_cpu<double,8,8,fem::C3D8,fem::C3D8IProp>();
-  // test_brick_elem_stiff_cpu<double,8,8,fem::C3D8R,fem::C3D8RIProp>();
-  test_brick_elem_stiff_cpu<double,8,8,fem::C3D20,fem::C3D20IProp>();
-  test_brick_elem_stiff_cpu<double,8,8,fem::C3D20R,fem::C3D20RIProp>();
+  test_brick_elem_stiff_cpu<double,fem::TL3D,fem::C3D8>();
+  // test_brick_elem_stiff_cpu<double,fem::TL3D,fem::C3D8R>();
+  test_brick_elem_stiff_cpu<double,fem::TL3D,fem::C3D20>();
+  test_brick_elem_stiff_cpu<double,fem::TL3D,fem::C3D20R>();
   LOG(INFO) << "double precision test passed";
   // single precision tests
   test_brick_interp_sum<float,8>();
@@ -196,10 +196,10 @@ int main(int argc, char* argv[]) {
   test_brick_interp_prop<float,1,1,1,8>();
   test_brick_interp_prop<float,3,3,3,20>();
   test_brick_interp_prop<float,2,2,2,20>();
-  test_brick_elem_stiff_cpu<float,8,8,fem::C3D8,fem::C3D8IProp>();
-  // test_brick_elem_stiff_cpu<float,8,8,fem::C3D8R,fem::C3D8RIProp>();
-  test_brick_elem_stiff_cpu<float,8,8,fem::C3D20,fem::C3D20IProp>();
-  test_brick_elem_stiff_cpu<float,8,8,fem::C3D20R,fem::C3D20RIProp>();
+  test_brick_elem_stiff_cpu<float,fem::TL3D,fem::C3D8>();
+  // test_brick_elem_stiff_cpu<float,fem::TL3D,fem::C3D8R>();
+  test_brick_elem_stiff_cpu<float,fem::TL3D,fem::C3D20>();
+  test_brick_elem_stiff_cpu<float,fem::TL3D,fem::C3D20R>();
   LOG(INFO) << "single precision test passed";
   return 0;
 }

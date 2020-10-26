@@ -1,29 +1,30 @@
 #ifndef FEM_FE_ELEMENT_H_
 #define FEM_FE_ELEMENT_H_
 
-#include <common/gauss_legendre.h>
+#include <fem/formulator/formulator.h>
 
 namespace fem {
 template <typename T, unsigned int NI, unsigned int N>
 struct ElementIProp {
   T hbuf[NI*N*3];
   T weights[NI];
-  // unsigned int num_nodes;
-  // constexpr ElementIProp() {
-    // num_nodes = N;
-  // }
 };
 
-template <
-  typename T, unsigned int NI, unsigned int N,
-  template <typename> class IPropType>
+#define FORM_REGISTER_ELEMENT_TEMPLATE() \
+  template < \
+    typename T, unsigned int NI, unsigned int N, \
+    template <typename> class IPropType, \
+    template <typename> class FormType>
+
+FORM_REGISTER_ELEMENT_TEMPLATE()
 class Element {
   public:
-    static IPropType<T> iprop;
     void init_coordinate(const T* const data, const unsigned int size);
     void init_coordinate();
-    virtual void form_elem_stiff_cpu();
+    virtual void form_elem_stiff();
   private:
+    static FormType<T> form;
+    static IPropType<T> iprop;
     /*!
      * \brief Global Node Id List, of shape (N,)
      */
@@ -42,11 +43,11 @@ class Element {
     T Ke[9*N*N];
 };
 
-#define FORM_REGISTER_ELEMENT(T, NI, N, IPropType) \
+#define FORM_REGISTER_ELEMENT(T, NI, N, IPropType, FormType) \
   template \
-  void Element<T,NI,N,IPropType>::form_elem_stiff_cpu(); \
+  void Element<T,NI,N,IPropType,FormType>::form_elem_stiff(); \
   template \
-  void Element<T,NI,N,IPropType>::init_coordinate( \
+  void Element<T,NI,N,IPropType,FormType>::init_coordinate( \
     const T* const data, const unsigned int size);
 } // namespace fem
 
