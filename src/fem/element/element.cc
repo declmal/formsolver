@@ -1,18 +1,14 @@
 #include <fem/element/element.h>
 #include <fem/iprop/brick_iprop.h>
-#include <fem/formulator/total_lagrangian.h>
 #include <common/common.h>
 #include <iostream> // for debug
 
 namespace fem {
 FORM_REGISTER_ELEMENT_TEMPLATE()
-IPropType<T> Element<T,N,IPropType,FormType>::iprop;
+IPropType<T> Element<T,N,IPropType>::iprop;
 
 FORM_REGISTER_ELEMENT_TEMPLATE()
-FormType<T> Element<T,N,IPropType,FormType>::form;
-
-FORM_REGISTER_ELEMENT_TEMPLATE()
-void Element<T,N,IPropType,FormType>::form_elem_stiff() {
+void Element<T,N,IPropType>::form_elem_stiff() {
   auto h = iprop.hbuf;
   auto weights = iprop.weights;
   init_zero<T>(Ke, 9*N*N);
@@ -23,12 +19,12 @@ void Element<T,N,IPropType,FormType>::form_elem_stiff() {
 }
 
 FORM_REGISTER_ELEMENT_TEMPLATE()
-void Element<T,N,IPropType,FormType>::init_coordinate() {
+void Element<T,N,IPropType>::init_coordinate() {
   // TODO
 }
 
 FORM_REGISTER_ELEMENT_TEMPLATE()
-void Element<T,N,IPropType,FormType>::init_coordinate(
+void Element<T,N,IPropType>::init_coordinate(
   const T* const data, const unsigned int size) {
   for (unsigned int i = 0; i < size; ++i) {
     X0[i] = data[i];
@@ -36,16 +32,16 @@ void Element<T,N,IPropType,FormType>::init_coordinate(
 }
 
 // C3D8 TL
-FORM_REGISTER_ELEMENT(double, 8, C3D8IProp, TL3D)
-FORM_REGISTER_ELEMENT(float, 8, C3D8IProp, TL3D)
+FORM_REGISTER_ELEMENT(double, 8, C3D8IProp)
+FORM_REGISTER_ELEMENT(float, 8, C3D8IProp)
 // // C3D8R TL
-// FORM_REGISTER_ELEMENT(double, 8, C3D8RIProp, TL3D)
-// FORM_REGISTER_ELEMENT(float, 8, C3D8RIProp, TL3D)
+// FORM_REGISTER_ELEMENT(double, 8, C3D8RIProp)
+// FORM_REGISTER_ELEMENT(float, 8, C3D8RIProp)
 // C3D20 TL
-FORM_REGISTER_ELEMENT(double, 20, C3D20IProp, TL3D)
-FORM_REGISTER_ELEMENT(float, 20, C3D20IProp, TL3D)
+FORM_REGISTER_ELEMENT(double, 20, C3D20IProp)
+FORM_REGISTER_ELEMENT(float, 20, C3D20IProp)
 // C3D20R TL
-FORM_REGISTER_ELEMENT(double, 20, C3D20RIProp, TL3D)
-FORM_REGISTER_ELEMENT(float, 20, C3D20RIProp, TL3D)
+FORM_REGISTER_ELEMENT(double, 20, C3D20RIProp)
+FORM_REGISTER_ELEMENT(float, 20, C3D20RIProp)
 
 } // namespace fem

@@ -5,24 +5,20 @@
 #include "element.h"
 
 namespace fem {
-template <
-  typename T, template <typename> class FormType>
-class C3D8 : public Element<T,8,C3D8IProp,FormType> {
+template <typename T>
+class C3D8 : public Element<T,8,C3D8IProp> {
 };
 
-// template <
-  // typename T, template <typename> class FormType>
-// class C3D8R : public Element<T,8,C3D8RIProp,FormType> {
+// template <typename T>
+// class C3D8R : public Element<T,8,C3D8RIProp> {
 // };
 
-template <
-  typename T, template <typename> class FormType>
-class C3D20 : public Element<T,20,C3D20IProp,FormType> {
+template <typename T>
+class C3D20 : public Element<T,20,C3D20IProp> {
 };
 
-template <
-  typename T, template <typename> class FormType>
-class C3D20R : public Element<T,20,C3D20RIProp,FormType> {
+template <typename T>
+class C3D20R : public Element<T,20,C3D20RIProp> {
 };
 } // namespace fem
 

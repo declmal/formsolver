@@ -1,7 +1,6 @@
 #ifndef FEM_TOTAL_LAGRANGIAN_H_
 #define FEM_TOTAL_LAGRANGIAN_H_
 
-#include <fem/element/element.h>
 #include "formulator.h"
 
 namespace fem {

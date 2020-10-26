@@ -5,8 +5,7 @@ namespace fem {
 #define FORM_REGISTER_ELEMENT_TEMPLATE() \
   template < \
     typename T, unsigned int N, \
-    template <typename> class IPropType, \
-    template <typename> class FormType>
+    template <typename> class IPropType>
 
 FORM_REGISTER_ELEMENT_TEMPLATE()
 class Element {
@@ -14,8 +13,10 @@ class Element {
     void init_coordinate(const T* const data, const unsigned int size);
     void init_coordinate();
     virtual void form_elem_stiff();
-  private:
-    static FormType<T> form;
+  protected:
+    /*!
+     * \brief Element Interpolation Property
+     */
     static IPropType<T> iprop;
     /*!
      * \brief Global Node Id List, of shape (N,)
@@ -35,11 +36,11 @@ class Element {
     T Ke[9*N*N];
 };
 
-#define FORM_REGISTER_ELEMENT(T, N, IPropType, FormType) \
+#define FORM_REGISTER_ELEMENT(T, N, IPropType) \
   template \
-  void Element<T,N,IPropType,FormType>::form_elem_stiff(); \
+  void Element<T,N,IPropType>::form_elem_stiff(); \
   template \
-  void Element<T,N,IPropType,FormType>::init_coordinate( \
+  void Element<T,N,IPropType>::init_coordinate( \
     const T* const data, const unsigned int size);
 } // namespace fem
 
