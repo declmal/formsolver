@@ -55,36 +55,29 @@ void legendre_roots(
   }
 }
 
-template <typename T, unsigned int N>
-struct GaussRoots1D {
-  T roots[N];
+template <
+  typename T, unsigned Dim, unsigned int N0, unsigned int N1, unsigned int N2>
+struct GaussRoots {
+  // constexpr static auto NI = N0 * N1 * N2;
+  // constexpr static double tol = 1e-20;
+  // T roots[NI*Dim];
+};
+template <typename T, unsigned int N0>
+struct GaussRoots<T,1,N0,1,1> {
   constexpr static double tol = 1e-20;
-  constexpr GaussRoots1D() {
-    legendre_roots<T,N>(roots, tol);
+  T roots[N0];
+  constexpr GaussRoots() {
+    legendre_roots<T,N0>(roots, tol);
   }
 };
-
-template <typename T, unsigned int N>
-struct GaussWeights1D {
-  T weights[N];
-  constexpr GaussWeights1D() {
-    GaussRoots1D<T,N> gr;
-    for (unsigned int i = 0; i < N; ++i) {
-      weights[i] = (T)2 / (
-        (T)(1-pow(gr.roots[i],2)) * pow(dlegendre<T,N>(gr.roots[i]),2)
-      );
-    }
-  }
-};
-
 template <typename T, unsigned int N0, unsigned int N1, unsigned int N2>
-struct GaussRoots3D {
+struct GaussRoots<T,3,N0,N1,N2> {
   constexpr static auto NI = N0 * N1 * N2;
   T roots[NI*3];
-  constexpr GaussRoots3D() {
-    GaussRoots1D<T,N0> gr0;
-    GaussRoots1D<T,N1> gr1;
-    GaussRoots1D<T,N2> gr2;
+  constexpr GaussRoots() {
+    GaussRoots<T,1,N0,1,1> gr0;
+    GaussRoots<T,1,N1,1,1> gr1;
+    GaussRoots<T,1,N2,1,1> gr2;
     auto stride0 = N1 * N2;
     auto stride1 = N2;
     for (unsigned int i = 0; i < N0; ++i) {
@@ -101,14 +94,32 @@ struct GaussRoots3D {
   }
 };
 
+template <
+  typename T, unsigned int Dim, unsigned int N0, unsigned N1, unsigned int N2>
+struct GaussWeights {
+  // constexpr static auto NI = N0 * N1 * N2;
+  // T weights[NI];
+};
+template <typename T, unsigned int N0>
+struct GaussWeights<T,1,N0,1,1>  {
+  T weights[N0];
+  constexpr GaussWeights() {
+    GaussRoots<T,1,N0,1,1> gr;
+    for (unsigned int i = 0; i < N0; ++i) {
+      weights[i] = (T)2 / (
+        (T)(1-pow(gr.roots[i],2)) * pow(dlegendre<T,N0>(gr.roots[i]),2)
+      );
+    }
+  }
+};
 template <typename T, unsigned int N0, unsigned int N1, unsigned int N2>
-struct GaussWeights3D {
+struct GaussWeights<T,3,N0,N1,N2> {
   constexpr static auto NI = N0 * N1 * N2;
   T weights[NI];
-  constexpr GaussWeights3D() {
-    GaussWeights1D<T,N0> gw0;
-    GaussWeights1D<T,N1> gw1;
-    GaussWeights1D<T,N2> gw2;
+  constexpr GaussWeights() {
+    GaussWeights<T,1,N0,1,1> gw0;
+    GaussWeights<T,1,N1,1,1> gw1;
+    GaussWeights<T,1,N2,1,1> gw2;
     auto stride0 = N1 * N2;
     auto stride1 = N2;
     for (unsigned int i = 0; i < N0; ++i) {

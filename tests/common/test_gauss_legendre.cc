@@ -491,8 +491,8 @@ struct ValidateGauss<T,16> {
 
 template <typename T, unsigned int N>
 void test_gauss_1d(bool layout=true, double tol=1e-6) {
-  GaussRoots1D<T,N> gr;
-  GaussWeights1D<T,N> gw;
+  GaussRoots<T,1,N,1,1> gr;
+  GaussWeights<T,1,N,1,1> gw;
   if (layout) {
     LOG(INFO) << "matrix roots layout";
     print_mat<T>(gr.roots, N, 1);
@@ -511,8 +511,8 @@ void test_gauss_1d(bool layout=true, double tol=1e-6) {
 
 template <typename T, unsigned int N0, unsigned int N1, unsigned int N2>
 void test_gauss_3d(bool layout=true) {
-  GaussRoots3D<T,N0,N1,N2> gr;
-  GaussWeights3D<T,N0,N1,N2> gw;
+  GaussRoots<T,3,N0,N1,N2> gr;
+  GaussWeights<T,3,N0,N1,N2> gw;
   if (layout) {
     LOG(INFO) << "matrix roots layout";
     print_mat<T>(gr.roots, N0*N1*N2, 3);

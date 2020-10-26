@@ -18,6 +18,7 @@ void Element<T,NI,N,IPropType>::form_elem_stiff_cpu() {
   auto weights = iprop.weights;
   init_zero<T>(Ke, 9*N*N);
   for (unsigned int i = 0; i < NI; ++i) {
+    std::cout << weights[i] << std::endl;
     h += NI;
   }
 }

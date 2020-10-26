@@ -229,7 +229,7 @@ struct BrickIProp : public ElementIProp<T,N0*N1*N2,N> {
   constexpr BrickIProp() : ElementIProp<T,N0*N1*N2,N>() {
     // init hbuf
     auto NI = N0 * N1 * N2;
-    GaussRoots3D<T,N0,N1,N2> gr;
+    GaussRoots<T,3,N0,N1,N2> gr;
     T* r = gr.roots;
     T* h = this->hbuf;
     for (unsigned int i = 0; i < NI; ++i) {
@@ -238,7 +238,7 @@ struct BrickIProp : public ElementIProp<T,N0*N1*N2,N> {
       h += NI;
     }
     // init weights
-    GaussWeights3D<T,N0,N1,N2> gw;
+    GaussWeights<T,3,N0,N1,N2> gw;
     for (unsigned int i = 0; i < NI; ++i) {
       this->weights[i] = gw.weights[i];
     }
