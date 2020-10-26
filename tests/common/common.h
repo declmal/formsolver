@@ -35,13 +35,6 @@ void init_diag_unit(T* const data, const unsigned int ndim) {
 }
 
 template <typename T>
-void init_zero(T* const data, const unsigned int size) {
-  for (unsigned int i = 0; i < size; ++i) {
-    data[i] = (T)0;
-  }
-}
-
-template <typename T>
 T rand_gen(const T low, const T high) {
   T rnd = static_cast<T>(rand())/static_cast<T>(RAND_MAX);
   return low + rnd*(high-low);
@@ -89,7 +82,7 @@ void matadd(
 
 template <typename T>
 struct Matmul {
-  static inline void impl(
+  static inline void matmul(
     CBLAS_ORDER order, CBLAS_TRANSPOSE trans_a, CBLAS_TRANSPOSE trans_b,
     const unsigned int M, const unsigned int N, const unsigned int K,
     const double alpha, const T* a, const unsigned int lda, const T* b,
@@ -98,7 +91,7 @@ struct Matmul {
 };
 template <>
 struct Matmul<double> {
-  static inline void impl(
+  static inline void matmul(
     CBLAS_ORDER order, CBLAS_TRANSPOSE trans_a, CBLAS_TRANSPOSE trans_b,
     const unsigned int M, const unsigned int N, const unsigned int K,
     const double alpha, const double* a, const unsigned int lda, const double* b,
@@ -110,7 +103,7 @@ struct Matmul<double> {
 };
 template <>
 struct Matmul<float> {
-  static inline void impl(
+  static inline void matmul(
     CBLAS_ORDER order, CBLAS_TRANSPOSE trans_a, CBLAS_TRANSPOSE trans_b,
     const unsigned int M, const unsigned int N, const unsigned int K,
     const float alpha, const float* a, const unsigned int lda, const float* b,

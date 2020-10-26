@@ -154,18 +154,10 @@ template <
 void test_brick_elem_stiff_cpu(bool layout=true, double tol=1e-6) {
   EType<T> elem;
   IPropType<T> iprop;
-  // init Ke0
-  unsigned nEntryKe0 = N * 3 * N * 3;
-  auto Ke0 = (T*)malloc(nEntryKe0*sizeof(T));
-  // init Ke1
-  auto Ke1 = (T*)malloc(nEntryKe0*sizeof(T));
   // execute
-  elem.form_elem_stiff(Ke0, iprop);
+  elem.form_elem_stiff_cpu(iprop);
   // validate
   bool flag = true;
-  // free Ke
-  free(Ke0);
-  free(Ke1);
   if (flag) {
     LOG(INFO) << "test_brick_elem_stiff_cpu succeed, dtype: " 
       << typeid(T).name() << ", N: " << N
@@ -191,7 +183,10 @@ int main(int argc, char* argv[]) {
   test_brick_interp_prop<double,1,1,1,8>();
   test_brick_interp_prop<double,3,3,3,20>();
   test_brick_interp_prop<double,2,2,2,20>();
-  test_brick_elem_stiff_cpu<double,8,8, fem::C3D8, fem::C3D8IProp>();
+  test_brick_elem_stiff_cpu<double,8,8,fem::C3D8,fem::C3D8IProp>();
+  // test_brick_elem_stiff_cpu<double,8,8,fem::C3D8R,fem::C3D8RIProp>();
+  test_brick_elem_stiff_cpu<double,8,8,fem::C3D20,fem::C3D20IProp>();
+  test_brick_elem_stiff_cpu<double,8,8,fem::C3D20R,fem::C3D20RIProp>();
   LOG(INFO) << "double precision test passed";
   // single precision tests
   test_brick_interp_sum<float,8>();
@@ -201,7 +196,10 @@ int main(int argc, char* argv[]) {
   test_brick_interp_prop<float,1,1,1,8>();
   test_brick_interp_prop<float,3,3,3,20>();
   test_brick_interp_prop<float,2,2,2,20>();
-  test_brick_elem_stiff_cpu<float,8,8, fem::C3D8, fem::C3D8IProp>();
+  test_brick_elem_stiff_cpu<float,8,8,fem::C3D8,fem::C3D8IProp>();
+  // test_brick_elem_stiff_cpu<float,8,8,fem::C3D8R,fem::C3D8RIProp>();
+  test_brick_elem_stiff_cpu<float,8,8,fem::C3D20,fem::C3D20IProp>();
+  test_brick_elem_stiff_cpu<float,8,8,fem::C3D20R,fem::C3D20RIProp>();
   LOG(INFO) << "single precision test passed";
   return 0;
 }

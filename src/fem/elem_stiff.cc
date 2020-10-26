@@ -2,7 +2,7 @@
 
 namespace fem {
 template <typename T>
-void lin_trans_mat_tl(
+void lin_trans_mat_tl_3d(
   const T* const h0, const T* const u0t, const unsigned int N, T* const B0t_L) {
   auto H = h0;
   auto _3N = 3 * N;
@@ -42,16 +42,16 @@ void lin_trans_mat_tl(
   }
 }
 template
-void lin_trans_mat_tl(
+void lin_trans_mat_tl_3d(
   const double* const h0, const double* const u0t,
   const unsigned int N, double* const B0t_L);
 template
-void lin_trans_mat_tl(
+void lin_trans_mat_tl_3d(
   const float* const h0, const float* const u0t,
   const unsigned int N, float* const B0t_L);
 
 template <typename T>
-void nonlin_trans_mat_tl(
+void nonlin_trans_mat_tl_3d(
   const T* const h0, const unsigned int N, T* const B0_NL) {
   auto H = h0;
   auto _3N = 3 * N;
@@ -85,9 +85,9 @@ void nonlin_trans_mat_tl(
   }
 }
 template
-void nonlin_trans_mat_tl(
+void nonlin_trans_mat_tl_3d(
   const double* const h0, const unsigned int N, double* const B0_NL);
 template
-void nonlin_trans_mat_tl(
+void nonlin_trans_mat_tl_3d(
   const float* const h0, const unsigned int N, float* const B0_NL);
 } // namespace fem

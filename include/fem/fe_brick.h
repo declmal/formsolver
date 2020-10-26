@@ -225,8 +225,8 @@ template <typename T, unsigned int N> void brick_interp_deriv(
 
 template <
   typename T, unsigned int N0, unsigned int N1, unsigned int N2, unsigned int N> 
-struct BrickIProp : public ElementVolIProp<T,N0*N1*N2,N> {
-  constexpr BrickIProp() : ElementVolIProp<T,N0*N1*N2,N>() {
+struct BrickIProp : public ElementIProp<T,N0*N1*N2,N> {
+  constexpr BrickIProp() : ElementIProp<T,N0*N1*N2,N>() {
     // init hbuf
     auto NI = N0 * N1 * N2;
     GaussRoots3D<T,N0,N1,N2> gr;
@@ -255,7 +255,19 @@ template <typename T>
 using C3D20RIProp = BrickIProp<T,2,2,2,20>;
 
 template <typename T>
-class C3D8 : public ElementVol<T,8,8> {
+class C3D8 : public Element<T,8,8> {
+};
+
+// template <typename T>
+// class C3D8R : public Element<T,1,8> {
+// };
+
+template <typename T>
+class C3D20 : public Element<T,27,20> {
+};
+
+template <typename T>
+class C3D20R : public Element<T,8,20> {
 };
 } // namespace fem
 

@@ -10,7 +10,7 @@ namespace fem {
  * \param b input variable, matrix of shape (N, 3) 
  * \param N input variable, dimension variable
  * \param c output variable, matrix of shape (3, 3)
-*/
+ */
 template <typename T>
 void matmul_3nn3(const T* const a, const T* const b, const unsigned int N, T* const c);
 
@@ -22,7 +22,7 @@ void matmul_3nn3(const T* const a, const T* const b, const unsigned int N, T* co
  * \param b input variable, matrix of shape (3, 3) 
  * \param N input variable, dimension variable
  * \param c output variable, matrix of shape (N, 3)
-*/
+ */
 template <typename T>
 void matmul_n333(const T* const a, const T* const b, const unsigned int N, T* const c);
 
@@ -31,7 +31,7 @@ void matmul_n333(const T* const a, const T* const b, const unsigned int N, T* co
  *
  * \param a input variable, matrix of shape (3, 3)
  * \param det output variable, determinant of matrix, of shape (1,)
-*/
+ */
 template <typename T>
 void det_33(const T* const a, T* const det);
 
@@ -41,7 +41,7 @@ void det_33(const T* const a, T* const det);
  * \param a input variable, matrix of shape (3, 3)
  * \param det intput variable, determinant of matrix, of shape (1,)
  * \param inv output variable, inversion matrix, of shape (3, 3),
-*/
+ */
 template <typename T>
 void inv_33(const T* const a, const T* const det, T* const inv);
 
@@ -50,7 +50,7 @@ void inv_33(const T* const a, const T* const det, T* const inv);
  *
  * \param a input variable, matrix of shape (3, 3)
  * \param tile output variable, inversion matrix, of shape (9, 9),
-*/
+ */
 template <typename T>
 void mattile_diag_33(const T* const a, T* const tile);
 
@@ -63,7 +63,7 @@ void mattile_diag_33(const T* const a, T* const tile);
  * \param N input variable, dimension variable
  * \param buffer output variable, matrix of shape (6,)
  * \param c output variable, matrix of shape (3N, 3N)
-*/
+ */
 template <typename T>
 void matmul2_3n6_66_63n(
   const T* const a, const T* const b, const unsigned int N,
@@ -78,7 +78,7 @@ void matmul2_3n6_66_63n(
  * \param N input variable, dimension variable
  * \param buffer output variable, matrix of shape (9,)
  * \param c output variable, matrix of shape (3N, 3N)
-*/
+ */
 template <typename T>
 void matmul2_3n9_99_93n(
   const T* const a, const T* const b, const unsigned int N,

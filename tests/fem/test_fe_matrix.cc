@@ -2,6 +2,7 @@
 #include <cblas.h>
 #include <glog/logging.h>
 #include <fem/fe_matrix.h>
+#include <common/common.h>
 #include "../common/common.h"
 
 template <typename T>
@@ -24,7 +25,7 @@ void test_matmul_cblas(bool layout=true) {
   unsigned int nEntryC = rc * cc;
   auto c = (T*)malloc(nEntryC*sizeof(T));
   // execute
-  Matmul<T>::impl(
+  Matmul<T>::matmul(
     CblasRowMajor, CblasNoTrans, CblasNoTrans,
     rc, cc, ca, (T)1.0, a, ca, b, cb, (T)0.0, c, cc);
   if (layout) {
@@ -65,7 +66,7 @@ void test_matmul_n333_cpu(bool layout=false, double tol=1e-6) {
   // execute
   fem::matmul_n333<T>(a, b, N, c);
   // validate
-  Matmul<T>::impl(
+  Matmul<T>::matmul(
     CblasRowMajor, CblasNoTrans, CblasNoTrans,
     N, 3, 3, (T)1.0, a, 3, b, 3, (T)0.0, d, 3);
   if (layout) {
@@ -115,7 +116,7 @@ void test_matmul_3nn3_cpu(bool layout=false, double tol=1e-6) {
   // execute
   fem::matmul_3nn3<T>(a, b, N, c);
   // validate
-  Matmul<T>::impl(
+  Matmul<T>::matmul(
     CblasRowMajor, CblasNoTrans, CblasNoTrans,
     3, 3, N, (T)1.0, a, N, b, 3, (T)0.0, d, 3);
   if (layout) {
@@ -176,7 +177,7 @@ void test_inv_33_cpu(bool layout=false, double tol=1e-6) {
   }
   fem::inv_33(a, det, inv);
   // validate
-  Matmul<T>::impl(
+  Matmul<T>::matmul(
     CblasRowMajor, CblasNoTrans, CblasNoTrans,
     3, 3, 3, (T)1.0, a, 3, inv, 3, (T)0.0, mul, 3);
   if (layout) {
@@ -235,22 +236,22 @@ void test_mattile_diag_33_cpu(bool layout=false, double tol=1e-6) {
   // execute
   fem::mattile_diag_33<T>(a, tile);
   // validate
-  Matmul<T>::impl(
+  Matmul<T>::matmul(
     CblasRowMajor, CblasTrans, CblasNoTrans,
     9, 3, 3, (T)1.0, I0, 9, a, 3, (T)0.0, tmp, 3);
-  Matmul<T>::impl(
+  Matmul<T>::matmul(
     CblasRowMajor, CblasNoTrans, CblasNoTrans,
     9, 9, 3, (T)1.0, tmp, 3, I0, 9, (T)0.0, mul0, 9);
-  Matmul<T>::impl(
+  Matmul<T>::matmul(
     CblasRowMajor, CblasTrans, CblasNoTrans,
     9, 3, 3, (T)1.0, I1, 9, a, 3, (T)0.0, tmp, 3);
-  Matmul<T>::impl(
+  Matmul<T>::matmul(
     CblasRowMajor, CblasNoTrans, CblasNoTrans,
     9, 9, 3, (T)1.0, tmp, 3, I1, 9, (T)0.0, mul1, 9);
-  Matmul<T>::impl(
+  Matmul<T>::matmul(
     CblasRowMajor, CblasTrans, CblasNoTrans,
     9, 3, 3, (T)1.0, I2, 9, a, 3, (T)0.0, tmp, 3);
-  Matmul<T>::impl(
+  Matmul<T>::matmul(
     CblasRowMajor, CblasNoTrans, CblasNoTrans,
     9, 9, 3, (T)1.0, tmp, 3, I2, 9, (T)0.0, mul2, 9);
   matadd<T>(mul0, mul1, 81, add0);
@@ -316,10 +317,10 @@ void test_matmul2_3n6_66_63n_cpu(bool layout=false, double tol=1e-6) {
   // execute
   fem::matmul2_3n6_66_63n(a, b, N, buffer, c);
   // validate
-  Matmul<T>::impl(
+  Matmul<T>::matmul(
     CblasRowMajor, CblasTrans, CblasNoTrans,
     _3N, 6, 6, (T)1.0, a, _3N, b, 6, (T)0.0, d, 6);
-  Matmul<T>::impl(
+  Matmul<T>::matmul(
     CblasRowMajor, CblasNoTrans, CblasNoTrans,
     _3N, _3N, 6, (T)1.0, d, 6, a, _3N, (T)0.0, e, _3N);
   if (layout) {
@@ -380,10 +381,10 @@ void test_matmul2_3n9_99_93n_cpu(bool layout=false, double tol=1e-6) {
   // execute
   fem::matmul2_3n9_99_93n(a, b, N, buffer, c);
   // validate
-  Matmul<T>::impl(
+  Matmul<T>::matmul(
     CblasRowMajor, CblasTrans, CblasNoTrans,
     _3N, 9, 9, (T)1.0, a, _3N, b, 9, (T)0.0, d, 9);
-  Matmul<T>::impl(
+  Matmul<T>::matmul(
     CblasRowMajor, CblasNoTrans, CblasNoTrans,
     _3N, _3N, 9, (T)1.0, d, 9, a, _3N, (T)0.0, e, _3N);
   if (layout) {

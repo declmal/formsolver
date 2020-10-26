@@ -20,7 +20,7 @@ void test_lin_trans_mat_tl_cpu(bool layout=true) {
   unsigned int nBytesB0t_L = nEntryB0t_L * sizeof(T);
   auto B0t_L = (T*)malloc(nBytesB0t_L);
   // execute
-  fem::lin_trans_mat_tl(h0, u0t, N, B0t_L);
+  fem::lin_trans_mat_tl_3d(h0, u0t, N, B0t_L);
   if (layout) {
     LOG(INFO) << "matrix h0 layout";
     print_mat<T>(h0, N, 3);
@@ -49,7 +49,7 @@ void test_nonlin_trans_mat_tl_cpu(bool layout=true) {
   unsigned int nBytesB0_NL = nEntryB0_NL * sizeof(T);
   auto B0_NL = (T*)malloc(nBytesB0_NL);
   // execute
-  fem::nonlin_trans_mat_tl(h0, N, B0_NL);
+  fem::nonlin_trans_mat_tl_3d(h0, N, B0_NL);
   if (layout) {
     LOG(INFO) << "matrix h0 layout";
     print_mat<T>(h0, N, 3);
