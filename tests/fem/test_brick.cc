@@ -1,5 +1,6 @@
 #include <glog/logging.h>
 #include <fem/element/brick.h>
+#include <fem/formulator/total_lagrangian.h>
 #include "../common/common.h"
 
 template <
@@ -21,6 +22,19 @@ void test_brick_elem_stiff_cpu(bool layout=true, double tol=1e-6) {
   }
 }
 
+template <
+  typename T,
+  template <typename> class EType,
+  template <
+    typename, template<typename> class
+  > class FormType
+>
+void test_form_brick(bool layout=true) {
+  EType<T> elem;
+  FormType<T, EType> form(&elem);
+  form.load_elem_data();
+}
+
 int main(int argc, char* argv[]) {
   // log init
   google::InitGoogleLogging(argv[0]);
@@ -36,6 +50,7 @@ int main(int argc, char* argv[]) {
   // test_brick_elem_stiff_cpu<float,fem::C3D8R>();
   test_brick_elem_stiff_cpu<float,fem::C3D20>();
   test_brick_elem_stiff_cpu<float,fem::C3D20R>();
+  test_form_brick<float, fem::C3D8, fem::TL3D>();
   LOG(INFO) << "single precision test passed";
   return 0;
 }

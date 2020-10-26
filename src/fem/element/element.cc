@@ -19,16 +19,31 @@ void Element<T,N,IPropType>::form_elem_stiff() {
 }
 
 FORM_REGISTER_ELEMENT_TEMPLATE()
-void Element<T,N,IPropType>::init_coordinate() {
-  // TODO
-}
-
-FORM_REGISTER_ELEMENT_TEMPLATE()
 void Element<T,N,IPropType>::init_coordinate(
   const T* const data, const unsigned int size) {
   for (unsigned int i = 0; i < size; ++i) {
     X0[i] = data[i];
   }
+}
+
+FORM_REGISTER_ELEMENT_TEMPLATE()
+T* Element<T,N,IPropType>::get_X0() {
+  return X0;
+}
+
+FORM_REGISTER_ELEMENT_TEMPLATE()
+T* Element<T,N,IPropType>::get_J() {
+  return J;
+}
+
+FORM_REGISTER_ELEMENT_TEMPLATE()
+T* Element<T,N,IPropType>::get_Ke() {
+  return Ke;
+}
+
+FORM_REGISTER_ELEMENT_TEMPLATE()
+void Element<T,N,IPropType>::init_coordinate() {
+  // TODO
 }
 
 // C3D8 TL

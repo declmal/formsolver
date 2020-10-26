@@ -12,6 +12,9 @@ class Element {
   public:
     void init_coordinate(const T* const data, const unsigned int size);
     void init_coordinate();
+    T* get_X0();
+    T* get_J();
+    T* get_Ke();
     virtual void form_elem_stiff();
   protected:
     /*!
@@ -41,7 +44,13 @@ class Element {
   void Element<T,N,IPropType>::form_elem_stiff(); \
   template \
   void Element<T,N,IPropType>::init_coordinate( \
-    const T* const data, const unsigned int size);
+    const T* const data, const unsigned int size); \
+  template \
+  T* Element<T,N,IPropType>::get_X0(); \
+  template \
+  T* Element<T,N,IPropType>::get_J(); \
+  template \
+  T* Element<T,N,IPropType>::get_Ke();
 } // namespace fem
 
 #endif // FEM_ELEMENT_ELEMENT_H_

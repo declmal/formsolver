@@ -1,7 +1,6 @@
-#ifndef FEM_FE_MATRIX_H_
-#define FEM_FE_MATRIX_H_
+#ifndef COMMON_MATRIX_H_
+#define COMMON_MATRIX_H_
 
-namespace fem {
 template <typename T, unsigned int Dim>
 struct FEMatrix {
   /*!
@@ -67,10 +66,10 @@ struct FEMatrix {
    *  i = 0,1,...,3N-1; j = 0,1,...,3N-1; 
    *  k = 0,1,...,Dim^2-1; l = 0,1,...,Dim^2-1
    *
-   * \param a input variable, matrix of shape (9, 3N)
-   * \param b input variable, matrix of shape (9, 9)
+   * \param a input variable, matrix of shape (Dim^2, 3N)
+   * \param b input variable, matrix of shape (Dim^2, Dim^2)
    * \param N input variable, dimension variable
-   * \param buffer output variable, matrix of shape (9,)
+   * \param buffer output variable, matrix of shape (Dim^2,)
    * \param c output variable, matrix of shape (3N, 3N)
    */
   static void matmul2_dnf_ff_fdn(
@@ -80,7 +79,7 @@ struct FEMatrix {
 
 template <typename T>
 struct FEMatrix<T,3> {
-  void matmul_dnnd(
+  static void matmul_dnnd(
     const T* const a, const T* const b, const unsigned int N, T* const c) {
     auto a0_ = a;
     auto a1_ = a0_ + N;
@@ -106,7 +105,7 @@ struct FEMatrix<T,3> {
     }
   }
 
-  void matmul_nddd(
+  static void matmul_nddd(
     const T* const a, const T* const b, const unsigned int N, T* const c) {
     auto a_ = a;
     auto c_ = c;
@@ -119,14 +118,14 @@ struct FEMatrix<T,3> {
     }
   }
 
-  void det_dd(const T* const a, T* const det) {
+  static void det_dd(const T* const a, T* const det) {
     det[0] =
       (a[3]*a[7] - a[4]*a[6]) * a[2] +
       (a[1]*a[6] - a[0]*a[7]) * a[5] +
       (a[0]*a[4] - a[1]*a[3]) * a[8];
   }
 
-  void inv_dd(const T* const a, const T* const det, T* const inv) {
+  static void inv_dd(const T* const a, const T* const det, T* const inv) {
     inv[0] = a[4]*a[8] - a[5]*a[7];
     inv[1] = a[2]*a[7] - a[1]*a[8];
     inv[2] = a[1]*a[5] - a[2]*a[4];
@@ -141,7 +140,7 @@ struct FEMatrix<T,3> {
     }
   }
 
-  void mattile_diag_dd(const T* const a, T* const tile) {
+  static void mattile_diag_dd(const T* const a, T* const tile) {
     for (unsigned int i = 0; i < 81; ++i) {
       tile[i] = (T)0;
     }
@@ -155,7 +154,7 @@ struct FEMatrix<T,3> {
     tile[19] = tile[49] = tile[79] = a[7];
     tile[20] = tile[50] = tile[80] = a[8];
   }
-  void matmul2_dne_ee_edn(
+  static void matmul2_dne_ee_edn(
     const T* const a, const T* const b, const unsigned int N,
     T* const buffer, T* const c) {
     auto _3N = 3 * N;
@@ -187,7 +186,7 @@ struct FEMatrix<T,3> {
     }
   }
 
-  void matmul2_dnf_ff_fdn(
+  static void matmul2_dnf_ff_fdn(
     const T* const a, const T* const b, const unsigned int N,
     T* const buffer, T* const c) {
     auto _3N = 3 * N;
@@ -239,24 +238,4 @@ struct FEMatrix<T,3> {
   }
 };
 
-template <typename T>
-void matmul_3nn3(const T* const a, const T* const b, const unsigned int N, T* const c);
-template <typename T>
-void matmul_n333(const T* const a, const T* const b, const unsigned int N, T* const c);
-template <typename T>
-void det_33(const T* const a, T* const det);
-template <typename T>
-void inv_33(const T* const a, const T* const det, T* const inv);
-template <typename T>
-void mattile_diag_33(const T* const a, T* const tile);
-template <typename T>
-void matmul2_3n6_66_63n(
-  const T* const a, const T* const b, const unsigned int N,
-  T* const buffer, T* const c);
-template <typename T>
-void matmul2_3n9_99_93n(
-  const T* const a, const T* const b, const unsigned int N,
-  T* const buffer, T* const c);
-} // namespace fem
-
-#endif // FEM_FE_MATRIX_H_
+#endif // COMMON_MATRIX_H_

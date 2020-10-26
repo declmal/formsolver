@@ -2,6 +2,7 @@
 #include <cblas.h>
 #include <glog/logging.h>
 #include <fem/fe_matrix.h>
+#include <common/matrix.h>
 #include <common/common.h>
 #include "../common/common.h"
 
@@ -42,42 +43,41 @@ void test_matmul_cblas(bool layout=true) {
   free(c);
 }
 
-template <typename T>
-void test_matmul_n333_cpu(bool layout=false, double tol=1e-6) {
+template <typename T, unsigned int Dim, unsigned int N>
+void test_matmul_nddd(bool layout=false, double tol=1e-6) {
   // init a
-  unsigned int N = 8;
-  unsigned int nEntryA = N * 3;
+  unsigned int nEntryA = N * Dim;
   unsigned int nBytesA = nEntryA * sizeof(T);
   auto a = (T*)malloc(nBytesA);
   init_rand<T>(a, nEntryA);
   // init b
-  unsigned int nEntryB = 3 * 3;
+  unsigned int nEntryB = Dim * Dim;
   unsigned int nBytesB = nEntryB * sizeof(T);
   auto b = (T*)malloc(nBytesB);
   init_rand<T>(b, nEntryB);
   // init c
-  unsigned int nEntryC = N * 3;
+  unsigned int nEntryC = N * Dim;
   unsigned int nBytesC = nEntryC * sizeof(T);
   auto c = (T*)malloc(nBytesC);
   // init d
-  unsigned int nEntryD = N * 3;
+  unsigned int nEntryD = N * Dim;
   unsigned int nBytesD = nEntryD * sizeof(T);
   auto d = (T*)malloc(nBytesD);
   // execute
-  fem::matmul_n333<T>(a, b, N, c);
+  FEMatrix<T,Dim>::matmul_nddd(a, b, N, c);
   // validate
   Matmul<T>::matmul(
     CblasRowMajor, CblasNoTrans, CblasNoTrans,
-    N, 3, 3, (T)1.0, a, 3, b, 3, (T)0.0, d, 3);
+    N, Dim, Dim, (T)1.0, a, Dim, b, Dim, (T)0.0, d, Dim);
   if (layout) {
     LOG(INFO) << "matrix a layout";
-    print_mat<T>(a, N, 3);
+    print_mat<T>(a, N, Dim);
     LOG(INFO) << "matrix b layout";
-    print_mat<T>(b, 3, 3);
+    print_mat<T>(b, Dim, Dim);
     LOG(INFO) << "matrix c layout";
-    print_mat<T>(c, N, 3);
+    print_mat<T>(c, N, Dim);
     LOG(INFO) << "matrix d layout";
-    print_mat<T>(d, N, 3);
+    print_mat<T>(d, N, Dim);
   }
   bool flag = validate<T>(c, d, nEntryC, tol);
   // free
@@ -86,48 +86,47 @@ void test_matmul_n333_cpu(bool layout=false, double tol=1e-6) {
   free(c);
   free(d);
   if (flag) {
-    LOG(INFO) << "test_matmul_n333_cpu succeed, T: " << typeid(T).name();
+    LOG(INFO) << "test_matmul_nddd succeed, T: " << typeid(T).name();
   } else {
-    LOG(FATAL) << "test_matmul_n333_cpu failed, T: " << typeid(T).name();
+    LOG(FATAL) << "test_matmul_nddd failed, T: " << typeid(T).name();
   }
 }
 
-template <typename T>
-void test_matmul_3nn3_cpu(bool layout=false, double tol=1e-6) {
+template <typename T, unsigned int Dim, unsigned int N>
+void test_matmul_dnnd(bool layout=false, double tol=1e-6) {
   // init a
-  unsigned int N = 8;
-  unsigned int nEntryA = 3 * N;
+  unsigned int nEntryA = Dim * N;
   unsigned int nBytesA = nEntryA * sizeof(T);
   auto a = (T*)malloc(nBytesA);
   init_rand<T>(a, nEntryA);
   // init b
-  unsigned int nEntryB = N * 3;
+  unsigned int nEntryB = N * Dim;
   unsigned int nBytesB = nEntryB * sizeof(T);
   auto b = (T*)malloc(nBytesB);
   init_rand<T>(b, nEntryB);
   // init c
-  unsigned int nEntryC = 3 * 3;
+  unsigned int nEntryC = Dim * Dim;
   unsigned int nBytesC = nEntryC * sizeof(T);
   auto c = (T*)malloc(nBytesC);
   // init d
-  unsigned int nEntryD = 3 * 3;
+  unsigned int nEntryD = Dim * Dim;
   unsigned int nBytesD = nEntryD * sizeof(T);
   auto d = (T*)malloc(nBytesD);
   // execute
-  fem::matmul_3nn3<T>(a, b, N, c);
+  FEMatrix<T,Dim>::matmul_dnnd(a, b, N, c);
   // validate
   Matmul<T>::matmul(
     CblasRowMajor, CblasNoTrans, CblasNoTrans,
-    3, 3, N, (T)1.0, a, N, b, 3, (T)0.0, d, 3);
+    Dim, Dim, N, (T)1.0, a, N, b, Dim, (T)0.0, d, Dim);
   if (layout) {
     LOG(INFO) << "matrix a layout";
-    print_mat<T>(a, 3, N);
+    print_mat<T>(a, Dim, N);
     LOG(INFO) << "matrix b layout";
-    print_mat<T>(b, N, 3);
+    print_mat<T>(b, N, Dim);
     LOG(INFO) << "matrix c layout";
-    print_mat<T>(c, 3, 3);
+    print_mat<T>(c, Dim, Dim);
     LOG(INFO) << "matrix d layout";
-    print_mat<T>(d, 3, 3);
+    print_mat<T>(d, Dim, Dim);
   }
   bool flag = validate<T>(c, d, nEntryC, tol);
   // free
@@ -136,9 +135,9 @@ void test_matmul_3nn3_cpu(bool layout=false, double tol=1e-6) {
   free(c);
   free(d);
   if (flag) {
-    LOG(INFO) << "test_matmul_3nn3_cpu succeed, T: " << typeid(T).name();
+    LOG(INFO) << "test_matmul_dnnd succeed, T: " << typeid(T).name();
   } else {
-    LOG(FATAL) << "test_matmul_3nn3_cpu failed, T: " << typeid(T).name();
+    LOG(FATAL) << "test_matmul_dnnd failed, T: " << typeid(T).name();
   }
 }
 
@@ -418,8 +417,8 @@ int main(int argc, char* argv[]) {
   FLAGS_logtostderr = 1;
   // double precison tests
   test_matmul_cblas<double>(false);
-  test_matmul_n333_cpu<double>();
-  test_matmul_3nn3_cpu<double>();
+  test_matmul_nddd<double,3,8>();
+  test_matmul_dnnd<double,3,8>();
   test_inv_33_cpu<double>();
   test_mattile_diag_33_cpu<double>();
   test_matmul2_3n6_66_63n_cpu<double>();
@@ -427,8 +426,8 @@ int main(int argc, char* argv[]) {
   LOG(INFO) << "double precision test passed";
   // single precision tests
   test_matmul_cblas<float>(false);
-  test_matmul_n333_cpu<float>();
-  test_matmul_3nn3_cpu<float>();
+  test_matmul_nddd<float,3,8>();
+  test_matmul_dnnd<float,3,8>();
   test_inv_33_cpu<float>();
   test_mattile_diag_33_cpu<float>();
   test_matmul2_3n6_66_63n_cpu<float>();
