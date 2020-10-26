@@ -1,11 +1,12 @@
 #ifndef FEM_TOTAL_LAGRANGIAN_H_
 #define FEM_TOTAL_LAGRANGIAN_H_
 
+#include <fem/element/element.h>
 #include "formulator.h"
 
 namespace fem {
 template <typename T, unsigned int Dim>
-struct TotalLagrangian : public Formulator<T,Dim> {
+struct TotalLagrangian : Formulator<T,Dim> {
   void form_elem_stiff();
 };
 

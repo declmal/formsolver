@@ -2,7 +2,7 @@
 #define FEM_ELEMENT_BRICK_H_
 
 #include <fem/iprop/brick_iprop.h>
-#include <fem/element/element.h>
+#include "element.h"
 
 namespace fem {
 template <

@@ -1,8 +1,8 @@
 #ifndef FEM_IPROP_BRICK_IPROP_H_
 #define FEM_IPROP_BRICK_IPROP_H_
 
-#include <fem/iprop/element_iprop.h>
 #include <common/gauss_legendre.h>
+#include "element_iprop.h"
 
 namespace fem {
 template <typename T, int R>
@@ -224,7 +224,7 @@ template <typename T, unsigned int N> void brick_interp_deriv(
 
 template <
   typename T, unsigned int N0, unsigned int N1, unsigned int N2, unsigned int N> 
-struct BrickIProp : public ElementIProp<T,N0*N1*N2,N> {
+struct BrickIProp : ElementIProp<T,N0*N1*N2,N> {
   constexpr BrickIProp() : ElementIProp<T,N0*N1*N2,N>() {
     // init hbuf
     auto NI = N0 * N1 * N2;
