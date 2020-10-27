@@ -1,5 +1,4 @@
 #include <math.h>
-#include <cblas.h>
 #include <glog/logging.h>
 #include <common/matrix.h>
 #include <common/common.h>
