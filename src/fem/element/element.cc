@@ -14,32 +14,32 @@ void Element<T,N,Dim,IPropType>::init_coordinate(const T* const data) {
 }
 
 FORM_REGISTER_ELEMENT_TEMPLATE()
-unsigned int Element<T,N,Dim,IPropType>::get_ndim() {
+unsigned int const Element<T,N,Dim,IPropType>::get_ndim() {
   return Dim;
 }
 
 FORM_REGISTER_ELEMENT_TEMPLATE()
-T* Element<T,N,Dim,IPropType>::get_X0() {
+T* const Element<T,N,Dim,IPropType>::get_X0() {
   return X0;
 }
 
 FORM_REGISTER_ELEMENT_TEMPLATE()
-T* Element<T,N,Dim,IPropType>::get_hbuf() {
+T* const Element<T,N,Dim,IPropType>::get_hbuf() {
   return iprop.get_hbuf();
 }
 
 FORM_REGISTER_ELEMENT_TEMPLATE()
-T* Element<T,N,Dim,IPropType>::get_weights() {
+T* const Element<T,N,Dim,IPropType>::get_weights() {
   return iprop.get_weights();
 }
 
 FORM_REGISTER_ELEMENT_TEMPLATE()
-unsigned int Element<T,N,Dim,IPropType>::get_num_ipoints() {
+unsigned int const Element<T,N,Dim,IPropType>::get_num_ipoints() {
   return iprop.get_num_ipoints();
 }
 
 FORM_REGISTER_ELEMENT_TEMPLATE()
-unsigned int Element<T,N,Dim,IPropType>::get_num_nodes() {
+unsigned int const Element<T,N,Dim,IPropType>::get_num_nodes() {
   return N;
 }
 

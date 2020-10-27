@@ -14,12 +14,12 @@ class Element {
   public:
     void init_coordinate(const T* const data);
     void init_coordinate();
-    unsigned int get_ndim();
-    T* get_X0();
-    T* get_hbuf();
-    T* get_weights();
-    unsigned int get_num_ipoints();
-    unsigned int get_num_nodes();
+    unsigned const int get_ndim();
+    T* const get_X0();
+    T* const get_hbuf();
+    T* const get_weights();
+    unsigned int const get_num_ipoints();
+    unsigned int const get_num_nodes();
   protected:
     /*!
      * \brief Element Interpolation Property
@@ -40,17 +40,17 @@ class Element {
   void Element<T,N,Dim,IPropType>::init_coordinate( \
     const T* const data); \
   template \
-  unsigned int Element<T,N,Dim,IPropType>::get_ndim(); \
+  unsigned int const Element<T,N,Dim,IPropType>::get_ndim(); \
   template \
-  T* Element<T,N,Dim,IPropType>::get_X0(); \
+  T* const Element<T,N,Dim,IPropType>::get_X0(); \
   template \
-  T* Element<T,N,Dim,IPropType>::get_hbuf(); \
+  T* const Element<T,N,Dim,IPropType>::get_hbuf(); \
   template \
-  T* Element<T,N,Dim,IPropType>::get_weights(); \
+  T* const Element<T,N,Dim,IPropType>::get_weights(); \
   template \
-  unsigned int Element<T,N,Dim,IPropType>::get_num_ipoints(); \
+  unsigned int const Element<T,N,Dim,IPropType>::get_num_ipoints(); \
   template \
-  unsigned int Element<T,N,Dim,IPropType>::get_num_nodes();
+  unsigned int const Element<T,N,Dim,IPropType>::get_num_nodes();
 
 template <typename T>
 using C3D8 = Element<T,8,3,C3D8IProp>;
