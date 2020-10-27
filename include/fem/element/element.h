@@ -12,6 +12,8 @@ namespace fem {
 FORM_REGISTER_ELEMENT_TEMPLATE()
 class Element {
   public:
+    Element(unsigned int id_) : id(id_) {}
+    Element(unsigned int id_, const T* const X0_);
     void init_coordinate(const T* const data);
     unsigned int const get_id();
     unsigned int const get_ndim();

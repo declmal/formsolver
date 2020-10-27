@@ -12,7 +12,7 @@ template <
 >
 void test_form_brick(bool layout=true) {
   // init X0
-  EType<T> elem;
+  EType<T> elem(233);
   auto rowX0 = elem.get_ndim();
   auto colX0 = elem.get_num_nodes();
   auto nEntryX0 = rowX0 * colX0;
