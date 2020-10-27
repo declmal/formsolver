@@ -6,19 +6,19 @@
 
 namespace fem {
 template <typename T>
-class C3D8 : public Element<T,8,C3D8IProp> {
+class C3D8 : public Element<T,8,3,C3D8IProp> {
 };
 
 // template <typename T>
-// class C3D8R : public Element<T,8,C3D8RIProp> {
+// class C3D8R : public Element<T,8,3,C3D8RIProp> {
 // };
 
 template <typename T>
-class C3D20 : public Element<T,20,C3D20IProp> {
+class C3D20 : public Element<T,20,3,C3D20IProp> {
 };
 
 template <typename T>
-class C3D20R : public Element<T,20,C3D20RIProp> {
+class C3D20R : public Element<T,20,3,C3D20RIProp> {
 };
 } // namespace fem
 

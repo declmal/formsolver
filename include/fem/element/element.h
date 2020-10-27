@@ -4,7 +4,7 @@
 namespace fem {
 #define FORM_REGISTER_ELEMENT_TEMPLATE() \
   template < \
-    typename T, unsigned int N, \
+    typename T, unsigned int N, unsigned int Dim, \
     template <typename> class IPropType>
 
 FORM_REGISTER_ELEMENT_TEMPLATE()
@@ -29,23 +29,23 @@ class Element {
     /*!
      * \brief Initial Global Coordinate Matrix, of shape (3, N)
      */
-    T X0[3*N];
+    T X0[Dim*N];
 };
 
-#define FORM_REGISTER_ELEMENT(T, N, IPropType) \
+#define FORM_REGISTER_ELEMENT(T, N, Dim, IPropType) \
   template \
-  void Element<T,N,IPropType>::init_coordinate( \
+  void Element<T,N,Dim,IPropType>::init_coordinate( \
     const T* const data, const unsigned int size); \
   template \
-  T* Element<T,N,IPropType>::get_X0(); \
+  T* Element<T,N,Dim,IPropType>::get_X0(); \
   template \
-  T* Element<T,N,IPropType>::get_hbuf(); \
+  T* Element<T,N,Dim,IPropType>::get_hbuf(); \
   template \
-  T* Element<T,N,IPropType>::get_weights(); \
+  T* Element<T,N,Dim,IPropType>::get_weights(); \
   template \
-  unsigned int Element<T,N,IPropType>::get_num_ipoints(); \
+  unsigned int Element<T,N,Dim,IPropType>::get_num_ipoints(); \
   template \
-  unsigned int Element<T,N,IPropType>::get_num_nodes();
+  unsigned int Element<T,N,Dim,IPropType>::get_num_nodes();
 } // namespace fem
 
 #endif // FEM_ELEMENT_ELEMENT_H_
