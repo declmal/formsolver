@@ -2,10 +2,12 @@ cmake_minimum_required(VERSION 3.2)
 
 project(formsolver_tests)
 
-if(EXISTS ${CMAKE_CURRENT_BINARY_DIR}/config.cmake)
-  include(${CMAKE_CURRENT_BINARY_DIR}/config.cmake)
-elseif(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/config.cmake)
+get_filename_component(PARENT_DIR ${CMAKE_CURRENT_SOURCE_DIR} DIRECTORY)
+
+if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/config.cmake)
   include(${CMAKE_CURRENT_SOURCE_DIR}/config.cmake)
+elseif(EXISTS ${PARENT_DIR}/cmake/config.cmake)
+  include(${PARENT_DIR}/cmake/config.cmake)
 endif()
 
 # set compilation flags
@@ -14,15 +16,11 @@ set(CMAKE_CXX_FLAGS "-std=c++14")
 # specify include directories
 include_directories("../include")
 
-# find extern packages
+# find cblas
+include(${PARENT_DIR}/cmake/FindBLAS.cmake)
+
+# find glog
 find_package(glog REQUIRED)
-if(USE_BLAS STREQUAL "openblas")
-  find_package(BLAS REQUIRED)
-elseif(USE_BLAS STREQUAL "apple")
-  find_library(BLAS_LIBRARIES Accelerate)
-  include_directories(SYSTEM ${BLAS_LIBRARIES}/Versions/Current/Frameworks/vecLib.framework/Versions/Current/Headers/)
-endif()
-message(STATUS "Using BLAS library " ${BLAS_LIBRARIES})
 
 # locate libform
 find_file(LIB_FORM_PATH NAMES libform.so libform.dylib PATHS ../lib)
