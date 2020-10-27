@@ -31,6 +31,7 @@ void test_form_brick(bool layout=true) {
 }
 
 int main(int argc, char* argv[]) {
+  LOG(FATAL) << "test here";
   // log init
   google::InitGoogleLogging(argv[0]);
   FLAGS_logtostderr = 1;
