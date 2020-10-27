@@ -48,11 +48,6 @@ unsigned int const Element<T,N,Dim,IPropType>::get_num_nodes() {
   return N;
 }
 
-FORM_REGISTER_ELEMENT_TEMPLATE()
-void Element<T,N,Dim,IPropType>::init_coordinate() {
-  // TODO
-}
-
 // C3D8
 FORM_REGISTER_ELEMENT(double, 8, 3, C3D8IProp)
 FORM_REGISTER_ELEMENT(float, 8, 3, C3D8IProp)

@@ -13,7 +13,6 @@ FORM_REGISTER_ELEMENT_TEMPLATE()
 class Element {
   public:
     void init_coordinate(const T* const data);
-    void init_coordinate();
     unsigned int const get_id();
     unsigned int const get_ndim();
     T* const get_X0();
