@@ -3,13 +3,14 @@
 
 namespace fem {
 template <typename T, unsigned int NI, unsigned int N>
-struct ElementIProp {
-  T hbuf[NI*N*3];
-  T weights[NI];
-  unsigned int num_ipoints;
-  constexpr ElementIProp() {
-    num_ipoints = NI;
-  }
+class ElementIProp {
+  public:
+    T get_num_ipoints() { return NI; }
+    T* get_hbuf() { return hbuf; }
+    T* get_weights() { return weights; }
+  protected:
+    T hbuf[NI*N*3];
+    T weights[NI];
 };
 } // namespace fem
 

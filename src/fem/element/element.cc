@@ -21,17 +21,17 @@ T* Element<T,N,Dim,IPropType>::get_X0() {
 
 FORM_REGISTER_ELEMENT_TEMPLATE()
 T* Element<T,N,Dim,IPropType>::get_hbuf() {
-  return iprop.hbuf;
+  return iprop.get_hbuf();
 }
 
 FORM_REGISTER_ELEMENT_TEMPLATE()
 T* Element<T,N,Dim,IPropType>::get_weights() {
-  return iprop.weights;
+  return iprop.get_weights();
 }
 
 FORM_REGISTER_ELEMENT_TEMPLATE()
 unsigned int Element<T,N,Dim,IPropType>::get_num_ipoints() {
-  return iprop.num_ipoints;
+  return iprop.get_num_ipoints();
 }
 
 FORM_REGISTER_ELEMENT_TEMPLATE()

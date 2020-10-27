@@ -137,7 +137,7 @@ void test_brick_interp_prop(bool layout=true) {
   if (layout) {
     LOG(INFO) << "tensor buf.h layout";
     auto NI = N0 * N1 * N2;
-    T* h = prop.hbuf;
+    T* h = prop.get_hbuf();
     for (unsigned i = 0; i < NI; ++i) {
       LOG(INFO) << "tensor buf.h[" << i << "] layout";
       print_mat<T>(h, N, 3);

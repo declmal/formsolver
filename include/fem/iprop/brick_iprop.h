@@ -224,24 +224,25 @@ template <typename T, unsigned int N> void brick_interp_deriv(
 
 template <
   typename T, unsigned int N0, unsigned int N1, unsigned int N2, unsigned int N> 
-struct BrickIProp : ElementIProp<T,N0*N1*N2,N> {
-  constexpr BrickIProp() : ElementIProp<T,N0*N1*N2,N>() {
-    // init hbuf
-    auto NI = N0 * N1 * N2;
-    GaussRoots<T,3,N0,N1,N2> gr;
-    T* r = gr.roots;
-    T* h = this->hbuf;
-    for (unsigned int i = 0; i < NI; ++i) {
-      brick_interp_deriv<T, N>(h, r[0], r[1], r[2]);
-      r += 3;
-      h += NI;
+class BrickIProp : public ElementIProp<T,N0*N1*N2,N> {
+  public:
+    constexpr BrickIProp() : ElementIProp<T,N0*N1*N2,N>() {
+      // init hbuf
+      auto NI = N0 * N1 * N2;
+      GaussRoots<T,3,N0,N1,N2> gr;
+      T* r = gr.roots;
+      T* h = this->hbuf;
+      for (unsigned int i = 0; i < NI; ++i) {
+        brick_interp_deriv<T, N>(h, r[0], r[1], r[2]);
+        r += 3;
+        h += NI;
+      }
+      // init weights
+      GaussWeights<T,3,N0,N1,N2> gw;
+      for (unsigned int i = 0; i < NI; ++i) {
+        this->weights[i] = gw.weights[i];
+      }
     }
-    // init weights
-    GaussWeights<T,3,N0,N1,N2> gw;
-    for (unsigned int i = 0; i < NI; ++i) {
-      this->weights[i] = gw.weights[i];
-    }
-  }
 };
 
 template <typename T>
