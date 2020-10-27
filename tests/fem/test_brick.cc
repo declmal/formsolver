@@ -221,9 +221,22 @@ void test_brick_tl_form(bool layout=true) {
   auto nRowKe = Dim * N;
   auto nEntryKe = nRowKe * nRowKe;
   auto Ke = (T*)malloc(nEntryKe*sizeof(T));
-  // init 
-  BrickTLFormType<T>::form_elem_stiff(
+  // execute
+  int ret = BrickTLFormType<T>::form_elem_stiff(
     X0, hbuf, Ut, C0, S0t, J0, invJ0, h0, u0t, B0tL, buf, tmpK, B0NL, tile, Ke);
+  if (ret == 0) {
+    if (layout) {
+      LOG(INFO) << "matrix Ke layout"; 
+      print_mat<T>(Ke, nRowKe, nRowKe);
+    }
+    LOG(INFO) << "test_brick_tl_form succeed, T: " << typeid(T).name()
+      << ", BrickIPropType: " << typeid(BrickIPropType<T>).name()
+      << ", BrickTLFormType: " << typeid(BrickTLFormType<T>).name();
+  } else {
+    LOG(INFO) << "test_brick_tl_form fail, T: " << typeid(T).name()
+      << ", BrickIPropType: " << typeid(BrickIPropType<T>).name()
+      << ", BrickTLFormType: " << typeid(BrickTLFormType<T>).name();
+  }
   // execute
   // free
   free(X0);
@@ -240,9 +253,6 @@ void test_brick_tl_form(bool layout=true) {
   free(B0NL);
   free(tile);
   free(Ke);
-  LOG(INFO) << "test_brick_tl_form passed, T: " << typeid(T).name()
-    << ", BrickIPropType: " << typeid(BrickIPropType<T>).name()
-    << ", BrickTLFormType: " << typeid(BrickTLFormType<T>).name();
 }
 
 int main(int argc, char* argv[]) {
@@ -258,10 +268,10 @@ int main(int argc, char* argv[]) {
   // test_brick_interp_prop<double,fem::C3D8RIProp>(layout);
   test_brick_interp_prop<double,fem::C3D20IProp>(layout);
   test_brick_interp_prop<double,fem::C3D20RIProp>(layout);
-  test_brick_tl_form<double,fem::C3D8IProp,fem::C3D8TLForm>();
-  // test_brick_tl_form<double,fem::C3D8RIProp,fem::C3D8RTLForm>();
-  test_brick_tl_form<double,fem::C3D20IProp,fem::C3D20TLForm>();
-  test_brick_tl_form<double,fem::C3D20RIProp,fem::C3D20RTLForm>();
+  test_brick_tl_form<double,fem::C3D8IProp,fem::C3D8TLForm>(layout);
+  // test_brick_tl_form<double,fem::C3D8RIProp,fem::C3D8RTLForm>(layout);
+  test_brick_tl_form<double,fem::C3D20IProp,fem::C3D20TLForm>(layout);
+  test_brick_tl_form<double,fem::C3D20RIProp,fem::C3D20RTLForm>(layout);
   LOG(INFO) << "double precision test passed";
   // single precision tests
   test_brick_interp_sum<float,8>(layout);
@@ -271,10 +281,10 @@ int main(int argc, char* argv[]) {
   // test_brick_interp_prop<float,fem::C3D8RIProp>(layout);
   test_brick_interp_prop<float,fem::C3D20IProp>(layout);
   test_brick_interp_prop<float,fem::C3D20RIProp>(layout);
-  test_brick_tl_form<float,fem::C3D8IProp,fem::C3D8TLForm>();
-  // test_brick_tl_form<float,fem::C3D8RIProp,fem::C3D8RTLForm>();
-  test_brick_tl_form<float,fem::C3D20IProp,fem::C3D20TLForm>();
-  test_brick_tl_form<float,fem::C3D20RIProp,fem::C3D20RTLForm>();
+  test_brick_tl_form<float,fem::C3D8IProp,fem::C3D8TLForm>(layout);
+  // test_brick_tl_form<float,fem::C3D8RIProp,fem::C3D8RTLForm>(layout);
+  test_brick_tl_form<float,fem::C3D20IProp,fem::C3D20TLForm>(layout);
+  test_brick_tl_form<float,fem::C3D20RIProp,fem::C3D20RTLForm>(layout);
   LOG(INFO) << "single precision test passed";
   return 0;
 }
