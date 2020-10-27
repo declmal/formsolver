@@ -1,5 +1,5 @@
 #include <fem/formulator/total_lagrangian.h>
-#include <fem/element/brick.h>
+#include <fem/element/element.h>
 #include <common/matrix.h>
 #include <common/common.h>
 #include <iostream> // for debug
@@ -28,11 +28,11 @@ int TotalLagrangian<T,Dim,EType>::form_elem_stiff() {
   auto J0 = (T*)malloc(nEntryJ0*sizeof(T));
   for (unsigned int i = 0; i < num_ipoints; ++i) {
     FEMatrix<T,Dim>::matmul_dnnd(X0, h, num_nodes, J0);
-    std::cout << "hihi" << std::endl;
     auto det = FEMatrix<T,Dim>::det_dd(J0);
     if (abs(det) < 1e-6) {
       free(Ke);
       free(J0);
+      return -1;
     }
     h += num_ipoints;
   }

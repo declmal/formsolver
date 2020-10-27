@@ -1,6 +1,8 @@
 #ifndef FEM_ELEMENT_ELEMENT_H_
 #define FEM_ELEMENT_ELEMENT_H_
 
+#include <fem/iprop/brick_iprop.h>
+
 namespace fem {
 #define FORM_REGISTER_ELEMENT_TEMPLATE() \
   template < \
@@ -49,6 +51,16 @@ class Element {
   unsigned int Element<T,N,Dim,IPropType>::get_num_ipoints(); \
   template \
   unsigned int Element<T,N,Dim,IPropType>::get_num_nodes();
+
+template <typename T>
+using C3D8 = Element<T,8,3,C3D8IProp>;
+// template <typename T>
+// using C3D8R = Element<T,8,3,C3D8RIProp>;
+template <typename T>
+using C3D20 = Element<T,20,3,C3D20IProp>;
+template <typename T>
+using C3D20R = Element<T,20,3,C3D20RIProp>;
+
 } // namespace fem
 
 #endif // FEM_ELEMENT_ELEMENT_H_

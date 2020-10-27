@@ -1,5 +1,5 @@
 #include <glog/logging.h>
-#include <fem/element/brick.h>
+#include <fem/element/element.h>
 #include <fem/formulator/total_lagrangian.h>
 #include <common/common.h>
 
