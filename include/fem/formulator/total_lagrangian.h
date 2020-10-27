@@ -100,11 +100,12 @@ struct TLForm {
    *  initial global coordinate, of shape (Dim, Dim)
    * \param B0tL auxiliary variable, linear strain incremental stiffness
    *  matrix, of shape (3*Dim-3, Dim*N)
-   * \param B0NL auxiliary variable, linear strain incremental stiffness
-   *  matrix, of shape (Dim^2, Dim*N)
    * \param buf auxiliary variable, of shape (Dim^2,)
    * \param tmpK auxiliary variable, temporary stiffness matrix component,
    *  of shape (Dim*N, Dim*N)
+   * \param B0NL auxiliary variable, no- linear strain incremental stiffness
+   *  matrix, of shape (Dim^2, Dim*N)
+   * \param tile auxiliary variable, of shape (Dim^2, Dim^2)
    * \param Ke, output variable, element stiffness matrix, 
    *  of shape (Dim*N, Dim*N)
    */
@@ -112,7 +113,7 @@ struct TLForm {
     const T* const X0, const T* const hbuf, const T* const Ut, 
     const T* const C0, const T* const S0t, T* const J0, T* const invJ0, 
     T* const h0, T* const u0t, T* const B0tL, T* const buf, T* const tmpK,
-    T* const Ke) {
+    T* const B0NL, T* const tile, T* const Ke) {
     auto rowKe = Dim * N;
     auto nEntryKe = rowKe * rowKe;
     init_zero<T>(Ke, nEntryKe);
@@ -131,6 +132,10 @@ struct TLForm {
       MatmulDNND<T,Dim>::matmul_dnnd(Ut, h0, N, u0t);
       LinTransMatTL<T,Dim>::lin_trans_mat_tl(h0, u0t, N, B0tL);
       Matmul2DNEEEEDN<T,Dim>::matmul2_dne_ee_edn(B0tL, C0, N, buf, tmpK);
+      matinc<T>(tmpK, nEntryKe, Ke);
+      NonlinTransMatTL<T,Dim>::nonlin_trans_mat_tl(h0, N, B0NL);
+      MattileDiagDD<T,Dim>::mattile_diag_dd(S0t, tile);
+      Matmul2DNFFFFDN<T,Dim>::matmul2_dnf_ff_fdn(B0NL, tile, N, buf, tmpK);
       matinc<T>(tmpK, nEntryKe, Ke);
     }
     printf("hihihihhih\n\n\n\n\n");

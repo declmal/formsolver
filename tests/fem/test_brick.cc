@@ -208,13 +208,22 @@ void test_brick_tl_form(bool layout=true) {
   auto nRowTmpK = Dim * N;
   auto nEntryTmpK = nRowTmpK * nRowTmpK;
   auto tmpK = (T*)malloc(nEntryTmpK*sizeof(T));
+  // init B0NL
+  auto nRowB0NL = Dim * Dim;
+  auto nColB0NL = Dim * N;
+  auto nEntryB0NL = nRowB0NL * nColB0NL;
+  auto B0NL = (T*)malloc(nEntryB0NL*sizeof(T));
+  // init tile
+  auto nRowTile = Dim * Dim;
+  auto nEntryTile = nRowTile * nRowTile;
+  auto tile = (T*)malloc(nEntryTile*sizeof(T));
   // init Ke
   auto nRowKe = Dim * N;
   auto nEntryKe = nRowKe * nRowKe;
   auto Ke = (T*)malloc(nEntryKe*sizeof(T));
   // init 
   BrickTLFormType<T>::form_elem_stiff(
-    X0, hbuf, Ut, C0, S0t, J0, invJ0, h0, u0t, B0tL, buf, tmpK, Ke);
+    X0, hbuf, Ut, C0, S0t, J0, invJ0, h0, u0t, B0tL, buf, tmpK, B0NL, tile, Ke);
   // execute
   // free
   free(X0);
@@ -228,6 +237,8 @@ void test_brick_tl_form(bool layout=true) {
   free(B0tL);
   free(buf);
   free(tmpK);
+  free(B0NL);
+  free(tile);
   free(Ke);
   LOG(INFO) << "test_brick_tl_form passed, T: " << typeid(T).name()
     << ", BrickIPropType: " << typeid(BrickIPropType<T>).name()
