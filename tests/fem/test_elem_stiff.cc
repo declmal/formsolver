@@ -1,6 +1,6 @@
 #include <glog/logging.h>
 #include <fem/elem_stiff.h>
-#include "../common/common.h"
+#include <common/common.h>
 
 template <typename T>
 void test_lin_trans_mat_tl_cpu(bool layout=true) {

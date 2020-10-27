@@ -1,6 +1,8 @@
 #ifndef COMMON_MATRIX_H_
 #define COMMON_MATRIX_H_
 
+#include <cblas.h>
+
 template <typename T, unsigned int Dim>
 struct FEMatrix {
   /*!
@@ -235,6 +237,48 @@ struct FEMatrix<T,3> {
       }
       c_ += _3N;
     }
+  }
+};
+
+template <typename T>
+void matadd(
+  const T* const a, const T* const b, const unsigned int size, T* const c) {
+  for (unsigned int i = 0; i < size; ++i) {
+    c[i] = a[i] + b[i];
+  }
+}
+
+template <typename T>
+struct Matmul {
+  static inline void matmul(
+    CBLAS_ORDER order, CBLAS_TRANSPOSE trans_a, CBLAS_TRANSPOSE trans_b,
+    const unsigned int M, const unsigned int N, const unsigned int K,
+    const double alpha, const T* a, const unsigned int lda, const T* b,
+    const unsigned int ldb, const double beta, T* c, 
+    const unsigned int ldc);
+};
+template <>
+struct Matmul<double> {
+  static inline void matmul(
+    CBLAS_ORDER order, CBLAS_TRANSPOSE trans_a, CBLAS_TRANSPOSE trans_b,
+    const unsigned int M, const unsigned int N, const unsigned int K,
+    const double alpha, const double* a, const unsigned int lda, const double* b,
+    const unsigned int ldb, const double beta, double* c, 
+    const unsigned int ldc) {
+    cblas_dgemm(
+      order, trans_a, trans_b, M, N, K, alpha, a, lda, b, ldb, beta, c, ldc);
+  }
+};
+template <>
+struct Matmul<float> {
+  static inline void matmul(
+    CBLAS_ORDER order, CBLAS_TRANSPOSE trans_a, CBLAS_TRANSPOSE trans_b,
+    const unsigned int M, const unsigned int N, const unsigned int K,
+    const float alpha, const float* a, const unsigned int lda, const float* b,
+    const unsigned int ldb, const float beta, float* c, 
+    const unsigned int ldc) {
+    cblas_sgemm(
+      order, trans_a, trans_b, M, N, K, alpha, a, lda, b, ldb, beta, c, ldc);
   }
 };
 

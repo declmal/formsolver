@@ -3,7 +3,6 @@
 #include <glog/logging.h>
 #include <common/matrix.h>
 #include <common/common.h>
-#include "../common/common.h"
 
 template <typename T>
 void test_matmul_cblas(bool layout=true) {

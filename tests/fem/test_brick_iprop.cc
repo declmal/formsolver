@@ -1,6 +1,6 @@
 #include <glog/logging.h>
 #include <fem/iprop/brick_iprop.h>
-#include "../common/common.h"
+#include <common/common.h>
 
 template <typename T, unsigned int I, unsigned int N>
 struct BrickInterpSum {

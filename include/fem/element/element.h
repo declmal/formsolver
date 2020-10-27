@@ -10,8 +10,9 @@ namespace fem {
 FORM_REGISTER_ELEMENT_TEMPLATE()
 class Element {
   public:
-    void init_coordinate(const T* const data, const unsigned int size);
+    void init_coordinate(const T* const data);
     void init_coordinate();
+    unsigned int get_ndim();
     T* get_X0();
     T* get_hbuf();
     T* get_weights();
@@ -35,7 +36,9 @@ class Element {
 #define FORM_REGISTER_ELEMENT(T, N, Dim, IPropType) \
   template \
   void Element<T,N,Dim,IPropType>::init_coordinate( \
-    const T* const data, const unsigned int size); \
+    const T* const data); \
+  template \
+  unsigned int Element<T,N,Dim,IPropType>::get_ndim(); \
   template \
   T* Element<T,N,Dim,IPropType>::get_X0(); \
   template \

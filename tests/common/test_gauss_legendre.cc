@@ -1,6 +1,6 @@
 #include <glog/logging.h>
 #include <common/gauss_legendre.h>
-#include "common.h"
+#include <common/common.h>
 #include <stdio.h>
 
 template <typename T, unsigned int N>

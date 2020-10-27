@@ -7,11 +7,15 @@ FORM_REGISTER_ELEMENT_TEMPLATE()
 IPropType<T> Element<T,N,Dim,IPropType>::iprop;
 
 FORM_REGISTER_ELEMENT_TEMPLATE()
-void Element<T,N,Dim,IPropType>::init_coordinate(
-  const T* const data, const unsigned int size) {
-  for (unsigned int i = 0; i < size; ++i) {
+void Element<T,N,Dim,IPropType>::init_coordinate(const T* const data) {
+  for (unsigned int i = 0; i < Dim*N; ++i) {
     X0[i] = data[i];
   }
+}
+
+FORM_REGISTER_ELEMENT_TEMPLATE()
+unsigned int Element<T,N,Dim,IPropType>::get_ndim() {
+  return Dim;
 }
 
 FORM_REGISTER_ELEMENT_TEMPLATE()

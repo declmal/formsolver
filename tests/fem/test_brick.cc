@@ -1,7 +1,7 @@
 #include <glog/logging.h>
 #include <fem/element/brick.h>
 #include <fem/formulator/total_lagrangian.h>
-#include "../common/common.h"
+#include <common/common.h>
 
 template <
   typename T,
@@ -11,9 +11,23 @@ template <
   > class FormType
 >
 void test_form_brick(bool layout=true) {
+  // init X0
   EType<T> elem;
+  auto rowX0 = elem.get_ndim();
+  auto colX0 = elem.get_num_nodes();
+  auto nEntryX0 = rowX0 * colX0;
+  auto X0 = (T*)malloc(nEntryX0*sizeof(T));
+  init_rand<T>(X0, nEntryX0);
+  // execute
+  elem.init_coordinate(X0);
   FormType<T, EType> form(&elem);
   form.form_elem_stiff();
+  if (layout) {
+    LOG(INFO) << "matrix X0 layout";
+    print_mat<T>(X0, rowX0, colX0);
+  }
+  // free
+  free(X0);
 }
 
 int main(int argc, char* argv[]) {
