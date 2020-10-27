@@ -14,13 +14,18 @@ class Element {
   public:
     void init_coordinate(const T* const data);
     void init_coordinate();
-    unsigned const int get_ndim();
+    unsigned int const get_id();
+    unsigned int const get_ndim();
     T* const get_X0();
     T* const get_hbuf();
     T* const get_weights();
     unsigned int const get_num_ipoints();
     unsigned int const get_num_nodes();
   protected:
+    /*!
+     * \brief Element Id
+     */
+    unsigned int id;
     /*!
      * \brief Element Interpolation Property
      */
@@ -39,6 +44,8 @@ class Element {
   template \
   void Element<T,N,Dim,IPropType>::init_coordinate( \
     const T* const data); \
+  template \
+  unsigned int const Element<T,N,Dim,IPropType>::get_id(); \
   template \
   unsigned int const Element<T,N,Dim,IPropType>::get_ndim(); \
   template \

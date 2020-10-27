@@ -14,6 +14,11 @@ void Element<T,N,Dim,IPropType>::init_coordinate(const T* const data) {
 }
 
 FORM_REGISTER_ELEMENT_TEMPLATE()
+unsigned int const Element<T,N,Dim,IPropType>::get_id() {
+  return id;
+}
+
+FORM_REGISTER_ELEMENT_TEMPLATE()
 unsigned int const Element<T,N,Dim,IPropType>::get_ndim() {
   return Dim;
 }
