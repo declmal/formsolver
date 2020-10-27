@@ -13,15 +13,10 @@ FORM_REGISTER_ELEMENT_TEMPLATE()
 class Element {
   public:
     Element(unsigned int id_) : id(id_) {}
-    Element(unsigned int id_, const T* const X0_);
-    void init_coordinate(const T* const data);
     unsigned int const get_id();
-    unsigned int const get_ndim();
-    T* const get_X0();
     T* const get_hbuf();
     T* const get_weights();
     unsigned int const get_num_ipoints();
-    unsigned int const get_num_nodes();
   protected:
     /*!
      * \brief Element Id
@@ -35,30 +30,17 @@ class Element {
      * \brief Global Node Id List, of shape (N,)
      */
     unsigned int IdN[N];
-    /*!
-     * \brief Initial Global Coordinate Matrix, of shape (3, N)
-     */
-    T X0[Dim*N];
 };
 
 #define FORM_REGISTER_ELEMENT(T, N, Dim, IPropType) \
   template \
-  void Element<T,N,Dim,IPropType>::init_coordinate( \
-    const T* const data); \
-  template \
   unsigned int const Element<T,N,Dim,IPropType>::get_id(); \
-  template \
-  unsigned int const Element<T,N,Dim,IPropType>::get_ndim(); \
-  template \
-  T* const Element<T,N,Dim,IPropType>::get_X0(); \
   template \
   T* const Element<T,N,Dim,IPropType>::get_hbuf(); \
   template \
   T* const Element<T,N,Dim,IPropType>::get_weights(); \
   template \
-  unsigned int const Element<T,N,Dim,IPropType>::get_num_ipoints(); \
-  template \
-  unsigned int const Element<T,N,Dim,IPropType>::get_num_nodes();
+  unsigned int const Element<T,N,Dim,IPropType>::get_num_ipoints();
 
 template <typename T>
 using C3D8 = Element<T,8,3,C3D8IProp>;

@@ -58,9 +58,6 @@ void legendre_roots(
 template <
   typename T, unsigned Dim, unsigned int N0, unsigned int N1, unsigned int N2>
 struct GaussRoots {
-  // constexpr static auto NI = N0 * N1 * N2;
-  // constexpr static double tol = 1e-20;
-  // T roots[NI*Dim];
 };
 template <typename T, unsigned int N0>
 struct GaussRoots<T,1,N0,1,1> {

@@ -1,5 +1,5 @@
 #include <glog/logging.h>
-#include <fem/iprop/brick_iprop.h>
+#include <fem/element/brick.h>
 #include <common/common.h>
 
 template <typename T, unsigned int I, unsigned int N>
@@ -131,44 +131,97 @@ void test_brick_interp_deriv(bool layout=false, double tol=1e-6) {
 }
 
 template <
-  typename T, unsigned int N0, unsigned int N1, unsigned int N2, unsigned int N> 
+  typename T,
+  template <typename> class BrickIPropType
+>
 void test_brick_interp_prop(bool layout=true) {
-  fem::BrickIProp<T,N0,N1,N2,N> prop;
+  BrickIPropType<T>::initialize();
+  auto hbuf = BrickIPropType<T>::get_hbuf();
+  auto weights = BrickIPropType<T>::get_weights();
+  auto num_ipoints = BrickIPropType<T>::get_num_ipoints();
+  auto num_nodes = BrickIPropType<T>::get_num_nodes();
+  auto ndim = BrickIPropType<T>::get_ndim();
+  auto stride_h = num_nodes * ndim;
+  auto h = hbuf;
   if (layout) {
-    LOG(INFO) << "tensor buf.h layout";
-    auto NI = N0 * N1 * N2;
-    T* h = prop.get_hbuf();
-    for (unsigned i = 0; i < NI; ++i) {
-      LOG(INFO) << "tensor buf.h[" << i << "] layout";
-      print_mat<T>(h, N, 3);
-      h += NI;
+    LOG(INFO) << "tensor hbuf layout and weights";
+    for (unsigned i = 0; i < num_ipoints; ++i) {
+      LOG(INFO) << "tensor hbuf[" << i << "] layout";
+      print_mat<T>(h, num_nodes, ndim);
+      LOG(INFO) << "weights[" << i << "]: " << weights[i];
+      h += stride_h;
     }
   }
   LOG(INFO) << "test_brick_interp_prop succeed, dtype: "
-    << typeid(T).name();
+    << typeid(T).name() << " BrickIPropType: " 
+    << typeid(BrickIPropType<T>).name();
+}
+
+template <
+  typename T,
+  template <typename> class BrickIPropType,
+  template <typename> class BrickTLFormType
+>
+void test_brick_tl_form(bool layout=true) {
+  auto Dim = BrickIPropType<T>::get_ndim();
+  auto N = BrickIPropType<T>::get_num_nodes();
+  // init X0
+  auto nEntryX0 = Dim * N;
+  auto X0 = (T*)malloc(nEntryX0*sizeof(T));
+  init_rand(X0, nEntryX0);
+  // init hbuf
+  auto hbuf = BrickIPropType<T>::get_hbuf();
+  // init J0
+  auto nEntryJ0 = Dim * Dim;
+  auto J0 = (T*)malloc(nEntryJ0*sizeof(T));
+  // init invJ0
+  auto nEntryInvJ0 = Dim * Dim;
+  auto invJ0 = (T*)malloc(nEntryInvJ0*sizeof(T));
+  // init Ke
+  auto nRowKe = Dim * N;
+  auto nEntryKe = nRowKe * nRowKe;
+  auto Ke = (T*)malloc(nEntryKe*sizeof(T));
+  // init 
+  BrickTLFormType<T>::form_elem_stiff(
+    X0, hbuf, J0, invJ0, Ke);
+  // execute
+  // free
+  free(X0);
+  free(J0);
+  free(invJ0);
+  free(Ke);
 }
 
 int main(int argc, char* argv[]) {
   // log init
   google::InitGoogleLogging(argv[0]);
   FLAGS_logtostderr = 1;
+  bool layout = false;
   // double precison tests
-  test_brick_interp_sum<double,8>();
-  test_brick_interp_deriv<double,8>();
-  test_brick_interp_sum<double, 20>();
-  test_brick_interp_prop<double,2,2,2,8>();
-  test_brick_interp_prop<double,1,1,1,8>();
-  test_brick_interp_prop<double,3,3,3,20>();
-  test_brick_interp_prop<double,2,2,2,20>();
+  test_brick_interp_sum<double,8>(layout);
+  test_brick_interp_deriv<double,8>(layout);
+  test_brick_interp_sum<double, 20>(layout);
+  test_brick_interp_prop<double,fem::C3D8IProp>(layout);
+  // test_brick_interp_prop<double,fem::C3D8RIProp>(layout);
+  test_brick_interp_prop<double,fem::C3D20IProp>(layout);
+  test_brick_interp_prop<double,fem::C3D20RIProp>(layout);
+  test_brick_tl_form<double,fem::C3D8IProp,fem::C3D8TLForm>();
+  // test_brick_tl_form<double,fem::C3D8RIProp,fem::C3D8RTLForm>();
+  test_brick_tl_form<double,fem::C3D20IProp,fem::C3D20TLForm>();
+  test_brick_tl_form<double,fem::C3D20RIProp,fem::C3D20RTLForm>();
   LOG(INFO) << "double precision test passed";
   // single precision tests
-  test_brick_interp_sum<float,8>();
-  test_brick_interp_deriv<float,8>();
-  test_brick_interp_sum<float,20>();
-  test_brick_interp_prop<float,2,2,2,8>();
-  test_brick_interp_prop<float,1,1,1,8>();
-  test_brick_interp_prop<float,3,3,3,20>();
-  test_brick_interp_prop<float,2,2,2,20>();
+  test_brick_interp_sum<float,8>(layout);
+  test_brick_interp_deriv<float,8>(layout);
+  test_brick_interp_sum<float,20>(layout);
+  test_brick_interp_prop<float,fem::C3D8IProp>(layout);
+  // test_brick_interp_prop<float,fem::C3D8RIProp>(layout);
+  test_brick_interp_prop<float,fem::C3D20IProp>(layout);
+  test_brick_interp_prop<float,fem::C3D20RIProp>(layout);
+  test_brick_tl_form<float,fem::C3D8IProp,fem::C3D8TLForm>();
+  // test_brick_tl_form<float,fem::C3D8RIProp,fem::C3D8RTLForm>();
+  test_brick_tl_form<float,fem::C3D20IProp,fem::C3D20TLForm>();
+  test_brick_tl_form<float,fem::C3D20RIProp,fem::C3D20RTLForm>();
   LOG(INFO) << "single precision test passed";
   return 0;
 }

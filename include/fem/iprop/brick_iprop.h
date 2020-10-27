@@ -223,36 +223,33 @@ template <typename T, unsigned int N> void brick_interp_deriv(
 }
 
 template <
-  typename T, unsigned int N0, unsigned int N1, unsigned int N2, unsigned int N> 
-class BrickIProp : public ElementIProp<T,N0*N1*N2,N> {
-  public:
-    constexpr BrickIProp() : ElementIProp<T,N0*N1*N2,N>() {
-      // init hbuf
-      auto NI = N0 * N1 * N2;
-      GaussRoots<T,3,N0,N1,N2> gr;
-      T* r = gr.roots;
-      T* h = this->hbuf;
-      for (unsigned int i = 0; i < NI; ++i) {
-        brick_interp_deriv<T, N>(h, r[0], r[1], r[2]);
-        r += 3;
-        h += NI;
-      }
-      // init weights
-      GaussWeights<T,3,N0,N1,N2> gw;
-      for (unsigned int i = 0; i < NI; ++i) {
-        this->weights[i] = gw.weights[i];
-      }
+  typename T, unsigned int N0, unsigned int N1,
+  unsigned int N2, unsigned int N
+>
+struct BrickIPropInitializer : IPropInitializer<T> {
+  static inline void iprop_initialize(T* const hbuf, T* const weights) {
+    auto NI = N0 * N1 * N2;
+    GaussRoots<T,3,N0,N1,N2> gr;
+    GaussWeights<T,3,N0,N1,N2> gw;
+    T* r = gr.roots;
+    auto * h = hbuf;
+    auto stride_h = N * 3;
+    for (unsigned int i = 0; i < NI; ++i) {
+      brick_interp_deriv<T,N>(h, r[0], r[1], r[2]);
+      weights[i] = gw.weights[i];
+      r += 3;
+      h += stride_h;
     }
+  }
 };
 
-template <typename T>
-using C3D8IProp = BrickIProp<T,2,2,2,8>;
-template <typename T>
-using C3D8RIProp = BrickIProp<T,1,1,1,8>;
-template <typename T>
-using C3D20IProp = BrickIProp<T,3,3,3,20>;
-template <typename T>
-using C3D20RIProp = BrickIProp<T,2,2,2,20>;
+#define FORM_REGISTER_BRICK_IPROP(BrickType, N0, N1, N2, N) \
+  template <typename T> \
+  using BrickType##IPropIntializer = \
+    BrickIPropInitializer<T,N0,N1,N2,N>; \
+  template <typename T> \
+  using BrickType##IProp = \
+    IProp<T,N0*N1*N2,3,N,BrickType##IPropIntializer>;
 } // namespace fem
 
 #endif // FEM_IPROP_BRICK_IPROP_H_

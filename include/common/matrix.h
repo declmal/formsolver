@@ -4,7 +4,7 @@
 #include <cblas.h>
 
 template <typename T, unsigned int Dim>
-struct FEMatrix {
+struct MatmulDNND {
   /*!
    * \brief Matrix Multiplication, cij = aik * bkj, 
    *  i = 0,1,...,Dim-1; j = 0,1,...,Dim-1; k = 0,1,...,N-1
@@ -14,74 +14,12 @@ struct FEMatrix {
    * \param N input variable, dimension variable
    * \param c output variable, matrix of shape (Dim, Dim)
    */
-  static void matmul_dnnd(
+  static inline void matmul_dnnd(
     const T* const a, const T* const b, const unsigned int N, T* const c);
-  /*!
-   * \brief Matrix Multiplication, ckj = aki * bij, 
-   *  i = 0,1,...,Dim-1; j = 0,1,...,Dim-1; k = 0,1,...,N-1
-   *
-   * \param a input variable, matrix of shape (N, Dim) 
-   * \param b input variable, matrix of shape (Dim, Dim) 
-   * \param N input variable, dimension variable
-   * \param c output variable, matrix of shape (N, Dim)
-   */
-  static void matmul_nddd(
-    const T* const a, const T* const b, const unsigned int N, T* const c);
-  /*!
-   * \brief Determinant of Dim x Dim Matrix
-   *
-   * \param a input variable, matrix of shape (Dim, Dim)
-   * \return det, determinant of matrix
-   */
-  static T det_dd(const T* const a);
-  /*!
-   * \brief Inversion of Dim x Dim Matrix
-   *
-   * \param a input variable, matrix of shape (Dim, Dim)
-   * \param det intput variable, determinant of matrix
-   * \param inv output variable, inversion matrix, of shape (Dim, Dim),
-   */
-  static void inv_dd(const T* const a, const T det, T* const inv);
-  /*!
-   * \brief Diagnal Tile of Dim x Dim Matrix to Dim^2 x Dim^2
-   *
-   * \param a input variable, matrix of shape (Dim, Dim)
-   * \param tile output variable, inversion matrix, of shape (Dim^2, Dim^2),
-   */
-  void mattile_diag_dd(const T* const a, T* const tile);
-  /*!
-   * \brief Matrix Multiplication, cij = ali blk akj
-   *  i = 0,1,...,3N-1; j = 0,1,...,3N-1; 
-   *  k = 0,1,...,3*Dim-4; l = 0,1,...,3*Dim-4
-   *
-   * \param a input variable, matrix of shape (3*Dim-3, 3N)
-   * \param b input variable, matrix of shape (3*Dim-3, 3*Dim-3)
-   * \param N input variable, dimension variable
-   * \param buffer output variable, matrix of shape (3*Dim-3,)
-   * \param c output variable, matrix of shape (3N, 3N)
-   */
-  static void matmul2_dne_ee_edn(
-    const T* const a, const T* const b, const unsigned int N,
-    T* const buffer, T* const c);
-  /*!
-   * \brief Matrix Multiplication, cij = ali blk akj
-   *  i = 0,1,...,3N-1; j = 0,1,...,3N-1; 
-   *  k = 0,1,...,Dim^2-1; l = 0,1,...,Dim^2-1
-   *
-   * \param a input variable, matrix of shape (Dim^2, 3N)
-   * \param b input variable, matrix of shape (Dim^2, Dim^2)
-   * \param N input variable, dimension variable
-   * \param buffer output variable, matrix of shape (Dim^2,)
-   * \param c output variable, matrix of shape (3N, 3N)
-   */
-  static void matmul2_dnf_ff_fdn(
-    const T* const a, const T* const b, const unsigned int N,
-    T* const buffer, T* const c);
 };
-
 template <typename T>
-struct FEMatrix<T,3> {
-  static void matmul_dnnd(
+struct MatmulDNND<T,3> {
+  static inline void matmul_dnnd(
     const T* const a, const T* const b, const unsigned int N, T* const c) {
     auto a0_ = a;
     auto a1_ = a0_ + N;
@@ -106,8 +44,25 @@ struct FEMatrix<T,3> {
       b_ += 3;
     }
   }
+};
 
-  static void matmul_nddd(
+template <typename T, unsigned int Dim>
+struct MatmulNDDD {
+  /*!
+   * \brief Matrix Multiplication, ckj = aki * bij, 
+   *  i = 0,1,...,Dim-1; j = 0,1,...,Dim-1; k = 0,1,...,N-1
+   *
+   * \param a input variable, matrix of shape (N, Dim) 
+   * \param b input variable, matrix of shape (Dim, Dim) 
+   * \param N input variable, dimension variable
+   * \param c output variable, matrix of shape (N, Dim)
+   */
+  static inline void matmul_nddd(
+    const T* const a, const T* const b, const unsigned int N, T* const c);
+};
+template <typename T>
+struct MatmulNDDD<T,3> {
+  static inline void matmul_nddd(
     const T* const a, const T* const b, const unsigned int N, T* const c) {
     auto a_ = a;
     auto c_ = c;
@@ -119,15 +74,43 @@ struct FEMatrix<T,3> {
       c_ += 3;
     }
   }
+};
 
-  static T det_dd(const T* const a) {
+template <typename T, unsigned int Dim>
+struct DetDD {
+  /*!
+   * \brief Determinant of Dim x Dim Matrix
+   *
+   * \param a input variable, matrix of shape (Dim, Dim)
+   * \return det, determinant of matrix
+   */
+  static inline T det_dd(const T* const a);
+};
+template <typename T>
+struct DetDD<T,3> {
+  static constexpr double tol = 1e-6;
+  static inline T det_dd(const T* const a) {
     return
       (a[3]*a[7] - a[4]*a[6]) * a[2] +
       (a[1]*a[6] - a[0]*a[7]) * a[5] +
       (a[0]*a[4] - a[1]*a[3]) * a[8];
   }
+};
 
-  static void inv_dd(const T* const a, const T det, T* const inv) {
+template <typename T, unsigned int Dim>
+struct InvDD {
+  /*!
+   * \brief Inversion of Dim x Dim Matrix
+   *
+   * \param a input variable, matrix of shape (Dim, Dim)
+   * \param det intput variable, determinant of matrix
+   * \param inv output variable, inversion matrix, of shape (Dim, Dim),
+   */
+  static inline void inv_dd(const T* const a, const T det, T* const inv);
+};
+template <typename T>
+struct InvDD<T,3> {
+  static inline void inv_dd(const T* const a, const T det, T* const inv) {
     inv[0] = a[4]*a[8] - a[5]*a[7];
     inv[1] = a[2]*a[7] - a[1]*a[8];
     inv[2] = a[1]*a[5] - a[2]*a[4];
@@ -141,8 +124,21 @@ struct FEMatrix<T,3> {
       inv[i] /= det;
     }
   }
+};
 
-  static void mattile_diag_dd(const T* const a, T* const tile) {
+template <typename T, unsigned int Dim>
+struct MattileDiagDD {
+  /*!
+   * \brief Diagnal Tile of Dim x Dim Matrix to Dim^2 x Dim^2
+   *
+   * \param a input variable, matrix of shape (Dim, Dim)
+   * \param tile output variable, inversion matrix, of shape (Dim^2, Dim^2),
+   */
+  static inline void mattile_diag_dd(const T* const a, T* const tile);
+};
+template <typename T>
+struct MattileDiagDD<T,3> {
+  static inline void mattile_diag_dd(const T* const a, T* const tile) {
     for (unsigned int i = 0; i < 81; ++i) {
       tile[i] = (T)0;
     }
@@ -156,7 +152,27 @@ struct FEMatrix<T,3> {
     tile[19] = tile[49] = tile[79] = a[7];
     tile[20] = tile[50] = tile[80] = a[8];
   }
-  static void matmul2_dne_ee_edn(
+};
+template <typename T, unsigned int Dim>
+struct Matmul2DNEEEEDN {
+  /*!
+   * \brief Matrix Multiplication, cij = ali blk akj
+   *  i = 0,1,...,3N-1; j = 0,1,...,3N-1; 
+   *  k = 0,1,...,3*Dim-4; l = 0,1,...,3*Dim-4
+   *
+   * \param a input variable, matrix of shape (3*Dim-3, 3N)
+   * \param b input variable, matrix of shape (3*Dim-3, 3*Dim-3)
+   * \param N input variable, dimension variable
+   * \param buffer output variable, matrix of shape (3*Dim-3,)
+   * \param c output variable, matrix of shape (3N, 3N)
+   */
+  static inline void matmul2_dne_ee_edn(
+    const T* const a, const T* const b, const unsigned int N,
+    T* const buffer, T* const c);
+};
+template <typename T>
+struct Matmul2DNEEEEDN<T,3> {
+  static inline void matmul2_dne_ee_edn(
     const T* const a, const T* const b, const unsigned int N,
     T* const buffer, T* const c) {
     auto _3N = 3 * N;
@@ -187,8 +203,27 @@ struct FEMatrix<T,3> {
       c_ += _3N;
     }
   }
-
-  static void matmul2_dnf_ff_fdn(
+};
+template <typename T, unsigned int Dim>
+struct Matmul2DNFFFFDN {
+  /*!
+   * \brief Matrix Multiplication, cij = ali blk akj
+   *  i = 0,1,...,3N-1; j = 0,1,...,3N-1; 
+   *  k = 0,1,...,Dim^2-1; l = 0,1,...,Dim^2-1
+   *
+   * \param a input variable, matrix of shape (Dim^2, 3N)
+   * \param b input variable, matrix of shape (Dim^2, Dim^2)
+   * \param N input variable, dimension variable
+   * \param buffer output variable, matrix of shape (Dim^2,)
+   * \param c output variable, matrix of shape (3N, 3N)
+   */
+  static inline void matmul2_dnf_ff_fdn(
+    const T* const a, const T* const b, const unsigned int N,
+    T* const buffer, T* const c);
+};
+template <typename T>
+struct Matmul2DNFFFFDN<T,3> {
+  static inline void matmul2_dnf_ff_fdn(
     const T* const a, const T* const b, const unsigned int N,
     T* const buffer, T* const c) {
     auto _3N = 3 * N;

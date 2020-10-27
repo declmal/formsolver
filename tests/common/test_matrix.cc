@@ -61,7 +61,7 @@ void test_matmul_nddd(bool layout=false, double tol=1e-6) {
   unsigned int nBytesD = nEntryD * sizeof(T);
   auto d = (T*)malloc(nBytesD);
   // execute
-  FEMatrix<T,Dim>::matmul_nddd(a, b, N, c);
+  MatmulNDDD<T,Dim>::matmul_nddd(a, b, N, c);
   // validate
   Matmul<T>::matmul(
     CblasRowMajor, CblasNoTrans, CblasNoTrans,
@@ -112,7 +112,7 @@ void test_matmul_dnnd(bool layout=false, double tol=1e-6) {
   unsigned int nBytesD = nEntryD * sizeof(T);
   auto d = (T*)malloc(nBytesD);
   // execute
-  FEMatrix<T,Dim>::matmul_dnnd(a, b, N, c);
+  MatmulDNND<T,Dim>::matmul_dnnd(a, b, N, c);
   // validate
   Matmul<T>::matmul(
     CblasRowMajor, CblasNoTrans, CblasNoTrans,
@@ -163,7 +163,7 @@ void test_inv_dd(bool layout=false, double tol=1e-6) {
   auto unit = (T*)malloc(nBytesUnit);
   init_diag_unit<T>(unit, Dim);
   // execute
-  auto det = FEMatrix<T,Dim>::det_dd(a);
+  auto det = DetDD<T,Dim>::det_dd(a);
   if (abs(det) < 1e-6) {
     free(a);
     free(inv);
@@ -171,7 +171,7 @@ void test_inv_dd(bool layout=false, double tol=1e-6) {
     free(unit);
     LOG(FATAL) << "singular matrix encountered, det: " << det;
   }
-  FEMatrix<T,Dim>::inv_dd(a, det, inv);
+  InvDD<T,Dim>::inv_dd(a, det, inv);
   // validate
   Matmul<T>::matmul(
     CblasRowMajor, CblasNoTrans, CblasNoTrans,
@@ -272,7 +272,7 @@ void test_mattile_diag_dd(bool layout=false, double tol=1e-6) {
   // init out
   auto out = (T*)malloc(nEntryTile*sizeof(T));
   // execute
-  FEMatrix<T,Dim>::mattile_diag_dd(a, tile);
+  MattileDiagDD<T,Dim>::mattile_diag_dd(a, tile);
   // validate
   DiagVal<T,Dim>::diag_val(a, out);
   if (layout) {
@@ -328,7 +328,7 @@ void test_matmul2_dne_ee_edn(bool layout=false, double tol=1e-6) {
   unsigned int nBytesE = nEntryE * sizeof(T);
   auto e = (T*)malloc(nBytesE);
   // execute
-  FEMatrix<T,Dim>::matmul2_dne_ee_edn(a, b, N, buffer, c);
+  Matmul2DNEEEEDN<T,Dim>::matmul2_dne_ee_edn(a, b, N, buffer, c);
   // validate
   Matmul<T>::matmul(
     CblasRowMajor, CblasTrans, CblasNoTrans,
@@ -394,7 +394,7 @@ void test_matmul2_dnf_ff_fdn(bool layout=false, double tol=1e-6) {
   unsigned int nBytesE = nEntryE * sizeof(T);
   auto e = (T*)malloc(nBytesE);
   // execute
-  FEMatrix<T,Dim>::matmul2_dnf_ff_fdn(a, b, N, buffer, c);
+  Matmul2DNFFFFDN<T,Dim>::matmul2_dnf_ff_fdn(a, b, N, buffer, c);
   // validate
   Matmul<T>::matmul(
     CblasRowMajor, CblasTrans, CblasNoTrans,
