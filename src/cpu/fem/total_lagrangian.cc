@@ -1,12 +1,13 @@
-#include <fem/elem_stiff.h>
+#include <fem/formulator/total_lagrangian.h>
 
 namespace fem {
 template <typename T>
 void lin_trans_mat_tl_3d(
-  const T* const h0, const T* const u0t, const unsigned int N, T* const B0t_L) {
+  const T* const h0, const T* const u0t, 
+  const unsigned int N, T* const B0tL) {
   auto H = h0;
   auto _3N = 3 * N;
-  auto B0 = B0t_L;
+  auto B0 = B0tL;
   auto B1 = B0 + _3N;
   auto B2 = B1 + _3N;
   auto B3 = B2 + _3N;
@@ -41,21 +42,13 @@ void lin_trans_mat_tl_3d(
     H += 3;
   }
 }
-template
-void lin_trans_mat_tl_3d(
-  const double* const h0, const double* const u0t,
-  const unsigned int N, double* const B0t_L);
-template
-void lin_trans_mat_tl_3d(
-  const float* const h0, const float* const u0t,
-  const unsigned int N, float* const B0t_L);
 
 template <typename T>
 void nonlin_trans_mat_tl_3d(
-  const T* const h0, const unsigned int N, T* const B0_NL) {
+  const T* const h0, const unsigned int N, T* const B0NL) {
   auto H = h0;
   auto _3N = 3 * N;
-  auto B0 = B0_NL;
+  auto B0 = B0NL;
   auto B1 = B0 + _3N;
   auto B2 = B1 + _3N;
   auto B3 = B2 + _3N;
@@ -84,10 +77,7 @@ void nonlin_trans_mat_tl_3d(
     H += 3;
   }
 }
-template
-void nonlin_trans_mat_tl_3d(
-  const double* const h0, const unsigned int N, double* const B0_NL);
-template
-void nonlin_trans_mat_tl_3d(
-  const float* const h0, const unsigned int N, float* const B0_NL);
+
+FORM_REGISTER_TL_OP(float)
+FORM_REGISTER_TL_OP(double)
 } // namespace fem
