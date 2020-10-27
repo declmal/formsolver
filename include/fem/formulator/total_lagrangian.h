@@ -8,7 +8,7 @@ FORM_REGISTER_FORMULATOR_TEMPLATE()
 class TotalLagrangian : public Formulator<T,Dim,EType> {
   public:
     TotalLagrangian(EType<T>* elem_);
-    void form_elem_stiff();
+    int form_elem_stiff();
   private:
     T* X0;
     T* hbuf;
@@ -27,7 +27,7 @@ using TL3D = TotalLagrangian<T,3,EType>;
   template \
   TotalLagrangian<T,Dim,EType>::TotalLagrangian(EType<T>* elem_); \
   template \
-  void TotalLagrangian<T,Dim,EType>::form_elem_stiff();
+  int TotalLagrangian<T,Dim,EType>::form_elem_stiff();
 } // namespace fem
 
 #endif // FEM_FORMULATOR_TOTAL_LAGRANGIAN_H_

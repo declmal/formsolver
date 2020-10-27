@@ -16,7 +16,7 @@ TotalLagrangian<T,Dim,EType>::TotalLagrangian(
 }
 
 FORM_REGISTER_FORMULATOR_TEMPLATE()
-void TotalLagrangian<T,Dim,EType>::form_elem_stiff() {
+int TotalLagrangian<T,Dim,EType>::form_elem_stiff() {
   auto h = hbuf;
   // init Ke
   auto rowKe = Dim * num_nodes;
@@ -34,6 +34,7 @@ void TotalLagrangian<T,Dim,EType>::form_elem_stiff() {
   // free
   free(Ke);
   free(J0);
+  return 0;
 }
 
 // C3D8 TL

@@ -151,9 +151,6 @@ void test_inv_dd(bool layout=false, double tol=1e-6) {
   unsigned int nBytesA = nEntryA * sizeof(T);
   auto a = (T*)malloc(nBytesA);
   init_rand<T>(a, nEntryA);
-  // init det
-  unsigned int nBytesDet = 1 * sizeof(T);
-  auto det = (T*)malloc(nBytesDet);
   // init inv
   unsigned int nEntryInv = Dim * Dim;
   unsigned int nBytesInv = nEntryInv * sizeof(T);
@@ -168,14 +165,13 @@ void test_inv_dd(bool layout=false, double tol=1e-6) {
   auto unit = (T*)malloc(nBytesUnit);
   init_diag_unit<T>(unit, Dim);
   // execute
-  FEMatrix<T,Dim>::det_dd(a, det);
-  if (abs(det[0]) < 1e-6) {
+  auto det = FEMatrix<T,Dim>::det_dd(a);
+  if (abs(det) < 1e-6) {
     free(a);
-    free(det);
     free(inv);
     free(mul);
     free(unit);
-    LOG(FATAL) << "singular matrix encountered, det: " << det[0];
+    LOG(FATAL) << "singular matrix encountered, det: " << det;
   }
   FEMatrix<T,Dim>::inv_dd(a, det, inv);
   // validate
@@ -185,8 +181,7 @@ void test_inv_dd(bool layout=false, double tol=1e-6) {
   if (layout) {
     LOG(INFO) << "matrix a layout";
     print_mat<T>(a, Dim, Dim);
-    LOG(INFO) << "matrix det layout";
-    print_mat<T>(det, 1, 1);
+    LOG(INFO) << "det: " << det;
     LOG(INFO) << "matrix inv layout";
     print_mat<T>(inv, Dim, Dim);
     LOG(INFO) << "matrix mul layout";
@@ -195,7 +190,6 @@ void test_inv_dd(bool layout=false, double tol=1e-6) {
   bool flag = validate<T>(mul, unit, Dim*Dim, tol);
   // free
   free(a);
-  free(det);
   free(inv);
   free(mul);
   free(unit);

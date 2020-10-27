@@ -29,17 +29,17 @@ struct FEMatrix {
    * \brief Determinant of Dim x Dim Matrix
    *
    * \param a input variable, matrix of shape (Dim, Dim)
-   * \param det output variable, determinant of matrix, of shape (1,)
+   * \return det, determinant of matrix
    */
-  static void det_dd(const T* const a, T* const det);
+  static T det_dd(const T* const a);
   /*!
    * \brief Inversion of Dim x Dim Matrix
    *
    * \param a input variable, matrix of shape (Dim, Dim)
-   * \param det intput variable, determinant of matrix, of shape (1,)
+   * \param det intput variable, determinant of matrix
    * \param inv output variable, inversion matrix, of shape (Dim, Dim),
    */
-  static void inv_dd(const T* const a, const T* const det, T* const inv);
+  static void inv_dd(const T* const a, const T det, T* const inv);
   /*!
    * \brief Diagnal Tile of Dim x Dim Matrix to Dim^2 x Dim^2
    *
@@ -118,14 +118,14 @@ struct FEMatrix<T,3> {
     }
   }
 
-  static void det_dd(const T* const a, T* const det) {
-    det[0] =
+  static T det_dd(const T* const a) {
+    return
       (a[3]*a[7] - a[4]*a[6]) * a[2] +
       (a[1]*a[6] - a[0]*a[7]) * a[5] +
       (a[0]*a[4] - a[1]*a[3]) * a[8];
   }
 
-  static void inv_dd(const T* const a, const T* const det, T* const inv) {
+  static void inv_dd(const T* const a, const T det, T* const inv) {
     inv[0] = a[4]*a[8] - a[5]*a[7];
     inv[1] = a[2]*a[7] - a[1]*a[8];
     inv[2] = a[1]*a[5] - a[2]*a[4];
@@ -136,7 +136,7 @@ struct FEMatrix<T,3> {
     inv[7] = a[1]*a[6] - a[0]*a[7];
     inv[8] = a[0]*a[4] - a[1]*a[3];
     for (unsigned int i = 0; i < 9; ++i) {
-      inv[i] /= det[0];
+      inv[i] /= det;
     }
   }
 
