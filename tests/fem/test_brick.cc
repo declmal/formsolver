@@ -175,6 +175,15 @@ void test_brick_tl_form(bool layout=true) {
   auto nEntryUt = Dim * N;
   auto Ut = (T*)malloc(nEntryUt*sizeof(T));
   init_rand<T>(Ut, nEntryUt);
+  // init C0
+  auto nRowC0 = 3*Dim - 3;
+  auto nEntryC0 = nRowC0 * nRowC0;
+  auto C0 = (T*)malloc(nEntryC0*sizeof(T));
+  init_rand<T>(C0, nEntryC0);
+  // init S0t
+  auto nEntryS0t = Dim * Dim;
+  auto S0t = (T*)malloc(nEntryS0t*sizeof(T));
+  init_rand<T>(S0t, nEntryS0t);
   // init J0
   auto nEntryJ0 = Dim * Dim;
   auto J0 = (T*)malloc(nEntryJ0*sizeof(T));
@@ -192,22 +201,33 @@ void test_brick_tl_form(bool layout=true) {
   auto nColB0tL = Dim * N;
   auto nEntryB0tL = nRowB0tL * nColB0tL;
   auto B0tL = (T*)malloc(nEntryB0tL*sizeof(T));
+  // init buf
+  auto nEntryBuf = Dim * Dim;
+  auto buf = (T*)malloc(nEntryBuf*sizeof(T));
+  // init tmpK
+  auto nRowTmpK = Dim * N;
+  auto nEntryTmpK = nRowTmpK * nRowTmpK;
+  auto tmpK = (T*)malloc(nEntryTmpK*sizeof(T));
   // init Ke
   auto nRowKe = Dim * N;
   auto nEntryKe = nRowKe * nRowKe;
   auto Ke = (T*)malloc(nEntryKe*sizeof(T));
   // init 
   BrickTLFormType<T>::form_elem_stiff(
-    X0, hbuf, Ut, J0, invJ0, h0, u0t, B0tL, Ke);
+    X0, hbuf, Ut, C0, S0t, J0, invJ0, h0, u0t, B0tL, buf, tmpK, Ke);
   // execute
   // free
   free(X0);
   free(J0);
   free(Ut);
+  free(C0);
+  free(S0t);
   free(invJ0);
   free(h0);
   free(u0t);
   free(B0tL);
+  free(buf);
+  free(tmpK);
   free(Ke);
   LOG(INFO) << "test_brick_tl_form passed, T: " << typeid(T).name()
     << ", BrickIPropType: " << typeid(BrickIPropType<T>).name()

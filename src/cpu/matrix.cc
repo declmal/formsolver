@@ -186,5 +186,12 @@ void matadd(
   }
 }
 
+template <typename T>
+void matinc(const T* const a, const unsigned int size, T* const b) {
+  for (unsigned int i = 0; i < size; ++i) {
+    b[i] += a[i];
+  }
+}
+
 FORM_REGISTER_MATRIX_OP(float)
 FORM_REGISTER_MATRIX_OP(double)

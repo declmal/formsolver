@@ -51,7 +51,7 @@ struct NonlinTransMatTL {
    *  with respect to initial global coordinate, of shape (N, Dim)
    * \param N input variable, the number of nodes in an element
    * \param B0NL output variable, nonlinear transformation matrix, 
-   *  of shape (Dim*Dim, Dim*N)
+   *  of shape (Dim^2, Dim*N)
    */
   static inline void nonlin_trans_mat_tl(
     const T* const h0, const unsigned int N, T* const B0NL);
@@ -87,6 +87,10 @@ struct TLForm {
    *  with respect to natural coordinate, of shape (NI, N, Dim)
    * \param Ut input variable, temporal element nodal displacement,
    *  of shape (Dim, N)
+   * \param C0 input variable, ,
+   *  of shape (3*Dim-3, 3*Dim-3)
+   * \param S0t input variable, ,
+   *  of shape (Dim, Dim)
    * \param J0, auxiliary variable, jacobian matrix with respect to 
    *  inital configuration, of shape (Dim, Dim)
    * \param invJ0, auxiliary variable, inversion of J0, of shape (Dim, Dim)
@@ -96,12 +100,19 @@ struct TLForm {
    *  initial global coordinate, of shape (Dim, Dim)
    * \param B0tL auxiliary variable, linear strain incremental stiffness
    *  matrix, of shape (3*Dim-3, Dim*N)
+   * \param B0NL auxiliary variable, linear strain incremental stiffness
+   *  matrix, of shape (Dim^2, Dim*N)
+   * \param buf auxiliary variable, of shape (Dim^2,)
+   * \param tmpK auxiliary variable, temporary stiffness matrix component,
+   *  of shape (Dim*N, Dim*N)
    * \param Ke, output variable, element stiffness matrix, 
    *  of shape (Dim*N, Dim*N)
    */
   static int form_elem_stiff(
-    const T* const X0, const T* const hbuf, const T* const Ut, T* const J0, 
-    T* const invJ0, T* const h0, T* const u0t, T* const B0tL, T* const Ke) {
+    const T* const X0, const T* const hbuf, const T* const Ut, 
+    const T* const C0, const T* const S0t, T* const J0, T* const invJ0, 
+    T* const h0, T* const u0t, T* const B0tL, T* const buf, T* const tmpK,
+    T* const Ke) {
     auto rowKe = Dim * N;
     auto nEntryKe = rowKe * rowKe;
     init_zero<T>(Ke, nEntryKe);
@@ -118,6 +129,9 @@ struct TLForm {
       MatmulNDDDT<T,Dim>::matmul_ndddt(h, invJ0, N, h0);
       h += stride_h;
       MatmulDNND<T,Dim>::matmul_dnnd(Ut, h0, N, u0t);
+      LinTransMatTL<T,Dim>::lin_trans_mat_tl(h0, u0t, N, B0tL);
+      Matmul2DNEEEEDN<T,Dim>::matmul2_dne_ee_edn(B0tL, C0, N, buf, tmpK);
+      matinc<T>(tmpK, nEntryKe, Ke);
     }
     printf("hihihihhih\n\n\n\n\n");
     return 0;

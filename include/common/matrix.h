@@ -209,6 +209,9 @@ template <typename T>
 void matadd(
   const T* const a, const T* const b, const unsigned int size, T* const c);
 
+template <typename T>
+void matinc(const T* const a, const unsigned int size, T* const b);
+
 #define FORM_REGISTER_MATRIX_OP(T) \
   template \
   void matmul_dnnd_3d( \
@@ -236,6 +239,8 @@ void matadd(
   template \
   void matadd( \
     const T* const a, const T* const b, const unsigned int size, T* const c); \
+  template \
+  void matinc(const T* const a, const unsigned int size, T* const b);
 
 template <typename T>
 struct Matmul {
