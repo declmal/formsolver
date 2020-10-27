@@ -171,25 +171,47 @@ void test_brick_tl_form(bool layout=true) {
   init_rand(X0, nEntryX0);
   // init hbuf
   auto hbuf = BrickIPropType<T>::get_hbuf();
+  // init Ut
+  auto nEntryUt = Dim * N;
+  auto Ut = (T*)malloc(nEntryUt*sizeof(T));
+  init_rand<T>(Ut, nEntryUt);
   // init J0
   auto nEntryJ0 = Dim * Dim;
   auto J0 = (T*)malloc(nEntryJ0*sizeof(T));
   // init invJ0
   auto nEntryInvJ0 = Dim * Dim;
   auto invJ0 = (T*)malloc(nEntryInvJ0*sizeof(T));
+  // init h0
+  auto nEntryH0 = N * Dim;
+  auto h0 = (T*)malloc(nEntryH0*sizeof(T));
+  // init u0t
+  auto nEntryU0t = Dim * Dim;
+  auto u0t = (T*)malloc(nEntryU0t*sizeof(T));
+  // init B0tL
+  auto nRowB0tL = 3*Dim - 3;
+  auto nColB0tL = Dim * N;
+  auto nEntryB0tL = nRowB0tL * nColB0tL;
+  auto B0tL = (T*)malloc(nEntryB0tL*sizeof(T));
   // init Ke
   auto nRowKe = Dim * N;
   auto nEntryKe = nRowKe * nRowKe;
   auto Ke = (T*)malloc(nEntryKe*sizeof(T));
   // init 
   BrickTLFormType<T>::form_elem_stiff(
-    X0, hbuf, J0, invJ0, Ke);
+    X0, hbuf, Ut, J0, invJ0, h0, u0t, B0tL, Ke);
   // execute
   // free
   free(X0);
   free(J0);
+  free(Ut);
   free(invJ0);
+  free(h0);
+  free(u0t);
+  free(B0tL);
   free(Ke);
+  LOG(INFO) << "test_brick_tl_form passed, T: " << typeid(T).name()
+    << ", BrickIPropType: " << typeid(BrickIPropType<T>).name()
+    << ", BrickTLFormType: " << typeid(BrickTLFormType<T>).name();
 }
 
 int main(int argc, char* argv[]) {

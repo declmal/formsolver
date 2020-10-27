@@ -5,6 +5,118 @@
 #include <common/common.h>
 
 namespace fem {
+template <typename T, unsigned int Dim>
+struct LinTransMatTL {
+  /*!
+   * \brief Linear Transformation Matrix 
+   *  for Total Lagrangian Formulation
+   *
+   * \param h0 input variable, interpolation derivative 
+   *  with respect to initial global coordinate, of shape (N, Dim)
+   * \param u0t input variable, temporal displacement derivative
+   *  with respect to initial global coordinate, of shape (Dim, Dim)
+   * \param N input variable, the number of nodes in an element
+   * \param B0tL output variable, linear transformation matrix, 
+   *  of shape (3*Dim-3, Dim*N)
+   */
+  static inline void lin_trans_mat_tl(
+    const T* const h0, const T* const u0t, const unsigned int N, T* const B0tL);
+};
+template <typename T>
+struct LinTransMatTL<T,3> {
+  static inline void lin_trans_mat_tl(
+    const T* const h0, const T* const u0t, const unsigned int N, T* const B0tL) {
+    auto H = h0;
+    auto _3N = 3 * N;
+    auto B0 = B0tL;
+    auto B1 = B0 + _3N;
+    auto B2 = B1 + _3N;
+    auto B3 = B2 + _3N;
+    auto B4 = B3 + _3N;
+    auto B5 = B4 + _3N;
+    for (unsigned int i = 0; i < N; ++i) {
+      // TODO: N parallel
+      B0[0] = H[0] * ((T)1 + u0t[0]);
+      B0[1] = H[0] * u0t[3];
+      B0[2] = H[0] * u0t[6];
+      B0 += 3;
+      B1[0] = H[1] * u0t[1];
+      B1[1] = H[1] * ((T)1 + u0t[4]);
+      B1[2] = H[1] * u0t[7];
+      B1 += 3;
+      B2[0] = H[2] * u0t[2];
+      B2[1] = H[2] * u0t[5];
+      B2[2] = H[2] * ((T)1 + u0t[8]);
+      B2 += 3;
+      B3[0] = H[0]*u0t[1] + H[1]*((T)1+u0t[0]);
+      B3[1] = H[0]*((T)1+u0t[4]) + H[1]*u0t[3];
+      B3[2] = H[0]*u0t[7] + H[1]*u0t[6];
+      B3 += 3;
+      B4[0] = H[1]*u0t[2] + H[2]*u0t[1];
+      B4[1] = H[1]*u0t[5] + H[2]*((T)1+u0t[4]);
+      B4[2] = H[1]*((T)1+u0t[8]) + H[2]*u0t[7];
+      B4 += 3;
+      B5[0] = H[0]*u0t[2] + H[2]*((T)1+u0t[0]);
+      B5[1] = H[0]*u0t[5] + H[2]*u0t[3];
+      B5[2] = H[0]*((T)1+u0t[8]) + H[2]*u0t[6];
+      B5 += 3;
+      H += 3;
+    }
+  }
+};
+
+template <typename T, unsigned int Dim>
+struct NonlinTransMatTL {
+  /*!
+   * \brief Nonlinear Transformation Matrix 
+   *  for Total Lagrangian Formulation
+   *
+   * \param h0 input variable, interpolation derivative 
+   *  with respect to initial global coordinate, of shape (N, Dim)
+   * \param N input variable, the number of nodes in an element
+   * \param B0NL output variable, nonlinear transformation matrix, 
+   *  of shape (Dim*Dim, Dim*N)
+   */
+  static inline void nonlin_trans_mat_tl(
+    const T* const h0, const unsigned int N, T* const B0NL);
+};
+template <typename T>
+struct NonlinTransMatTL<T,3> {
+  static inline void nonlin_trans_mat_tl(
+    const T* const h0, const unsigned int N, T* const B0NL) {
+    auto H = h0;
+    auto _3N = 3 * N;
+    auto B0 = B0NL;
+    auto B1 = B0 + _3N;
+    auto B2 = B1 + _3N;
+    auto B3 = B2 + _3N;
+    auto B4 = B3 + _3N;
+    auto B5 = B4 + _3N;
+    auto B6 = B5 + _3N;
+    auto B7 = B6 + _3N;
+    auto B8 = B7 + _3N;
+    for (unsigned int k = 0; k < N; ++k) {
+      // TODO: N parallel
+      B0[0] = B3[1] = B6[2] = H[0];
+      B0[1] = B0[2] = B3[0] = B3[2] = B6[0] = B6[1] = (T)0;
+      B0 += 3;
+      B3 += 3;
+      B6 += 3;
+      B1[0] = B4[1] = B7[2] = H[1];
+      B1[1] = B1[2] = B4[0] = B4[2] = B7[0] = B7[1] = (T)0;
+      B1 += 3;
+      B4 += 3;
+      B7 += 3;
+      B2[0] = B5[1] = B8[2] = H[2];
+      B2[1] = B2[2] = B5[0] = B5[2] = B8[0] = B8[1] = (T)0;
+      B2 += 3;
+      B5 += 3;
+      B8 += 3;
+      H += 3;
+    }
+  }
+};
+
 /*!
  * \brief Total Lagrangian Formulation (Single Element Version)
  */
@@ -17,15 +129,23 @@ struct TLForm {
    *  of shape (Dim, N)
    * \param hbuf input variable, buffer of interpolation derivative
    *  with respect to natural coordinate, of shape (NI, N, Dim)
+   * \param Ut input variable, temporal element nodal displacement,
+   *  of shape (Dim, N)
    * \param J0, auxiliary variable, jacobian matrix with respect to 
    *  inital configuration, of shape (Dim, Dim)
    * \param invJ0, auxiliary variable, inversion of J0, of shape (Dim, Dim)
+   * \param h0 auxiliary variable, interpolation derivative
+   *  with respect to initial global coordinate, of shape (N, Dim)
+   * \param u0t auxiliary variable, displacement derivative with respect to
+   *  initial global coordinate, of shape (Dim, Dim)
+   * \param B0tL auxiliary variable, linear strain incremental stiffness
+   *  matrix, of shape (3*Dim-3, Dim*N)
    * \param Ke, output variable, element stiffness matrix, 
    *  of shape (Dim*N, Dim*N)
    */
   static int form_elem_stiff(
-    const T* const X0, const T* const hbuf, T* const J0, T* const invJ0,
-    T* const Ke) {
+    const T* const X0, const T* const hbuf, const T* const Ut, T* const J0, 
+    T* const invJ0, T* const h0, T* const u0t, T* const B0tL, T* const Ke) {
     auto rowKe = Dim * N;
     auto nEntryKe = rowKe * rowKe;
     init_zero<T>(Ke, nEntryKe);
@@ -39,8 +159,11 @@ struct TLForm {
         return -1;
       }
       InvDD<T,Dim>::inv_dd(J0, detJ0, invJ0);
+      MatmulNDDDT<T,Dim>::matmul_ndddt(h, invJ0, N, h0);
       h += stride_h;
+      MatmulDNND<T,Dim>::matmul_dnnd(Ut, h0, N, u0t);
     }
+    printf("hihihihhih\n\n\n\n\n");
     return 0;
   }
 };
