@@ -7,13 +7,14 @@ namespace fem {
 FORM_REGISTER_FORMULATOR_TEMPLATE()
 class TotalLagrangian : public Formulator<T,Dim,EType> {
   public:
-    TotalLagrangian(EType<T>* elem_) : Formulator<T,Dim,EType>(elem_) {}
-    void load_elem_data();
+    TotalLagrangian(EType<T>* elem_);
     void form_elem_stiff();
   private:
     T* X0;
-    T* J;
-    T* Ke;
+    T* hbuf;
+    T* weights;
+    unsigned int num_ipoints;
+    unsigned int num_nodes;
 };
 
 template <
@@ -24,7 +25,7 @@ using TL3D = TotalLagrangian<T,3,EType>;
 
 #define FORM_REGISTER_TL(T, Dim, EType) \
   template \
-  void TotalLagrangian<T,Dim,EType>::load_elem_data(); \
+  TotalLagrangian<T,Dim,EType>::TotalLagrangian(EType<T>* elem_); \
   template \
   void TotalLagrangian<T,Dim,EType>::form_elem_stiff();
 } // namespace fem

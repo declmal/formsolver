@@ -13,9 +13,10 @@ class Element {
     void init_coordinate(const T* const data, const unsigned int size);
     void init_coordinate();
     T* get_X0();
-    T* get_J();
-    T* get_Ke();
-    virtual void form_elem_stiff();
+    T* get_hbuf();
+    T* get_weights();
+    unsigned int get_num_ipoints();
+    unsigned int get_num_nodes();
   protected:
     /*!
      * \brief Element Interpolation Property
@@ -29,28 +30,22 @@ class Element {
      * \brief Initial Global Coordinate Matrix, of shape (3, N)
      */
     T X0[3*N];
-    /*!
-     * \brief Jacobi Matrix, of shape (3, 3)
-     */
-    T J[9];
-    /*!
-     * \brief Element Stiffness Matrix, of shape (3N, 3N)
-     */
-    T Ke[9*N*N];
 };
 
 #define FORM_REGISTER_ELEMENT(T, N, IPropType) \
-  template \
-  void Element<T,N,IPropType>::form_elem_stiff(); \
   template \
   void Element<T,N,IPropType>::init_coordinate( \
     const T* const data, const unsigned int size); \
   template \
   T* Element<T,N,IPropType>::get_X0(); \
   template \
-  T* Element<T,N,IPropType>::get_J(); \
+  T* Element<T,N,IPropType>::get_hbuf(); \
   template \
-  T* Element<T,N,IPropType>::get_Ke();
+  T* Element<T,N,IPropType>::get_weights(); \
+  template \
+  unsigned int Element<T,N,IPropType>::get_num_ipoints(); \
+  template \
+  unsigned int Element<T,N,IPropType>::get_num_nodes();
 } // namespace fem
 
 #endif // FEM_ELEMENT_ELEMENT_H_

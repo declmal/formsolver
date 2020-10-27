@@ -12,7 +12,6 @@ FORM_REGISTER_FORMULATOR_TEMPLATE()
 class Formulator {
   public:
     Formulator(EType<T>* elem_) : elem(elem_) {}
-    virtual void load_elem_data() = 0;
     virtual void form_elem_stiff() = 0;
   protected:
     EType<T>* elem;
