@@ -4,7 +4,7 @@
 namespace fem {
 template <typename T>
 struct IPropInitializer {
-  static inline void iprop_initialize(T* const hbuf, T* const weights);
+  static inline void initialize(T* const hbuf, T* const weights);
 };
 
 #define FORM_IPROP_TEMPLATE() \
@@ -23,7 +23,7 @@ struct IProp {
   static T* get_hbuf() { return hbuf; }
   static T* get_weights() { return weights; }
   static void initialize() {
-    IPropInitializerType<T>::iprop_initialize(hbuf, weights);
+    IPropInitializerType<T>::initialize(hbuf, weights);
   }
 };
 

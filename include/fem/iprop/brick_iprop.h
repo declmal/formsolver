@@ -227,7 +227,7 @@ template <
   unsigned int N2, unsigned int N
 >
 struct BrickIPropInitializer : IPropInitializer<T> {
-  static inline void iprop_initialize(T* const hbuf, T* const weights) {
+  static inline void initialize(T* const hbuf, T* const weights) {
     auto NI = N0 * N1 * N2;
     GaussRoots<T,3,N0,N1,N2> gr;
     GaussWeights<T,3,N0,N1,N2> gw;
