@@ -181,10 +181,7 @@ void test_brick_tl_form(bool layout=true) {
   auto Ut = (T*)malloc(nEntryUt*sizeof(T));
   init_rand<T>(Ut, nEntryUt);
   // init C0
-  auto nRowC0 = 3*Dim - 3;
-  auto nEntryC0 = nRowC0 * nRowC0;
-  auto C0 = (T*)malloc(nEntryC0*sizeof(T));
-  init_rand<T>(C0, nEntryC0);
+  auto C0 = MatType<T>::get_C();
   // init S0t
   auto nEntryS0t = Dim * Dim;
   auto S0t = (T*)malloc(nEntryS0t*sizeof(T));
@@ -247,7 +244,6 @@ void test_brick_tl_form(bool layout=true) {
   free(X0);
   free(J0);
   free(Ut);
-  free(C0);
   free(S0t);
   free(invJ0);
   free(h0);

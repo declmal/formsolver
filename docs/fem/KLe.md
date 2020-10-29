@@ -111,17 +111,20 @@ $$
 \Big) \\
 
 &= \frac{1}{2}
-\Bigg[
-{}_{0}h_{n,j} \ U_{in} +
-{}_{0}h_{n,i} \ U_{jn} +
 \Big(
-{}_{0}^{t}u_{q,i} \ {}_{0}h_{n',j} +
-{}_{0}h_{n',i} \ {}_{0}^{t}u_{q,j}
-\Big) \
-U_{qn'}
-\Bigg]
+{}_{0}h_{n,j} \ \delta_{iq} +
+{}_{0}h_{n,i} \ \delta_{jq} +
+{}_{0}^{t}u_{q,i} \ {}_{0}h_{n,j} +
+{}_{0}h_{n,i} \ {}_{0}^{t}u_{q,j}
+\Big)
+U_{qn} \\
 
 \end{align}
+$$
+
+Thus
+$$
+{}_{0}^{t}e_{ij} = {}_{0}^{t}e_{ji}
 $$
 
 ##### Virtual Linear Strain Tensor
@@ -145,6 +148,32 @@ $$
 \end{align}
 $$
 
+Thus
+$$
+\delta \ {}_{0}^{t}e_{ij} = \delta \ {}_{0}^{t}e_{ji}
+$$
+
+##### Constitutive Tensor
+
+The following equation must be true
+$$
+{}_{0}C_{ijrs} = {}_{0}C_{ijsr} = {}_{0}C_{jirs}
+$$
+e.g. Isotropic elasticity
+
+[*Finite Element Procedures (2nd), P194, TABLE 4.3*]
+$$
+{}_{0}C_{ijrs} = \lambda \ \delta_{ij} \ \delta_{rs} + \mu \ \big(\delta_{ir} \ \delta_{js} + \delta_{is} \ \delta_{jr}\big)
+$$
+
+$$
+\lambda = \frac{E \nu}{(1+\nu)(1-2\nu)}
+$$
+
+$$
+\mu = \frac{E}{2(1+\nu)}
+$$
+
 ##### Linear Strain Incremental Stiffness Matrix
 
 [*Finite Element Procedures (2nd), P524, TABLE 6.2*]
@@ -153,23 +182,19 @@ $$
 \sum_{e=0}^{E-1} \iiint_{{}^{0}\hat V} {}_{0}C_{ijrs} \ {}_{0}e_{rs} \ \delta \ {}_{0}e_{ij} \ \text{d} \ {}^{0}\hat V
 $$
 
-Since ${}_{0}C_{ijrs} = {}_{0}C_{ijsr} = {}_{0}C_{jirs}$
+
 $$
 \begin{align}
 
-{}_{0}C_{ijrs} \ {}_{0}^{t}e_{rs} \ \delta \ {}_{0}^{t}e_{ij}
+\sum_{\{i,j\}} \sum_{\{r,s\}} {}_{0}C_{ijrs} \ {}_{0}^{t}e_{rs} \ \delta \ {}_{0}^{t}e_{ij}
 
-&= \delta U_{pm} \
-\Big(
-{}_{0}h_{m,i} \ \delta_{jp} +
-{}_{0}h_{m,i} \ {}_{0}^{t}u_{p,j}
-\Big) \
-{}_{0}C_{ijrs} \
-\Big(
-{}_{0}h_{n,r} \ \delta_{sq} +
-{}_{0}h_{n,r} \ {}_{0}^{t}u_{q,s}
-\Big) \
-U_{qn}
+=&
+\sum_{\{i,j|i<j\}} \sum_{\{r,s|r<s\}} {}_{0}C_{ijrs} \ \Big(2 \ {}_{0}^{t}e_{rs}\Big) \ \Big(2 \delta \  {}_{0}^{t}e_{ij}\Big) + \\
+& \sum_{\{i,j|i<j\}} \sum_{\{r,s|r=s\}} {}_{0}C_{ijrs} \ {}_{0}^{t}e_{rs} \ \Big(2 \ \delta \ {}_{0}^{t}e_{ij}\Big) + \\
+& \sum_{\{i,j|i=j\}} \sum_{\{r,s|r<s\}} {}_{0}C_{ijrs} \ \Big(2 \ {}_{0}^{t}e_{rs}\Big) \ \delta \ {}_{0}^{t}e_{ij} + \\
+& \sum_{\{i,j|i=j\}} \sum_{\{r,s|r=s\}} {}_{0}C_{ijrs} \ {}_{0}^{t}e_{rs} \ \delta \ {}_{0}^{t}e_{ij} \\
+
+
 
 \end{align}
 $$
@@ -183,11 +208,11 @@ b = 3n + q
 $$
 
 $$
-k = 2|i-j| + \bigg\lceil \frac{i+j}{2} \bigg\rceil
+k = 2(j-i) + \bigg\lceil \frac{i+j}{2} \bigg\rceil
 $$
 
 $$
-l = 2|r-s| + \bigg\lceil \frac{r+s}{2} \bigg\rceil
+l = 2(s-r) + \bigg\lceil \frac{r+s}{2} \bigg\rceil
 $$
 
 Thus
@@ -376,22 +401,6 @@ $$
 
 \end{align}
 $$
-Meta operator optimization
-
-
-
-Elastic Property
-$$
-{}_{0}C_{ijrs} = \lambda \ \delta_{ij} \ \delta_{rs} + \mu \ \big(\delta_{ir} \ \delta_{js} + \delta_{is} \ \delta_{jr}\big)
-$$
-
-$$
-\lambda = \frac{E \nu}{(1+\nu)(1-2\nu)}
-$$
-
-$$
-\mu = \frac{E}{2(1+\nu)}
-$$
 
 $$
 {}_{0}\boldsymbol{C} = \left(\begin{matrix}
@@ -403,4 +412,6 @@ $$
 0 & 0 & 0 & 0 & 0 & 4\mu
 \end{matrix}\right)
 $$
+
+
 
