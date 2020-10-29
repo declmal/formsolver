@@ -157,13 +157,15 @@ $$
 
 The following equation must be true
 $$
-{}_{0}C_{ijrs} = {}_{0}C_{ijsr} = {}_{0}C_{jirs}
+{}_{0}^{t}C_{ijrs} = {}_{0}^{t}C_{ijsr} = {}_{0}^{t}C_{jirs}
 $$
 e.g. Isotropic elasticity
 
 [*Finite Element Procedures (2nd), P194, TABLE 4.3*]
 $$
-{}_{0}C_{ijrs} = \lambda \ \delta_{ij} \ \delta_{rs} + \mu \ \big(\delta_{ir} \ \delta_{js} + \delta_{is} \ \delta_{jr}\big)
+{}_{0}^{t}C_{ijrs}
+
+= \lambda \ \delta_{ij} \ \delta_{rs} + \mu \ \big(\delta_{ir} \ \delta_{js} + \delta_{is} \ \delta_{jr}\big)
 $$
 
 $$
@@ -178,21 +180,22 @@ $$
 
 [*Finite Element Procedures (2nd), P524, TABLE 6.2*]
 $$
-\iiint_{{}^{0}V} {}_{0}C_{ijrs} \ {}_{0}e_{rs} \ \delta \ {}_{0}e_{ij} \ \text{d} \ {}^{0}V =
-\sum_{e=0}^{E-1} \iiint_{{}^{0}\hat V} {}_{0}C_{ijrs} \ {}_{0}e_{rs} \ \delta \ {}_{0}e_{ij} \ \text{d} \ {}^{0}\hat V
+\iiint_{{}^{0}V} {}_{0}^{t}C_{ijrs} \ {}_{0}e_{rs} \ \delta \ {}_{0}e_{ij} \ \text{d} \ {}^{0}V
+
+= \sum_{e=0}^{E-1} \iiint_{{}^{0}\hat V} {}_{0}^{t}C_{ijrs} \ {}_{0}e_{rs} \ \delta \ {}_{0}e_{ij} \ \text{d} \ {}^{0}\hat V
 $$
 
 
 $$
 \begin{align}
 
-\sum_{\{i,j\}} \sum_{\{r,s\}} {}_{0}C_{ijrs} \ {}_{0}^{t}e_{rs} \ \delta \ {}_{0}^{t}e_{ij}
+\sum_{\{i,j\}} \sum_{\{r,s\}} {}_{0}^{t}C_{ijrs} \ {}_{0}^{t}e_{rs} \ \delta \ {}_{0}^{t}e_{ij}
 
 =&
-\sum_{\{i,j|i<j\}} \sum_{\{r,s|r<s\}} {}_{0}C_{ijrs} \ \Big(2 \ {}_{0}^{t}e_{rs}\Big) \ \Big(2 \delta \  {}_{0}^{t}e_{ij}\Big) + \\
-& \sum_{\{i,j|i<j\}} \sum_{\{r,s|r=s\}} {}_{0}C_{ijrs} \ {}_{0}^{t}e_{rs} \ \Big(2 \ \delta \ {}_{0}^{t}e_{ij}\Big) + \\
-& \sum_{\{i,j|i=j\}} \sum_{\{r,s|r<s\}} {}_{0}C_{ijrs} \ \Big(2 \ {}_{0}^{t}e_{rs}\Big) \ \delta \ {}_{0}^{t}e_{ij} + \\
-& \sum_{\{i,j|i=j\}} \sum_{\{r,s|r=s\}} {}_{0}C_{ijrs} \ {}_{0}^{t}e_{rs} \ \delta \ {}_{0}^{t}e_{ij} \\
+\sum_{\{i,j|i<j\}} \sum_{\{r,s|r<s\}} {}_{0}^{t}C_{ijrs} \ \Big(2 \ {}_{0}^{t}e_{rs}\Big) \ \Big(2 \delta \  {}_{0}^{t}e_{ij}\Big) + \\
+& \sum_{\{i,j|i<j\}} \sum_{\{r,s|r=s\}} {}_{0}^{t}C_{ijrs} \ {}_{0}^{t}e_{rs} \ \Big(2 \ \delta \ {}_{0}^{t}e_{ij}\Big) + \\
+& \sum_{\{i,j|i=j\}} \sum_{\{r,s|r<s\}} {}_{0}^{t}C_{ijrs} \ \Big(2 \ {}_{0}^{t}e_{rs}\Big) \ \delta \ {}_{0}^{t}e_{ij} + \\
+& \sum_{\{i,j|i=j\}} \sum_{\{r,s|r=s\}} {}_{0}^{t}C_{ijrs} \ {}_{0}^{t}e_{rs} \ \delta \ {}_{0}^{t}e_{ij} \\
 
 
 
@@ -219,14 +222,14 @@ Thus
 $$
 \begin{align}
 
-{}_{0}C_{ijrs} \ {}_{0}^{t}e_{rs} \ \delta \ {}_{0}^{t}e_{ij}
+{}_{0}^{t}C_{ijrs} \ {}_{0}^{t}e_{rs} \ \delta \ {}_{0}^{t}e_{ij}
 
 &= \delta U_{a} \ 
 \Big(
 {}_{0}B^{L0}_{ka} +
 {}_{0}^{t}B^{L1}_{ka}
 \Big) \ 
-{}_{0}C_{kl} \
+{}_{0}^{t}C_{kl} \
 \Big(
 {}_{0}B^{L0}_{lb} +
 {}_{0}^{t}B^{L1}_{lb}
@@ -238,7 +241,7 @@ U_{b} \\
 {}_{0}\boldsymbol{B}^{L0} +
 {}_{0}^{t}\boldsymbol{B}^{L1}
 \Big)^{T} \ 
-{}_{0}\boldsymbol{C} \
+{}_{0}^{t}\boldsymbol{C} \
 \Big(
 {}_{0}\boldsymbol{B}^{L0} +
 {}_{0}^{t}\boldsymbol{B}^{L1}
@@ -281,6 +284,9 @@ $$
 ...& ...& ...& {}_{0}h_{m,2}& 0& {}_{0}h_{m,0}& ...& ...& ... \\
 \end{matrix}\right)
 $$
+
+
+
 
 $$
 {}_{0}\boldsymbol{B}^{L1}
@@ -359,6 +365,10 @@ $$
 The following equation must be true
 $$
 {}_{0}^{t} S_{ij} = {}_{0}^{t} S_{ji}
+$$
+e.g. 
+$$
+{}_{0}^{t}S_{ij} = {}_{0}^{t}C_{ijrs} \ {}_{0}^{t}\epsilon_{rs}
 $$
 
 ##### Nonlinear Strain Incremental Stiffness Matrix

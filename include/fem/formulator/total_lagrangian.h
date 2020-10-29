@@ -3,6 +3,7 @@
 
 #include <common/matrix.h>
 #include <common/common.h>
+#include <iostream>
 
 namespace fem {
 template <typename T>
@@ -64,6 +65,23 @@ struct NonlinTransMatTL<T,3> {
   }
 };
 
+template <typename T>
+void lin_trans_mat_3d(
+  const T* const h0, const unsigned int N, T* const B);
+
+template <typename T, unsigned int Dim>
+struct LinTransMat {
+  static inline void lin_trans_mat(
+    const T* const h0, const unsigned int N, T* const B);
+};
+template <typename T>
+struct LinTransMat<T,3> {
+  static inline void lin_trans_mat(
+    const T* const h0, const unsigned int N, T* const B) {
+    lin_trans_mat_3d<T>(h0, N, B);
+  }
+};
+
 #define FORM_REGISTER_TL_OP(T) \
   template \
   void lin_trans_mat_tl_3d( \
@@ -71,7 +89,10 @@ struct NonlinTransMatTL<T,3> {
     const unsigned int N, T* const B0tL); \
   template \
   void nonlin_trans_mat_tl_3d( \
-    const T* const h0, const unsigned int N, T* const B0NL);
+    const T* const h0, const unsigned int N, T* const B0NL); \
+  template \
+  void lin_trans_mat_3d( \
+    const T* const h0, const unsigned int N, T* const B);
 
 /*!
  * \brief Total Lagrangian Formulation (Single Element Version)
@@ -132,13 +153,44 @@ struct TLForm {
       MatmulDNND<T,Dim>::matmul_dnnd(Ut, h0, N, u0t);
       LinTransMatTL<T,Dim>::lin_trans_mat_tl(h0, u0t, N, B0tL);
       Matmul2DNEEEEDN<T,Dim>::matmul2_dne_ee_edn(B0tL, C0, N, buf, tmpK);
-      matinc<T>(tmpK, nEntryKe, Ke);
+      matinc<T>(tmpK, nEntryKe, Ke, abs(detJ0));
       NonlinTransMatTL<T,Dim>::nonlin_trans_mat_tl(h0, N, B0NL);
       MattileDiagDD<T,Dim>::mattile_diag_dd(S0t, tile);
       Matmul2DNFFFFDN<T,Dim>::matmul2_dnf_ff_fdn(B0NL, tile, N, buf, tmpK);
-      matinc<T>(tmpK, nEntryKe, Ke);
+      matinc<T>(tmpK, nEntryKe, Ke, abs(detJ0));
     }
     printf("hihihihhih\n\n\n\n\n");
+    return 0;
+  }
+
+  /* \brief Linear Element Stiffness Matrix Formulation (Only for Debug Purpose)
+   *
+   */
+  static int form_linear_elem_stiff(
+    const T* const X0, const T* const hbuf, 
+    const T* const C, T* const J0, T* const invJ0, 
+    T* const h0, T* const B, T* const buf, T* const tmpK,
+    T* const Ke) {
+    auto rowKe = Dim * N;
+    auto nEntryKe = rowKe * rowKe;
+    init_zero<T>(Ke, nEntryKe);
+    auto h = hbuf;
+    auto stride_h = Dim * N;
+    for (unsigned int i = 0; i < NI; ++i) {
+      MatmulDNND<T,Dim>::matmul_dnnd(X0, h, N, J0);
+      auto detJ0 = DetDD<T,Dim>::det_dd(J0);
+      auto absDetJ0 = abs(detJ0);
+      if ((double)absDetJ0 < DetDD<T,Dim>::tol) {
+        printf("singular jacobian matrix\n");
+        return -1;
+      }
+      InvDD<T,Dim>::inv_dd(J0, detJ0, invJ0);
+      MatmulNDDDT<T,Dim>::matmul_ndddt(h, invJ0, N, h0);
+      h += stride_h;
+      LinTransMat<T,Dim>::lin_trans_mat(h0, N, B);
+      Matmul2DNEEEEDN<T,Dim>::matmul2_dne_ee_edn(B, C, N, buf, tmpK);
+      matinc<T>(tmpK, nEntryKe, Ke, absDetJ0);
+    }
     return 0;
   }
 };

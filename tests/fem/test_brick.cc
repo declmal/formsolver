@@ -158,14 +158,30 @@ void test_brick_interp_prop(bool layout=true) {
     << typeid(BrickIPropType<T>).name();
 }
 
+template <typename T>
+void init_x(T* const X, unsigned int NR, unsigned int NC) {
+  if ((NC != 8) || (NR != 3)) {
+    return;
+  }
+  T X0[24] = {
+    0,1,1,0,0,1,1,0,
+    0,0,1,1,0,0,1,1,
+    0,0,0,0,1,1,1,1
+  };
+  for (unsigned int i = 0; i < 24; ++i) {
+    X[i] = X0[i];
+  }
+}
+
 template <
   typename T,
   template <typename> class MatType,
   template <typename> class BrickIPropType,
   template <typename> class BrickTLFormType
 >
-void test_brick_tl_form(bool layout=true) {
-  T p[2] = {(T)1e8, (T)0.3};
+void test_brick_tl_form(
+  bool layout=true, double tol=1e-6, bool linear_only=false) {
+  T p[2] = {(T)1e4, (T)0.3};
   MatType<T>::initialize(p);
   BrickIPropType<T>::initialize();
   auto Dim = BrickIPropType<T>::get_ndim();
@@ -174,6 +190,9 @@ void test_brick_tl_form(bool layout=true) {
   auto nEntryX0 = Dim * N;
   auto X0 = (T*)malloc(nEntryX0*sizeof(T));
   init_rand(X0, nEntryX0);
+  // for debug purpose
+  // print_mat<T>(X0, Dim, N);
+  init_x<T>(X0, Dim, N);
   // init hbuf
   auto hbuf = BrickIPropType<T>::get_hbuf();
   // init Ut
@@ -224,8 +243,14 @@ void test_brick_tl_form(bool layout=true) {
   auto nEntryKe = nRowKe * nRowKe;
   auto Ke = (T*)malloc(nEntryKe*sizeof(T));
   // execute
-  int ret = BrickTLFormType<T>::form_elem_stiff(
-    X0, hbuf, Ut, C0, S0t, J0, invJ0, h0, u0t, B0tL, buf, tmpK, B0NL, tile, Ke);
+  int ret;
+  if (linear_only) {
+    ret = BrickTLFormType<T>::form_linear_elem_stiff(
+      X0, hbuf, C0, J0, invJ0, h0, B0tL, buf, tmpK, Ke);
+  } else {
+    ret = BrickTLFormType<T>::form_elem_stiff(
+      X0, hbuf, Ut, C0, S0t, J0, invJ0, h0, u0t, B0tL, buf, tmpK, B0NL, tile, Ke);
+  }
   if (ret == 0) {
     if (layout) {
       LOG(INFO) << "matrix Ke layout"; 
@@ -270,13 +295,15 @@ int main(int argc, char* argv[]) {
   test_brick_interp_prop<double,fem::C3D20IProp>(layout);
   test_brick_interp_prop<double,fem::C3D20RIProp>(layout);
   test_brick_tl_form<
-    double,fem::Ela3D,fem::C3D8IProp,fem::C3D8TLForm>(true);
+    double,fem::Ela3D,fem::C3D8IProp,fem::C3D8TLForm>(true, 1e-6, true);
   // test_brick_tl_form<
-  //   double,fem::Ela3D,fem::C3D8RIProp,fem::C3D8RTLForm>(layout);
-  test_brick_tl_form<
-    double,fem::Ela3D,fem::C3D20IProp,fem::C3D20TLForm>(layout);
-  test_brick_tl_form<
-    double,fem::Ela3D,fem::C3D20RIProp,fem::C3D20RTLForm>(layout);
+    // double,fem::Ela3D,fem::C3D8IProp,fem::C3D8TLForm>(layout);
+  // // test_brick_tl_form<
+  // //   double,fem::Ela3D,fem::C3D8RIProp,fem::C3D8RTLForm>(layout);
+  // test_brick_tl_form<
+    // double,fem::Ela3D,fem::C3D20IProp,fem::C3D20TLForm>(layout);
+  // test_brick_tl_form<
+    // double,fem::Ela3D,fem::C3D20RIProp,fem::C3D20RTLForm>(layout);
   LOG(INFO) << "double precision test passed";
   // single precision tests
   test_brick_interp_sum<float,8>(layout);
@@ -286,14 +313,14 @@ int main(int argc, char* argv[]) {
   // test_brick_interp_prop<float,fem::C3D8RIProp>(layout);
   test_brick_interp_prop<float,fem::C3D20IProp>(layout);
   test_brick_interp_prop<float,fem::C3D20RIProp>(layout);
-  test_brick_tl_form<
-    float,fem::Ela3D,fem::C3D8IProp,fem::C3D8TLForm>(layout);
   // test_brick_tl_form<
-  //   float,fem::Ela3D,fem::C3D8RIProp,fem::C3D8RTLForm>(layout);
-  test_brick_tl_form<
-    float,fem::Ela3D,fem::C3D20IProp,fem::C3D20TLForm>(layout);
-  test_brick_tl_form<
-    float,fem::Ela3D,fem::C3D20RIProp,fem::C3D20RTLForm>(layout);
+    // float,fem::Ela3D,fem::C3D8IProp,fem::C3D8TLForm>(layout);
+  // // test_brick_tl_form<
+  // //   float,fem::Ela3D,fem::C3D8RIProp,fem::C3D8RTLForm>(layout);
+  // test_brick_tl_form<
+    // float,fem::Ela3D,fem::C3D20IProp,fem::C3D20TLForm>(layout);
+  // test_brick_tl_form<
+    // float,fem::Ela3D,fem::C3D20RIProp,fem::C3D20RTLForm>(layout);
   LOG(INFO) << "single precision test passed";
   return 0;
 }

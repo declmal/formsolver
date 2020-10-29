@@ -78,6 +78,47 @@ void nonlin_trans_mat_tl_3d(
   }
 }
 
+template <typename T>
+void lin_trans_mat_3d(
+  const T* const h0, const unsigned int N, T* const B) {
+  auto H = h0;
+  auto _3N = 3 * N;
+  auto B0 = B;
+  auto B1 = B0 + _3N;
+  auto B2 = B1 + _3N;
+  auto B3 = B2 + _3N;
+  auto B4 = B3 + _3N;
+  auto B5 = B4 + _3N;
+  for (unsigned int i = 0; i < N; ++i) {
+    // TODO: N parallel
+    B0[0] = H[0];
+    B0[1] = (T)0;
+    B0[2] = (T)0;
+    B0 += 3;
+    B1[0] = (T)0;
+    B1[1] = H[1];
+    B1[2] = (T)0;
+    B1 += 3;
+    B2[0] = (T)0;
+    B2[1] = (T)0;
+    B2[2] = H[2];
+    B2 += 3;
+    B3[0] = H[1];
+    B3[1] = H[0];
+    B3[2] = (T)0;
+    B3 += 3;
+    B4[0] = (T)0;
+    B4[1] = H[2];
+    B4[2] = H[1];
+    B4 += 3;
+    B5[0] = H[2];
+    B5[1] = (T)0;
+    B5[2] = H[0];
+    B5 += 3;
+    H += 3;
+  }
+}
+
 FORM_REGISTER_TL_OP(float)
 FORM_REGISTER_TL_OP(double)
 } // namespace fem
