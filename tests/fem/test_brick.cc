@@ -1,5 +1,6 @@
 #include <glog/logging.h>
 #include <fem/element/brick.h>
+#include <fem/mat/elastic.h>
 #include <common/common.h>
 
 template <typename T, unsigned int I, unsigned int N>
@@ -159,10 +160,14 @@ void test_brick_interp_prop(bool layout=true) {
 
 template <
   typename T,
+  template <typename> class MatType,
   template <typename> class BrickIPropType,
   template <typename> class BrickTLFormType
 >
 void test_brick_tl_form(bool layout=true) {
+  T p[2] = {(T)1e8, (T)0.3};
+  MatType<T>::initialize(p);
+  BrickIPropType<T>::initialize();
   auto Dim = BrickIPropType<T>::get_ndim();
   auto N = BrickIPropType<T>::get_num_nodes();
   // init X0
@@ -268,10 +273,14 @@ int main(int argc, char* argv[]) {
   // test_brick_interp_prop<double,fem::C3D8RIProp>(layout);
   test_brick_interp_prop<double,fem::C3D20IProp>(layout);
   test_brick_interp_prop<double,fem::C3D20RIProp>(layout);
-  test_brick_tl_form<double,fem::C3D8IProp,fem::C3D8TLForm>(layout);
-  // test_brick_tl_form<double,fem::C3D8RIProp,fem::C3D8RTLForm>(layout);
-  test_brick_tl_form<double,fem::C3D20IProp,fem::C3D20TLForm>(layout);
-  test_brick_tl_form<double,fem::C3D20RIProp,fem::C3D20RTLForm>(layout);
+  test_brick_tl_form<
+    double,fem::Ela3D,fem::C3D8IProp,fem::C3D8TLForm>(layout);
+  // test_brick_tl_form<
+  //   double,fem::Ela3D,fem::C3D8RIProp,fem::C3D8RTLForm>(layout);
+  test_brick_tl_form<
+    double,fem::Ela3D,fem::C3D20IProp,fem::C3D20TLForm>(layout);
+  test_brick_tl_form<
+    double,fem::Ela3D,fem::C3D20RIProp,fem::C3D20RTLForm>(layout);
   LOG(INFO) << "double precision test passed";
   // single precision tests
   test_brick_interp_sum<float,8>(layout);
@@ -281,10 +290,14 @@ int main(int argc, char* argv[]) {
   // test_brick_interp_prop<float,fem::C3D8RIProp>(layout);
   test_brick_interp_prop<float,fem::C3D20IProp>(layout);
   test_brick_interp_prop<float,fem::C3D20RIProp>(layout);
-  test_brick_tl_form<float,fem::C3D8IProp,fem::C3D8TLForm>(layout);
-  // test_brick_tl_form<float,fem::C3D8RIProp,fem::C3D8RTLForm>(layout);
-  test_brick_tl_form<float,fem::C3D20IProp,fem::C3D20TLForm>(layout);
-  test_brick_tl_form<float,fem::C3D20RIProp,fem::C3D20RTLForm>(layout);
+  test_brick_tl_form<
+    float,fem::Ela3D,fem::C3D8IProp,fem::C3D8TLForm>(layout);
+  // test_brick_tl_form<
+  //   float,fem::Ela3D,fem::C3D8RIProp,fem::C3D8RTLForm>(layout);
+  test_brick_tl_form<
+    float,fem::Ela3D,fem::C3D20IProp,fem::C3D20TLForm>(layout);
+  test_brick_tl_form<
+    float,fem::Ela3D,fem::C3D20RIProp,fem::C3D20RTLForm>(layout);
   LOG(INFO) << "single precision test passed";
   return 0;
 }
