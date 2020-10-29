@@ -349,6 +349,18 @@ U_{qn'} \ \delta U_{qn}
 \end{align}
 $$
 
+Thus
+$$
+\delta \ {}_{0}\eta_{ij} = \delta \ {}_{0}\eta_{ji}
+$$
+
+#### Second Piola-Kirchoff Stress Tensor
+
+The following equation must be true
+$$
+{}_{0}^{t} S_{ij} = {}_{0}^{t} S_{ji}
+$$
+
 ##### Nonlinear Strain Incremental Stiffness Matrix
 
 [*Finite Element Procedures (2nd), P524, TABLE 6.2*]
@@ -357,7 +369,7 @@ $$
 
 \sum_{e=0}^{E-1} \iiint_{{}^{0}\hat V} {}_{0}^{t}S_{ij} \ \delta \ {}_{0}\eta_{ij} \ \text{d} \ {}^{0}\hat V
 $$
-Since ${}_{0}^{t} S_{ij} = {}_{0}^{t} S_{ji}$
+
 $$
 \begin{align}
 
@@ -407,9 +419,9 @@ $$
 \lambda + 2\mu & \lambda & \lambda & 0 & 0 & 0 \\
 \lambda & \lambda + 2\mu & \lambda & 0 & 0 & 0 \\
 \lambda & \lambda & \lambda + 2\mu & 0 & 0 & 0 \\
-0 & 0 & 0 & 4\mu & 0 & 0 \\
-0 & 0 & 0 & 0 & 4\mu & 0 \\
-0 & 0 & 0 & 0 & 0 & 4\mu
+0 & 0 & 0 & \mu & 0 & 0 \\
+0 & 0 & 0 & 0 & \mu & 0 \\
+0 & 0 & 0 & 0 & 0 & \mu
 \end{matrix}\right)
 $$
 

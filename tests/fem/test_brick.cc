@@ -179,7 +179,7 @@ void test_brick_tl_form(bool layout=true) {
   // init Ut
   auto nEntryUt = Dim * N;
   auto Ut = (T*)malloc(nEntryUt*sizeof(T));
-  init_rand<T>(Ut, nEntryUt);
+  init_zero<T>(Ut, nEntryUt);
   // init C0
   auto C0 = MatType<T>::get_C();
   // init S0t
@@ -270,7 +270,7 @@ int main(int argc, char* argv[]) {
   test_brick_interp_prop<double,fem::C3D20IProp>(layout);
   test_brick_interp_prop<double,fem::C3D20RIProp>(layout);
   test_brick_tl_form<
-    double,fem::Ela3D,fem::C3D8IProp,fem::C3D8TLForm>(layout);
+    double,fem::Ela3D,fem::C3D8IProp,fem::C3D8TLForm>(true);
   // test_brick_tl_form<
   //   double,fem::Ela3D,fem::C3D8RIProp,fem::C3D8RTLForm>(layout);
   test_brick_tl_form<
