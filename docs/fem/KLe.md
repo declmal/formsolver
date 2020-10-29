@@ -378,3 +378,29 @@ $$
 $$
 Meta operator optimization
 
+
+
+Elastic Property
+$$
+{}_{0}C_{ijrs} = \lambda \ \delta_{ij} \ \delta_{rs} + \mu \ \big(\delta_{ir} \ \delta_{js} + \delta_{is} \ \delta_{jr}\big)
+$$
+
+$$
+\lambda = \frac{E \nu}{(1+\nu)(1-2\nu)}
+$$
+
+$$
+\mu = \frac{E}{2(1+\nu)}
+$$
+
+$$
+{}_{0}\boldsymbol{C} = \left(\begin{matrix}
+\lambda + 2\mu & \lambda & \lambda & 0 & 0 & 0 \\
+\lambda & \lambda + 2\mu & \lambda & 0 & 0 & 0 \\
+\lambda & \lambda & \lambda + 2\mu & 0 & 0 & 0 \\
+0 & 0 & 0 & 4\mu & 0 & 0 \\
+0 & 0 & 0 & 0 & 4\mu & 0 \\
+0 & 0 & 0 & 0 & 0 & 4\mu
+\end{matrix}\right)
+$$
+
