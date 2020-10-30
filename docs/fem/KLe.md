@@ -130,13 +130,11 @@ $$
 ##### Virtual Linear Strain Tensor
 
 $$
-\begin{align}
-
 \delta \ {}_{0}^{t}e_{ij}
 
-&= {}_{0}e_{ij,pm} \ \delta U_{pm} \\
+= {}_{0}e_{ij,pm} \ \delta U_{pm}
 
-&= \frac{1}{2}
+= \frac{1}{2}
 \Big(
 {}_{0}h_{m,j} \ \delta_{ip} +
 {}_{0}h_{m,i} \ \delta_{jp} +
@@ -144,8 +142,6 @@ $$
 {}_{0}h_{m,i} \ {}_{0}^{t}u_{p,j}
 \Big) \
 \delta U_{pm}
-
-\end{align}
 $$
 
 Thus
@@ -218,78 +214,70 @@ $$
 l = 2(s-r) + \bigg\lceil \frac{r+s}{2} \bigg\rceil
 $$
 
-Thus
-$$
-\begin{align}
-
-{}_{0}^{t}C_{ijrs} \ {}_{0}^{t}e_{rs} \ \delta \ {}_{0}^{t}e_{ij}
-
-&= \delta U_{a} \ 
-\Big(
-{}_{0}B^{L0}_{ka} +
-{}_{0}^{t}B^{L1}_{ka}
-\Big) \ 
-{}_{0}^{t}C_{kl} \
-\Big(
-{}_{0}B^{L0}_{lb} +
-{}_{0}^{t}B^{L1}_{lb}
-\Big) \
-U_{b} \\
-
-&= \delta\boldsymbol{U}^{T} \ 
-\Big(
-{}_{0}\boldsymbol{B}^{L0} +
-{}_{0}^{t}\boldsymbol{B}^{L1}
-\Big)^{T} \ 
-{}_{0}^{t}\boldsymbol{C} \
-\Big(
-{}_{0}\boldsymbol{B}^{L0} +
-{}_{0}^{t}\boldsymbol{B}^{L1}
-\Big) \
-\boldsymbol{U}
-
-\end{align}
-$$
-where
+###### Routine Component of Linear Strain Displacement Matrix
 
 [*Finite Element Procedures (2nd), P555, TABLE 6.6*]
 $$
-\begin{align}
-
-{}_{0}B^{L0}_{ka} 
-
-&= {}_{0}h_{m,i} \ \delta_{jp}
-
-\end{align}
-$$
-
-$$
-\begin{align}
-
-{}_{0}^{t}B^{L1}_{ka} 
-
-&= {}_{0}h_{m,i} \ {}_{0}^{t}u_{p,j}
-
-\end{align}
-$$
-
-$$
-{}_{0}\boldsymbol{B}^{L0}
+{}_{0}\boldsymbol{B}_{L0}
 = \left(\begin{matrix}
 ...& ...& ...& {}_{0}h_{m,0}& 0& 0& ...& ...& ... \\
 ...& ...& ...& 0& {}_{0}h_{m,1}& 0& ...& ...& ... \\
 ...& ...& ...& 0& 0& {}_{0}h_{m,2}& ...& ...& ... \\
 ...& ...& ...& {}_{0}h_{m,1}& {}_{0}h_{m,0}& 0& ...& ...& ... \\
 ...& ...& ...& 0& {}_{0}h_{m,2}& {}_{0}h_{m,1}& ...& ...& ... \\
-...& ...& ...& {}_{0}h_{m,2}& 0& {}_{0}h_{m,0}& ...& ...& ... \\
+...& ...& ...& {}_{0}h_{m,2}& 0& {}_{0}h_{m,0}& ...& ...& ...
 \end{matrix}\right)
 $$
 
-
-
+###### Bbar Approach
 
 $$
-{}_{0}\boldsymbol{B}^{L1}
+{}_{0}\boldsymbol{B}_{L0}^{dil}
+= \frac{1}{3} \left(\begin{matrix}
+... & ... & ... & {}_{0}h_{m,0} & {}_{0}h_{m,1} & {}_{0}h_{m,2} & ... & ... & ... \\
+... & ... & ... & {}_{0}h_{m,0} & {}_{0}h_{m,1} & {}_{0}h_{m,2} & ... & ... & ... \\
+... & ... & ... & {}_{0}h_{m,0} & {}_{0}h_{m,1} & {}_{0}h_{m,2} & ... & ... & ... \\
+... & ... & ... & 0 & 0 & 0 & ... & ... & ... \\
+... & ... & ... & 0 & 0 & 0 & ... & ... & ... \\
+... & ... & ... & 0 & 0 & 0 & ... & ... & ...
+\end{matrix}\right)
+$$
+
+$$
+{}^{0}V
+
+= \iiint_{{}^{0}\hat V} \text{d} \ {}^{0} \hat V
+
+= \sum_{i=0}^{\bar N_{int}-1}
+\omega_{i} \
+\Big|\det {}^{0} \boldsymbol{J}\Big|
+$$
+
+$$
+{}_{0}\boldsymbol{\bar B}_{L0}^{dil}
+
+= \frac{1}{{}^{0}V} \ 
+\iiint_{{}^{0}\hat V} \
+{}_{0}^{t}\boldsymbol{B}_{L0}^{dil} \ 
+\text{d} \ {}^{0}V
+
+= \frac{1}{{}^{0}V}
+\sum_{i=0}^{\bar N_{int}-1} \
+\omega_{i} \
+{}_{0}^{t}\boldsymbol{B}_{L0}^{dil} \
+\Big|\det {}^{0}\boldsymbol{J} \Big|
+$$
+
+$$
+{}_{0}\boldsymbol{\bar B}_{L0}
+
+= {}_{0}\boldsymbol{B}_{L0} -  {}_{0}\boldsymbol{B}_{L0}^{dil} + {}_{0}\boldsymbol{\bar B}_{L0}^{dil}
+$$
+
+###### Initial Displacement Component of Linear Strain Displacement Matrix
+
+$$
+{}_{0}\boldsymbol{B}_{L1}
 = \left(\begin{matrix}
 ...& ...& ...& 
 {}_{0}h_{m,0} \ {}_{0}^{t}u_{0,0}& 
@@ -323,18 +311,39 @@ $$
 \end{matrix}\right)
 $$
 
+###### Linear Strain Displacement Matrix
+
+$$
+{}_{0}\boldsymbol{B}_{L}
+= {}_{0}\boldsymbol{\bar B}_{L0} + {}_{0}\boldsymbol{B}_{L1}
+$$
+
+##### Linear Component of Element Stiffness Matrix
+
+$$
+\boldsymbol{K}_{L}^{e}
+
+= \iiint_{{}^{0}\hat V}
+{}_{0}^{t}\boldsymbol{B}_{L}^{T} \ 
+{}_{0}^{t}\boldsymbol{C} \ 
+{}_{0}^{t}\boldsymbol{B}_{L} \ \text{d}{}^{0}\hat V
+
+= \sum_{i=0}^{\hat N_{int}-1}
+\omega_{i} \ 
+{}_{0}^{t}\boldsymbol{B}_{L}(\boldsymbol{r}_{i}) \ 
+{}_{0}^{t}\boldsymbol{C} \
+{}_{0}^{t}\boldsymbol{B}_{L}(\boldsymbol{r}_{i}) \
+\Big|\det {}^{0}\boldsymbol{J}\Big|
+$$
+
 ##### Nonlinear Strain Tensor
 
 $$
-\begin{align}
-
 {}_{0}\eta_{ij}
 
-&= \frac{1}{2} {}_{0}u_{q,i} \ {}_{0}u_{q,j} \\
+= \frac{1}{2} {}_{0}u_{q,i} \ {}_{0}u_{q,j}
 
-&= \frac{1}{2} {}_{0}h_{n',i} \ {}_{0}h_{n,j} \ U_{qn'} \ U_{qn}
-
-\end{align}
+= \frac{1}{2} {}_{0}h_{n',i} \ {}_{0}h_{n,j} \ U_{qn'} \ U_{qn}
 $$
 
 ##### Virtual Nonlinear Strain Tensor

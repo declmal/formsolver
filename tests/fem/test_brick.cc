@@ -180,7 +180,7 @@ template <
   template <typename> class BrickTLFormType
 >
 void test_brick_tl_form(
-  bool layout=true, double tol=1e-6, bool linear_only=false) {
+  bool layout=true, double tol=1e-6, unsigned int form=0) {
   T p[2] = {(T)1e4, (T)0.3};
   MatType<T>::initialize(p);
   BrickIPropType<T>::initialize();
@@ -195,6 +195,8 @@ void test_brick_tl_form(
   init_x<T>(X0, Dim, N);
   // init hbuf
   auto hbuf = BrickIPropType<T>::get_hbuf();
+  // init weights
+  auto weights = BrickIPropType<T>::get_weights();
   // init Ut
   auto nEntryUt = Dim * N;
   auto Ut = (T*)malloc(nEntryUt*sizeof(T));
@@ -211,6 +213,16 @@ void test_brick_tl_form(
   // init invJ0
   auto nEntryInvJ0 = Dim * Dim;
   auto invJ0 = (T*)malloc(nEntryInvJ0*sizeof(T));
+  // init BdilBar
+  auto nRowBdilBar = 3*Dim - 3;
+  auto nColBdilBar = Dim * N;
+  auto nEntryBdilBar = nRowBdilBar * nColBdilBar;
+  auto BdilBar = (T*)malloc(nEntryBdilBar*sizeof(T));
+  // init tmpB
+  auto nRowTmpB = 3*Dim - 3;
+  auto nColTmpB = Dim * N;
+  auto nEntryTmpB = nRowTmpB * nColTmpB;
+  auto tmpB = (T*)malloc(nEntryTmpB*sizeof(T));
   // init h0
   auto nEntryH0 = N * Dim;
   auto h0 = (T*)malloc(nEntryH0*sizeof(T));
@@ -244,12 +256,17 @@ void test_brick_tl_form(
   auto Ke = (T*)malloc(nEntryKe*sizeof(T));
   // execute
   int ret;
-  if (linear_only) {
-    ret = BrickTLFormType<T>::form_linear_elem_stiff(
-      X0, hbuf, C0, J0, invJ0, h0, B0tL, buf, tmpK, Ke);
-  } else {
+  if (form == 0) {
     ret = BrickTLFormType<T>::form_elem_stiff(
-      X0, hbuf, Ut, C0, S0t, J0, invJ0, h0, u0t, B0tL, buf, tmpK, B0NL, tile, Ke);
+      X0, hbuf, weights, Ut, C0, S0t, J0, invJ0, h0, u0t, B0tL, buf, tmpK, B0NL, tile, Ke);
+  } else if (form == 1) {
+    ret = BrickTLFormType<T>::form_linear_elem_stiff(
+      X0, hbuf, weights, C0, J0, invJ0, h0, B0tL, buf, tmpK, Ke);
+  } else {
+    ret = BrickTLFormType<T>::form_linear_elem_stiff_Bbar(
+      X0, hbuf, weights, C0,
+      J0, invJ0, 
+      BdilBar, tmpB, h0, B0tL, buf, tmpK, Ke);
   }
   if (ret == 0) {
     if (layout) {
@@ -267,10 +284,12 @@ void test_brick_tl_form(
   // execute
   // free
   free(X0);
-  free(J0);
   free(Ut);
   free(S0t);
+  free(J0);
   free(invJ0);
+  free(BdilBar);
+  free(tmpB);
   free(h0);
   free(u0t);
   free(B0tL);
@@ -287,15 +306,15 @@ int main(int argc, char* argv[]) {
   FLAGS_logtostderr = 1;
   bool layout = false;
   // double precison tests
-  test_brick_interp_sum<double,8>(layout);
-  test_brick_interp_deriv<double,8>(layout);
-  test_brick_interp_sum<double, 20>(layout);
-  test_brick_interp_prop<double,fem::C3D8IProp>(layout);
-  // test_brick_interp_prop<double,fem::C3D8RIProp>(layout);
-  test_brick_interp_prop<double,fem::C3D20IProp>(layout);
-  test_brick_interp_prop<double,fem::C3D20RIProp>(layout);
+  // test_brick_interp_sum<double,8>(layout);
+  // test_brick_interp_deriv<double,8>(layout);
+  // test_brick_interp_sum<double, 20>(layout);
+  // test_brick_interp_prop<double,fem::C3D8IProp>(layout);
+  // // test_brick_interp_prop<double,fem::C3D8RIProp>(layout);
+  // test_brick_interp_prop<double,fem::C3D20IProp>(layout);
+  // test_brick_interp_prop<double,fem::C3D20RIProp>(layout);
   test_brick_tl_form<
-    double,fem::Ela3D,fem::C3D8IProp,fem::C3D8TLForm>(true, 1e-6, true);
+    double,fem::Ela3D,fem::C3D8IProp,fem::C3D8TLForm>(true, 1e-6, 2);
   // test_brick_tl_form<
     // double,fem::Ela3D,fem::C3D8IProp,fem::C3D8TLForm>(layout);
   // // test_brick_tl_form<
@@ -306,13 +325,13 @@ int main(int argc, char* argv[]) {
     // double,fem::Ela3D,fem::C3D20RIProp,fem::C3D20RTLForm>(layout);
   LOG(INFO) << "double precision test passed";
   // single precision tests
-  test_brick_interp_sum<float,8>(layout);
-  test_brick_interp_deriv<float,8>(layout);
-  test_brick_interp_sum<float,20>(layout);
-  test_brick_interp_prop<float,fem::C3D8IProp>(layout);
-  // test_brick_interp_prop<float,fem::C3D8RIProp>(layout);
-  test_brick_interp_prop<float,fem::C3D20IProp>(layout);
-  test_brick_interp_prop<float,fem::C3D20RIProp>(layout);
+  // test_brick_interp_sum<float,8>(layout);
+  // test_brick_interp_deriv<float,8>(layout);
+  // test_brick_interp_sum<float,20>(layout);
+  // test_brick_interp_prop<float,fem::C3D8IProp>(layout);
+  // // test_brick_interp_prop<float,fem::C3D8RIProp>(layout);
+  // test_brick_interp_prop<float,fem::C3D20IProp>(layout);
+  // test_brick_interp_prop<float,fem::C3D20RIProp>(layout);
   // test_brick_tl_form<
     // float,fem::Ela3D,fem::C3D8IProp,fem::C3D8TLForm>(layout);
   // // test_brick_tl_form<

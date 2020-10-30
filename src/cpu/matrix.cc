@@ -187,9 +187,23 @@ void matadd(
 }
 
 template <typename T>
-void matinc(const T* const a, const unsigned int size, T* const b, T k) {
+void matinc_mul(const T* const a, const unsigned int size, T* const b, T k) {
   for (unsigned int i = 0; i < size; ++i) {
     b[i] += a[i] * k;
+  }
+}
+
+template <typename T>
+void matinc(const T* const a, const unsigned int size, T* const b) {
+  for (unsigned int i = 0; i < size; ++i) {
+    b[i] += a[i];
+  }
+}
+
+template <typename T>
+void matdec(const T* const a, const unsigned int size, T* const b) {
+  for (unsigned int i = 0; i < size; ++i) {
+    b[i] -= a[i];
   }
 }
 
