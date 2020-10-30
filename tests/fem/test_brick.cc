@@ -160,16 +160,24 @@ void test_brick_interp_prop(bool layout=true) {
 
 template <typename T>
 void init_x(T* const X, unsigned int NR, unsigned int NC) {
-  if ((NC != 8) || (NR != 3)) {
-    return;
-  }
-  T X0[24] = {
-    0,1,1,0,0,1,1,0,
-    0,0,1,1,0,0,1,1,
-    0,0,0,0,1,1,1,1
-  };
-  for (unsigned int i = 0; i < 24; ++i) {
-    X[i] = X0[i];
+  if ((NR == 3) && (NC == 8)) {
+    T X0[24] = {
+      1,0,0,1,1,0,0,1,
+      1,1,0,0,1,1,0,0,
+      1,1,1,1,0,0,0,0
+    };
+    for (unsigned int i = 0; i < 24; ++i) {
+      X[i] = X0[i];
+    }
+  } else if ((NR == 3) && (NC == 20)) {
+    T X0[60] = {
+      1,0,0,1,1,0,0,1,0.5,0,0.5,1,0.5,0,0.5,1,1,0,0,1,
+      1,1,0,0,1,1,0,0,1,0.5,0,0.5,1,0.5,0,0.5,1,1,0,0,
+      1,1,1,1,0,0,0,0,1,1,1,1,0,0,0,0,0.5,0.5,0.5,0.5
+    };
+    for (unsigned int i = 0; i < 60; ++i) {
+      X[i] = X0[i];
+    }
   }
 }
 
@@ -314,7 +322,9 @@ int main(int argc, char* argv[]) {
   // test_brick_interp_prop<double,fem::C3D20IProp>(layout);
   // test_brick_interp_prop<double,fem::C3D20RIProp>(layout);
   test_brick_tl_form<
-    double,fem::Ela3D,fem::C3D8IProp,fem::C3D8TLForm>(true, 1e-6, 2);
+    double,fem::Ela3D,fem::C3D20IProp,fem::C3D20TLForm>(true, 1e-6, 1);
+  // test_brick_tl_form<
+    // double,fem::Ela3D,fem::C3D8IProp,fem::C3D8TLForm>(true, 1e-6, 2);
   // test_brick_tl_form<
     // double,fem::Ela3D,fem::C3D8IProp,fem::C3D8TLForm>(layout);
   // // test_brick_tl_form<

@@ -127,7 +127,7 @@ $$
 {}_{0}^{t}e_{ij} = {}_{0}^{t}e_{ji}
 $$
 
-##### Virtual Linear Strain Tensor
+##### 2Virtual Linear Strain Tensor
 
 $$
 \delta \ {}_{0}^{t}e_{ij}
@@ -258,13 +258,13 @@ $$
 
 = \frac{1}{{}^{0}V} \ 
 \iiint_{{}^{0}\hat V} \
-{}_{0}^{t}\boldsymbol{B}_{L0}^{dil} \ 
+{}_{0}\boldsymbol{B}_{L0}^{dil} \ 
 \text{d} \ {}^{0}V
 
 = \frac{1}{{}^{0}V}
 \sum_{i=0}^{\bar N_{int}-1} \
 \omega_{i} \
-{}_{0}^{t}\boldsymbol{B}_{L0}^{dil} \
+{}_{0}\boldsymbol{B}_{L0}^{dil} \
 \Big|\det {}^{0}\boldsymbol{J} \Big|
 $$
 
@@ -277,7 +277,7 @@ $$
 ###### Initial Displacement Component of Linear Strain Displacement Matrix
 
 $$
-{}_{0}\boldsymbol{B}_{L1}
+{}_{0}^{t}\boldsymbol{B}_{L1}
 = \left(\begin{matrix}
 ...& ...& ...& 
 {}_{0}h_{m,0} \ {}_{0}^{t}u_{0,0}& 
@@ -314,8 +314,8 @@ $$
 ###### Linear Strain Displacement Matrix
 
 $$
-{}_{0}\boldsymbol{B}_{L}
-= {}_{0}\boldsymbol{\bar B}_{L0} + {}_{0}\boldsymbol{B}_{L1}
+{}_{0}^{t}\boldsymbol{B}_{L}
+= {}_{0}\boldsymbol{\bar B}_{L0} + {}_{0}^{t}\boldsymbol{B}_{L1}
 $$
 
 ##### Linear Component of Element Stiffness Matrix

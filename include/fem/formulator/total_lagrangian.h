@@ -178,7 +178,7 @@ struct TLForm {
       NonlinTransMatTL<T,Dim>::nonlin_trans_mat_tl(h0, N, B0NL);
       MattileDiagDD<T,Dim>::mattile_diag_dd(S0t, tile);
       Matmul2DNFFFFDN<T,Dim>::matmul2_dnf_ff_fdn(B0NL, tile, N, buf, tmpK);
-      matinc_mul<T>(tmpK, nEntryKe, Ke, abs(detJ0));
+      matinc_mul<T>(tmpK, nEntryKe, Ke, weights[i]*abs(detJ0));
     }
     printf("hihihihhih\n\n\n\n\n");
     return 0;
@@ -210,7 +210,7 @@ struct TLForm {
       h += stride_h;
       LinTransMat<T,Dim>::lin_trans_mat(h0, N, B);
       Matmul2DNEEEEDN<T,Dim>::matmul2_dne_ee_edn(B, C, N, buf, tmpK);
-      matinc_mul<T>(tmpK, nEntryKe, Ke, absDetJ0);
+      matinc_mul<T>(tmpK, nEntryKe, Ke, weights[i]*absDetJ0);
     }
     return 0;
   }
@@ -255,7 +255,6 @@ struct TLForm {
       TransDivMat<T,Dim>::trans_dil_mat(h0, N, tmpB);
       matinc_mul<T>(tmpB, nEntryBdilBar, BdilBar, absDetJ0*weights[i]/V0);
     }
-    std::cout << "success here\n\n\n\n\n" << std::endl;
     h = hbuf;
     auto rowKe = Dim * N;
     auto nEntryKe = rowKe * rowKe;
