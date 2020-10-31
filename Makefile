@@ -1,4 +1,4 @@
-.PHONY: lib test clean
+.PHONY: lib ccx test clean
 
 ifeq ($(OS),Windows_NT)
   SHARED_LIBRARY_SUFFIX := dll
@@ -17,7 +17,12 @@ lib:
 	@mkdir -p lib
 	@mv build/libform.$(SHARED_LIBRARY_SUFFIX) lib
 
-test: lib
+ccx:
+	@mkdir -p build/ccx
+	@cd build/ccx && cmake ../../ccx && make
+	@mkdir -p lib
+
+test: lib cxx
 	@mkdir -p build/tests
 	@cd build/tests && cmake ../../tests && make
 	@mkdir -p bin

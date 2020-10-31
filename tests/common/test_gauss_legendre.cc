@@ -523,6 +523,28 @@ void test_gauss_3d(bool layout=true) {
     << ", N0: " << N0 << ", N1: " << N1 << ", N2: " << N2;
 }
 
+extern "C" {
+  void gauss_roots_3d2(const double* const arr);
+}
+
+template <unsigned int Dim, unsigned int NP>
+void get_gauss_roots(const double* const arr);
+template <>
+void get_gauss_roots<3,2>(const double* const arr) {
+  gauss_roots_3d2(arr);
+}
+
+template <unsigned int Dim, unsigned int NP>
+void test_gauss_roots() {
+  unsigned int nEntry = 1;
+  for (unsigned int i = 0; i < Dim; ++i) {
+    nEntry *= NP;
+  }
+  auto arr = (double*)malloc(nEntry*sizeof(double));
+  get_gauss_roots<Dim,NP>(arr);
+  free(arr);
+}
+
 int main(int argc, char* argv[]) {
   // log init
   google::InitGoogleLogging(argv[0]);
