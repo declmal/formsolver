@@ -1,4 +1,4 @@
-.PHONY: lib ccx test clean
+.PHONY: form ccx test clean
 
 ifeq ($(OS),Windows_NT)
   SHARED_LIBRARY_SUFFIX := dll
@@ -11,7 +11,7 @@ else
   endif
 endif
 
-lib:
+form:
 	@mkdir -p build
 	@cd build && cmake .. && make
 	@mkdir -p lib
@@ -21,8 +21,9 @@ ccx:
 	@mkdir -p build/ccx
 	@cd build/ccx && cmake ../../ccx && make
 	@mkdir -p lib
+	@mv build/ccx/libccx.${SHARED_LIBRARY_SUFFIX} lib
 
-test: lib cxx
+test: form ccx
 	@mkdir -p build/tests
 	@cd build/tests && cmake ../../tests && make
 	@mkdir -p bin

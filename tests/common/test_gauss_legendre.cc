@@ -524,31 +524,68 @@ void test_gauss_3d(bool layout=true) {
 }
 
 extern "C" {
-  void gauss_roots_3d2(const double* const arr);
+  void gauss_roots_3d2_(double* const ref);
+  void gauss_roots_3d3_(double* const ref);
+  void gauss_weights_3d2_(double* const ref);
+  void gauss_weights_3d3_(double* const ref);
 }
 
 template <unsigned int Dim, unsigned int NP>
-void get_gauss_roots(const double* const arr);
+void get_gauss_roots(double* const ref);
 template <>
-void get_gauss_roots<3,2>(const double* const arr) {
-  gauss_roots_3d2(arr);
+void get_gauss_roots<3,2>(double* const ref) {
+  gauss_roots_3d2_(ref);
+}
+template <>
+void get_gauss_roots<3,3>(double* const ref) {
+  gauss_roots_3d3_(ref);
 }
 
 template <unsigned int Dim, unsigned int NP>
-void test_gauss_roots() {
-  unsigned int nEntry = 1;
+void get_gauss_weights(double* const ref);
+template <>
+void get_gauss_weights<3,2>(double* const ref) {
+  gauss_weights_3d2_(ref);
+}
+template <>
+void get_gauss_weights<3,3>(double* const ref) {
+  gauss_weights_3d3_(ref);
+}
+
+template <unsigned int Dim, unsigned int NP>
+void validate_gauss() {
+  auto nRow = Dim;
+  unsigned int nCol = 1;
   for (unsigned int i = 0; i < Dim; ++i) {
-    nEntry *= NP;
+    nCol *= NP;
   }
-  auto arr = (double*)malloc(nEntry*sizeof(double));
-  get_gauss_roots<Dim,NP>(arr);
-  free(arr);
+  auto nEntry = nRow * nCol;
+  // init ref roots
+  auto ref_roots = (double*)malloc(nEntry*sizeof(double));
+  // init ref weights
+  // auto ref_weights = (double*)malloc(nCol*sizeof(double));
+  // init roots
+  GaussRoots<double,Dim,NP,NP,NP> gr;
+  // init weights
+  GaussWeights<double,Dim,NP,NP,NP> gw;
+  // validate
+  get_gauss_roots<Dim,NP>(ref_roots);
+  // get_gauss_weights<Dim,NP>(ref_weights);
+  printf("asdada");
+  print_mat<double>(gr.roots, nCol, nRow);
+  print_mat<double>(ref_roots, nRow, nCol);
+  // free
+  free(ref_roots);
+  // free(ref_weights);
 }
 
 int main(int argc, char* argv[]) {
   // log init
   google::InitGoogleLogging(argv[0]);
   FLAGS_logtostderr = 1;
+  validate_gauss<3,2>();
+  validate_gauss<3,3>();
+  return 0;
   // double precision tests
   test_gauss_1d<double,2>(false);
   test_gauss_1d<double,3>(false);

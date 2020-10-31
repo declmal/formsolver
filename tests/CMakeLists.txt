@@ -26,6 +26,10 @@ find_package(glog REQUIRED)
 find_file(LIB_FORM_PATH NAMES libform.so libform.dylib PATHS ../lib)
 get_filename_component(LIB_FORM ${LIB_FORM_PATH} ABSOLUTE)
 
+# locate libccx
+find_file(LIB_CCX_PATH NAMES libccx.so libccx.dylib PATHS ../lib)
+get_filename_component(LIB_CCX ${LIB_CCX_PATH} ABSOLUTE)
+
 # compile executives and link libraries
 file(GLOB_RECURSE SRCS_FORM_TEST *.cc)
 foreach (SRC_FILE ${SRCS_FORM_TEST})
@@ -34,6 +38,7 @@ foreach (SRC_FILE ${SRCS_FORM_TEST})
   add_executable(${EXE_FILE} ${SRC_FILE})
   target_link_libraries(${EXE_FILE} 
                         PRIVATE ${LIB_FORM} 
+                        PRIVATE ${LIB_CCX}
                         PRIVATE glog::glog
                         PRIVATE ${BLAS_LIBRARIES})
 endforeach()
