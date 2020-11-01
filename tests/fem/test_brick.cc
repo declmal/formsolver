@@ -208,7 +208,7 @@ template <
 >
 void test_brick_tl_form(
   bool layout=true, double tol=1e-6, unsigned int form=0) {
-  T p[2] = {(T)1e4, (T)0.3};
+  T p[2] = {(T)2e5, (T)0.3};
   MatType<T> m(p);
   BrickIPropType<T> bi;
   auto Dim = BrickIPropType<T>::get_ndim();
