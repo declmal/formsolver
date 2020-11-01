@@ -171,12 +171,31 @@ void init_x(T* const X, unsigned int NR, unsigned int NC) {
     }
   } else if ((NR == 3) && (NC == 20)) {
     T X0[60] = {
-      1,0,0,1,1,0,0,1,0.5,0,0.5,1,0.5,0,0.5,1,1,0,0,1,
-      1,1,0,0,1,1,0,0,1,0.5,0,0.5,1,0.5,0,0.5,1,1,0,0,
-      1,1,1,1,0,0,0,0,1,1,1,1,0,0,0,0,0.5,0.5,0.5,0.5
+      0, 0, 0,
+      1, 0, 0,
+      1, 1, 0,
+      0, 1, 0,
+      0, 0, 1,
+      1, 0, 1,
+      1, 1, 1,
+      0, 1, 1,
+      0.5, 0, 0,
+      1, 0.5, 0,
+      0.5, 1, 0,
+      0, 0.5, 0,
+      0.5, 0, 1,
+      1, 0.5, 1,
+      0.5, 1, 1,
+      0, 0.5, 1,
+      0, 0, 0.5,
+      1, 0, 0.5,
+      1, 1, 0.5,
+      0, 1, 0.5,
     };
+    T X0t[60];
+    transpose<T>(X0, 20, 3, X0t);
     for (unsigned int i = 0; i < 60; ++i) {
-      X[i] = X0[i];
+      X[i] = X0t[i];
     }
   }
 }
@@ -312,12 +331,14 @@ int main(int argc, char* argv[]) {
   // log init
   google::InitGoogleLogging(argv[0]);
   FLAGS_logtostderr = 1;
-  test_brick_interp_prop<double,fem::C3D20RIProp>(true);
-  // return 0;
-  test_brick_tl_form<
-    double,fem::Ela3D,fem::C3D8IProp,fem::C3D8TLForm>(true, 1e-6, 2);
   test_brick_tl_form<
     double,fem::Ela3D,fem::C3D20RIProp,fem::C3D20RTLForm>(false, 1e-6, 1);
+  return 0;
+  test_brick_interp_prop<double,fem::C3D20RIProp>(true);
+  return 0;
+  test_brick_tl_form<
+    double,fem::Ela3D,fem::C3D8IProp,fem::C3D8TLForm>(true, 1e-6, 2);
+  return 0;
 
   bool layout = false;
   // double precison tests
