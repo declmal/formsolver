@@ -15,24 +15,17 @@ struct IPropInitializer {
 
 FORM_IPROP_TEMPLATE()
 struct IProp {
-  static T hbuf[NI*N*Dim];
-  static T weights[NI];
+  T hbuf[NI*N*Dim];
+  T weights[NI];
   static unsigned int get_num_ipoints() { return NI; }
   static unsigned int get_num_nodes() { return N; }
   static unsigned int get_ndim() { return Dim; }
-  static T* get_hbuf() { return hbuf; }
-  static T* get_weights() { return weights; }
-  static void initialize() {
+  T* get_hbuf() { return hbuf; }
+  T* get_weights() { return weights; }
+  IProp() {
     IPropInitializerType<T>::initialize(hbuf, weights);
   }
 };
-
-FORM_IPROP_TEMPLATE()
-T IProp<T,NI,Dim,N,IPropInitializerType>::hbuf[NI*N*Dim];
-
-FORM_IPROP_TEMPLATE()
-T IProp<T,NI,Dim,N,IPropInitializerType>::weights[NI];
-
 } // namespace fem
 
 #endif // FEM_IPROP_ELEMENT_IPROP_H_

@@ -9,9 +9,9 @@ void test_ela_3d(bool layout=true) {
   if (nEntryP != fem::Ela3D<T>::get_num_params()) {
     LOG(FATAL) << "invalid params list";
   }
+  fem::Ela3D<T> m(p);
   auto NR = fem::Ela3D<T>::get_nrows();
-  fem::Ela3D<T>::initialize(p);
-  auto C = fem::Ela3D<T>::get_C();
+  auto C = m.get_C();
   if (layout) {
     LOG(INFO) << "matrix C layout";
     print_mat<T>(C, NR, NR);
