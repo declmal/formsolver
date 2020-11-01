@@ -554,37 +554,30 @@ void get_gauss_weights<3,3>(double* const ref) {
 
 template <unsigned int Dim, unsigned int NP>
 void validate_gauss(double tol=1e-6) {
-  auto nRow = Dim;
-  unsigned int nCol = 1;
+  unsigned int nRow = 1;
   for (unsigned int i = 0; i < Dim; ++i) {
-    nCol *= NP;
+    nRow*= NP;
   }
+  auto nCol = Dim;
   auto nEntry = nRow * nCol;
   // init ref roots
   auto ref_roots = (double*)malloc(nEntry*sizeof(double));
-  // init ref roots transpose
-  auto ref_rt = (double*)malloc(nEntry*sizeof(double));
   // init ref weights
-  auto ref_weights = (double*)malloc(nCol*sizeof(double));
-  // init roots, of shape (nCol, nRow)
+  auto ref_weights = (double*)malloc(nRow*sizeof(double));
+  // init roots
   GaussRoots<double,Dim,NP,NP,NP> gr;
   auto roots = gr.roots;
-  // init weights, of shape (nCol,)
+  // init weights
   GaussWeights<double,Dim,NP,NP,NP> gw;
   auto weights = gw.weights;
   // validate roots
-  bool flag = true;
   get_gauss_roots<Dim,NP>(ref_roots);
-  transpose<double>(ref_roots, nRow, nCol, ref_rt);
-  print_mat<double>(ref_roots, nRow, nCol);
-  // print_mat<double>(ref_rt, nCol, nRow);
-  print_mat<double>(roots, nCol, nRow);
+  bool flag = validate<double>(roots, ref_roots, nEntry, tol);
   // validate weights
   get_gauss_weights<Dim,NP>(ref_weights);
-  flag = flag && validate<double>(weights, ref_weights, nCol, tol);
+  flag = flag && validate<double>(weights, ref_weights, nRow, tol);
   // free
   free(ref_roots);
-  free(ref_rt);
   free(ref_weights);
   if (flag) {
     LOG(INFO) << "validate_gauss succeed, Dim: " << Dim << ", NP: " << NP;
@@ -598,7 +591,7 @@ int main(int argc, char* argv[]) {
   google::InitGoogleLogging(argv[0]);
   FLAGS_logtostderr = 1;
   validate_gauss<3,2>();
-  // validate_gauss<3,3>();
+  validate_gauss<3,3>();
   return 0;
   // double precision tests
   test_gauss_1d<double,2>(false);

@@ -75,16 +75,16 @@ struct GaussRoots<T,3,N0,N1,N2> {
     GaussRoots<T,1,N0,1,1> gr0;
     GaussRoots<T,1,N1,1,1> gr1;
     GaussRoots<T,1,N2,1,1> gr2;
-    auto stride0 = N1 * N2;
-    auto stride1 = N2;
-    for (unsigned int i = 0; i < N0; ++i) {
+    auto stride0 = N0 * N1;
+    auto stride1 = N1;
+    for (unsigned int i = 0; i < N2; ++i) {
       for (unsigned int j = 0; j < N1; ++j) {
-        for (unsigned int k = 0; k < N2; ++k) {
+        for (unsigned int k = 0; k < N0; ++k) {
           auto ind = i*stride0 + j*stride1 + k;
           auto ind3 = ind * 3;
-          roots[ind3] = gr0.roots[i];
+          roots[ind3] = gr0.roots[k];
           roots[ind3+1] = gr1.roots[j];
-          roots[ind3+2] = gr2.roots[k];
+          roots[ind3+2] = gr2.roots[i];
         }
       }
     }
@@ -115,13 +115,13 @@ struct GaussWeights<T,3,N0,N1,N2> {
     GaussWeights<T,1,N0,1,1> gw0;
     GaussWeights<T,1,N1,1,1> gw1;
     GaussWeights<T,1,N2,1,1> gw2;
-    auto stride0 = N1 * N2;
-    auto stride1 = N2;
-    for (unsigned int i = 0; i < N0; ++i) {
+    auto stride0 = N0 * N1;
+    auto stride1 = N0;
+    for (unsigned int i = 0; i < N2; ++i) {
       for (unsigned int j = 0; j < N1; ++j) {
-        for (unsigned int k = 0; k < N2; ++k) {
+        for (unsigned int k = 0; k < N0; ++k) {
           auto ind = i*stride0 + j*stride1 + k;
-          weights[ind] = gw0.weights[i] * gw1.weights[j] * gw2.weights[k];
+          weights[ind] = gw0.weights[k] * gw1.weights[j] * gw2.weights[i];
         }
       }
     }
