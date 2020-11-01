@@ -11,7 +11,7 @@ elseif(EXISTS ${PARENT_DIR}/cmake/config.cmake)
 endif()
 
 # set compilation flags
-set(CMAKE_CXX_FLAGS "-std=c++14")
+set(CMAKE_CXX_FLAGS "-std=c++17")
 
 # specify include directories
 include_directories("../include")
