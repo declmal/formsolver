@@ -590,9 +590,6 @@ int main(int argc, char* argv[]) {
   // log init
   google::InitGoogleLogging(argv[0]);
   FLAGS_logtostderr = 1;
-  validate_gauss<3,2>();
-  validate_gauss<3,3>();
-  return 0;
   // double precision tests
   test_gauss_1d<double,2>(false);
   test_gauss_1d<double,3>(false);
@@ -610,6 +607,8 @@ int main(int argc, char* argv[]) {
   test_gauss_1d<double,15>(false);
   test_gauss_1d<double,16>(false);
   test_gauss_3d<double,4,3,2>();
+  validate_gauss<3,2>();
+  validate_gauss<3,3>();
   LOG(INFO) << "double precision test passed";
   // single precision tests
   test_gauss_1d<float,2>(false);
