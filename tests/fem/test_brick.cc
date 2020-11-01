@@ -312,8 +312,12 @@ int main(int argc, char* argv[]) {
   // log init
   google::InitGoogleLogging(argv[0]);
   FLAGS_logtostderr = 1;
+  test_brick_interp_prop<double,fem::C3D20RIProp>(true);
+  return 0;
   test_brick_tl_form<
-    double,fem::Ela3D,fem::C3D20IProp,fem::C3D20TLForm>(true, 1e-6, 1);
+    double,fem::Ela3D,fem::C3D8IProp,fem::C3D8TLForm>(true, 1e-6, 2);
+  test_brick_tl_form<
+    double,fem::Ela3D,fem::C3D20RIProp,fem::C3D20RTLForm>(false, 1e-6, 1);
 
   bool layout = false;
   // double precison tests
@@ -324,8 +328,6 @@ int main(int argc, char* argv[]) {
   // test_brick_interp_prop<double,fem::C3D8RIProp>(layout);
   test_brick_interp_prop<double,fem::C3D20IProp>(layout);
   test_brick_interp_prop<double,fem::C3D20RIProp>(layout);
-  test_brick_tl_form<
-    double,fem::Ela3D,fem::C3D8IProp,fem::C3D8TLForm>(true, 1e-6, 2);
   test_brick_tl_form<
     double,fem::Ela3D,fem::C3D8IProp,fem::C3D8TLForm>(layout);
   // test_brick_tl_form<
