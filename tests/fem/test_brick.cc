@@ -333,12 +333,12 @@ int main(int argc, char* argv[]) {
   FLAGS_logtostderr = 1;
   test_brick_tl_form<
     double,fem::Ela3D,fem::C3D20RIProp,fem::C3D20RTLForm>(false, 1e-6, 1);
-  return 0;
+  // return 0;
   test_brick_interp_prop<double,fem::C3D20RIProp>(true);
-  return 0;
+  // return 0;
   test_brick_tl_form<
     double,fem::Ela3D,fem::C3D8IProp,fem::C3D8TLForm>(true, 1e-6, 2);
-  return 0;
+  // return 0;
 
   bool layout = false;
   // double precison tests

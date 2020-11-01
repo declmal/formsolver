@@ -1,4 +1,4 @@
-.PHONY: form ccx test clean ccx2
+.PHONY: form ccx test clean
 
 ifeq ($(OS),Windows_NT)
   SHARED_LIBRARY_SUFFIX := dll
@@ -19,17 +19,11 @@ form:
 
 ccx:
 	@mkdir -p build/ccx
-	@cd build/ccx && cmake ../../ccx && make
+	@cd build/ccx && cmake ../../3rdparty/ccx && make
 	@mkdir -p lib
 	@mv build/ccx/libccx.${SHARED_LIBRARY_SUFFIX} lib
 
-ccx2:
-	@mkdir -p build/ccx2
-	@cd build/ccx2 && cmake ../../3rdparty/ccx && make
-	@mkdir -p lib
-	@mv build/ccx2/libccx.${SHARED_LIBRARY_SUFFIX} lib
-
-test: form ccx2
+test: form ccx
 	@mkdir -p build/tests
 	@cd build/tests && cmake ../../tests && make
 	@mkdir -p bin
