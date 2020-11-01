@@ -313,7 +313,7 @@ int main(int argc, char* argv[]) {
   google::InitGoogleLogging(argv[0]);
   FLAGS_logtostderr = 1;
   test_brick_interp_prop<double,fem::C3D20RIProp>(true);
-  return 0;
+  // return 0;
   test_brick_tl_form<
     double,fem::Ela3D,fem::C3D8IProp,fem::C3D8TLForm>(true, 1e-6, 2);
   test_brick_tl_form<
@@ -322,7 +322,7 @@ int main(int argc, char* argv[]) {
   bool layout = false;
   // double precison tests
   test_brick_interp_sum<double,8>(layout);
-  test_brick_interp_deriv<double,8>(layout);
+  // test_brick_interp_deriv<double,8>(layout);
   test_brick_interp_sum<double, 20>(layout);
   test_brick_interp_prop<double,fem::C3D8IProp>(layout);
   // test_brick_interp_prop<double,fem::C3D8RIProp>(layout);
@@ -339,7 +339,7 @@ int main(int argc, char* argv[]) {
   LOG(INFO) << "double precision test passed";
   // single precision tests
   test_brick_interp_sum<float,8>(layout);
-  test_brick_interp_deriv<float,8>(layout);
+  // test_brick_interp_deriv<float,8>(layout);
   test_brick_interp_sum<float,20>(layout);
   test_brick_interp_prop<float,fem::C3D8IProp>(layout);
   // test_brick_interp_prop<float,fem::C3D8RIProp>(layout);
