@@ -37,7 +37,7 @@
       include "gauss.f"
 
       do i=1,8
-        ref(j)=weight3d2(i)
+        ref(i)=weight3d2(i)
       enddo
 
       return

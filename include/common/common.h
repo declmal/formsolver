@@ -78,4 +78,18 @@ bool validate(
   return true;
 }
 
+template <typename T>
+void transpose(
+  const T* const a, const unsigned int nRow, const unsigned int nCol, T* const at) {
+  unsigned int idA;
+  unsigned int idAt;
+  for (unsigned int i = 0; i < nRow; ++i) {
+    for (unsigned int j = 0; j < nCol; ++j) {
+      idA = i*nCol + j;
+      idAt = j*nRow + i;
+      at[idAt] = a[idA];
+    }
+  }
+}
+
 #endif // COMMON_COMMON_H_

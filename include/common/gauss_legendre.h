@@ -94,8 +94,6 @@ struct GaussRoots<T,3,N0,N1,N2> {
 template <
   typename T, unsigned int Dim, unsigned int N0, unsigned N1, unsigned int N2>
 struct GaussWeights {
-  // constexpr static auto NI = N0 * N1 * N2;
-  // T weights[NI];
 };
 template <typename T, unsigned int N0>
 struct GaussWeights<T,1,N0,1,1>  {
@@ -123,7 +121,6 @@ struct GaussWeights<T,3,N0,N1,N2> {
       for (unsigned int j = 0; j < N1; ++j) {
         for (unsigned int k = 0; k < N2; ++k) {
           auto ind = i*stride0 + j*stride1 + k;
-          auto ind3 = ind * 3;
           weights[ind] = gw0.weights[i] * gw1.weights[j] * gw2.weights[k];
         }
       }
