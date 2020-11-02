@@ -3,6 +3,8 @@
 
 extern "C" {
   void e_c3d_(
+    double* co,
+
     int* kon,
     char* lakonl,
     double* p1,
@@ -106,7 +108,8 @@ extern "C" {
 
 template <unsigned int Dim, unsigned int N>
 void test() {
-    // double co[Dim*N];
+    double co[Dim*N];
+    init_x<double>(co, Dim, N);
 
     // int* kon;
     // char lakonl[8] = "C3D20R";
