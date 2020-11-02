@@ -1,6 +1,8 @@
 #include <glog/logging.h>
 #include <fem/mat/elastic.h>
+#include <fem/element/brick.h>
 #include "common_brick.h"
+#include <iostream>
 
 extern "C" {
   void e_c3d_(
@@ -107,12 +109,113 @@ extern "C" {
   );
 }
 
-void test() {
+template <
+  template <typename> class MatType,
+  template <typename> class BrickIPropType,
+  template <typename> class BrickTLFormType
+>
+void test_brick_form(
+  bool layout=true, double tol=1e-6, unsigned int form=0) {
   double E = 2e5;
   double nu = 0.3;
-  // double p[2] = {E, nu};
-  // fem::Ela3D<double> ela(p);
+
+  // execute
+  double p[2] = {E, nu};
+  MatType<double> m(p);
+  BrickIPropType<double> bi;
+  auto Dim = BrickIPropType<double>::get_ndim();
+  auto N = BrickIPropType<double>::get_num_nodes();
+  // init X0
+  auto nEntryX0 = Dim * N;
+  auto X0 = (double*)malloc(nEntryX0*sizeof(double));
+  // for debug purpose
+  // print_mat<double>(X0, Dim, N);
+  init_x<double>(X0, Dim, N);
+  // init hbuf
+  auto hbuf = bi.get_hbuf();
+  // init weights
+  auto weights = bi.get_weights();
+  // init Ut
+  auto nEntryUt = Dim * N;
+  auto Ut = (double*)malloc(nEntryUt*sizeof(double));
+  init_zero<double>(Ut, nEntryUt);
+  // init C0
+  auto C0 = m.get_C();
+  // init S0t
+  auto nEntryS0t = Dim * Dim;
+  auto S0t = (double*)malloc(nEntryS0t*sizeof(double));
+  init_rand<double>(S0t, nEntryS0t);
+  // init J0
+  auto nEntryJ0 = Dim * Dim;
+  auto J0 = (double*)malloc(nEntryJ0*sizeof(double));
+  // init invJ0
+  auto nEntryInvJ0 = Dim * Dim;
+  auto invJ0 = (double*)malloc(nEntryInvJ0*sizeof(double));
+  // init BdilBar
+  auto nRowBdilBar = 3*Dim - 3;
+  auto nColBdilBar = Dim * N;
+  auto nEntryBdilBar = nRowBdilBar * nColBdilBar;
+  auto BdilBar = (double*)malloc(nEntryBdilBar*sizeof(double));
+  // init tmpB
+  auto nRowTmpB = 3*Dim - 3;
+  auto nColTmpB = Dim * N;
+  auto nEntryTmpB = nRowTmpB * nColTmpB;
+  auto tmpB = (double*)malloc(nEntryTmpB*sizeof(double));
+  // init h0
+  auto nEntryH0 = N * Dim;
+  auto h0 = (double*)malloc(nEntryH0*sizeof(double));
+  // init u0t
+  auto nEntryU0t = Dim * Dim;
+  auto u0t = (double*)malloc(nEntryU0t*sizeof(double));
+  // init B0tL
+  auto nRowB0tL = 3*Dim - 3;
+  auto nColB0tL = Dim * N;
+  auto nEntryB0tL = nRowB0tL * nColB0tL;
+  auto B0tL = (double*)malloc(nEntryB0tL*sizeof(double));
+  // init buf
+  auto nEntryBuf = Dim * Dim;
+  auto buf = (double*)malloc(nEntryBuf*sizeof(double));
+  // init tmpK
+  auto nRowTmpK = Dim * N;
+  auto nEntryTmpK = nRowTmpK * nRowTmpK;
+  auto tmpK = (double*)malloc(nEntryTmpK*sizeof(double));
+  // init B0NL
+  auto nRowB0NL = Dim * Dim;
+  auto nColB0NL = Dim * N;
+  auto nEntryB0NL = nRowB0NL * nColB0NL;
+  auto B0NL = (double*)malloc(nEntryB0NL*sizeof(double));
+  // init tile
+  auto nRowTile = Dim * Dim;
+  auto nEntryTile = nRowTile * nRowTile;
+  auto tile = (double*)malloc(nEntryTile*sizeof(double));
+  // init Ke
+  auto nRowKe = Dim * N;
+  auto nEntryKe = nRowKe * nRowKe;
+  auto Ke = (double*)malloc(nEntryKe*sizeof(double));
+  // run
+  int ret;
+  if (form == 0) {
+    ret = BrickTLFormType<double>::form_elem_stiff(
+      X0, hbuf, weights, Ut, C0, S0t, J0, invJ0, h0, u0t, B0tL, buf, tmpK, B0NL, tile, Ke);
+  } else if (form == 1) {
+    ret = BrickTLFormType<double>::form_linear_elem_stiff(
+      X0, hbuf, weights, C0, J0, invJ0, h0, B0tL, buf, tmpK, Ke);
+  } else {
+    ret = BrickTLFormType<double>::form_linear_elem_stiff_Bbar(
+      X0, hbuf, weights, C0,
+      J0, invJ0, 
+      BdilBar, tmpB, h0, B0tL, buf, tmpK, Ke);
+  }
+  if (ret == 0) {
+    if (layout) {
+      LOG(INFO) << "matrix Ke layout"; 
+      print_mat<double>(Ke, nRowKe, nRowKe);
+    }
+  } 
+  std::cout << Ke[43*60+22] << std::endl;
+  std::cout << Ke[22*60+43] << std::endl;
   
+  // validate
   double _co[3*20];
   init_x<double>(_co, 3, 20);
   double co[60]; /* input */
@@ -350,6 +453,33 @@ void test() {
     &smscalel,
     &mscalmethod
   );
+  full_sym<double>(s, 60);
+  bool flag  = validate<double>(Ke, s, 3600, tol);
+  // free
+  free(X0);
+  free(Ut);
+  free(S0t);
+  free(J0);
+  free(invJ0);
+  free(BdilBar);
+  free(tmpB);
+  free(h0);
+  free(u0t);
+  free(B0tL);
+  free(buf);
+  free(tmpK);
+  free(B0NL);
+  free(tile);
+  free(Ke);
+  if (flag) {
+    LOG(INFO) << "test_brick_tl_form succeed, T: " << typeid(double).name()
+      << ", BrickIPropType: " << typeid(BrickIPropType<double>).name()
+      << ", BrickTLFormType: " << typeid(BrickTLFormType<double>).name();
+  } else {
+    LOG(INFO) << "test_brick_tl_form fail, T: " << typeid(double).name()
+      << ", BrickIPropType: " << typeid(BrickIPropType<double>).name()
+      << ", BrickTLFormType: " << typeid(BrickTLFormType<double>).name();
+  }
 }
 
 int main(int argc, char* argv[]) {
@@ -357,6 +487,7 @@ int main(int argc, char* argv[]) {
   google::InitGoogleLogging(argv[0]);
   FLAGS_logtostderr = 1;
   // tests
-  test();
+  test_brick_form<
+    fem::Ela3D,fem::C3D20RIProp,fem::C3D20RTLForm>(false, 1e-6, 1);
   return 0;
 }

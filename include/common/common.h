@@ -92,4 +92,27 @@ void transpose(
   }
 }
 
+template <typename T>
+void full_sym(T* const a, const unsigned int n, bool trans=false) {
+  unsigned int ind1;
+  unsigned int ind2;
+  if (trans) {
+    for (unsigned int i = 0; i < n; ++i) {
+      for (unsigned int j = 0; j < i; ++j) {
+        ind1 = i*n + j;
+        ind2 = j*n + i;
+        a[ind1] = a[ind2];
+      }
+    }
+  } else {
+    for (unsigned int i = 0; i < n; ++i) {
+      for (unsigned int j = 0; j < i; ++j) {
+        ind1 = i*n + j;
+        ind2 = j*n + i;
+        a[ind2] = a[ind1];
+      }
+    }
+  }
+}
+
 #endif // COMMON_COMMON_H_
