@@ -133,7 +133,7 @@ void test() {
   int nmethod = 0;
   double* elcon = NULL; /* input, not runtime */
   int nelcon[2] = {2,1}; /* input */
-  double* rhcon = NULL;
+  double rhcon[2] = {0,0}; /* input */
   int* nrhcon = NULL;
   double* alcon = NULL;
   int* nalcon = NULL;
@@ -146,7 +146,7 @@ void test() {
   int ntmat_ = 1; /* input */
   double* t0 = NULL;
   double* t1 = NULL;
-  int* ithermal = NULL; /* input, not runtime */
+  int ithermal[2] = {0,0}; /* input */
   double* vold = NULL;
   int iperturb[2] = {0,0}; /* input */
   int* nelemload = NULL;
@@ -196,7 +196,7 @@ void test() {
   transpose<double>(_xstiff, 27, 8, xstiff);
   int npmat_ = 0;
   double dtime = 0;
-  char* matname = NULL;
+  char matname[80] = "STEEL"; /* input */
   int mi[3] = {8,3,1}; /* input */
   int ncmat_ = 2; /* input */
   int mass = 0; /* input */
