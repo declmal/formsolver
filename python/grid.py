@@ -46,6 +46,9 @@ def rotate_3d_vec(vec, yawMat, pitchMat, rollMat):
         )
     )
 
+def rand_num(th=0.1):
+    return np.random.random()*2*th - th
+
 
 class Element:
     def __init__(self, nodes):
@@ -85,6 +88,18 @@ class Element:
             nx, ny, nz = xo+ndx, yo+ndy, zo+ndz
             nnodes.append(Node(nx,ny,nz))
         return type(elem)(nnodes)
+    @staticmethod
+    def perturb(elem, th=0.1):
+        nnodes = []
+        for node in elem.get_nodes():
+            x, y, z = node.get_coord()
+            dx = rand_num(th=th)
+            dy = rand_num(th=th)
+            dz = rand_num(th=th)
+            nx, ny, nz = x+dx, y+dy, z+dz
+            nnodes.append(Node(nx,ny,nz))
+        return type(elem)(nnodes)
+
 
 # C3D20
 c3d20rUnitNodes = [
@@ -129,16 +144,14 @@ c3d8UnitNodes = [
 c3d8Unit = Element(c3d8UnitNodes)
 
 if __name__ == '__main__':
+    th = 0.3
+    elem = Element.perturb(c3d20Unit, th=0.3)
     origin = Node(0.5,0.5,0.5)
     alpha = 0.3
     beta = 1.5
     gamma = -2.1
-    # elem = Element.rotate_3d(
-        # c3d8Unit, origin=origin,
-        # alpha=alpha, beta=beta, gamma=gamma)
-    # print(elem.serialize())
-    otype = "inp"
     elem = Element.rotate_3d(
-        c3d20Unit, origin=origin,
+        elem, origin=origin,
         alpha=alpha, beta=beta, gamma=gamma)
+    otype = "form"
     print(elem.serialize(otype=otype))
