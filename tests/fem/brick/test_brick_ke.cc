@@ -206,6 +206,11 @@ void test_brick_form(
       J0, invJ0, 
       BdilBar, tmpB, h0, B0tL, buf, tmpK, Ke);
   }
+  if (!check_sym<double>(Ke, nRowKe, tol)) {
+    ret = -1;
+  } else {
+    LOG(INFO) << "symmetrical Ke acquired";
+  } 
   if (ret == 0) {
     if (layout) {
       LOG(INFO) << "matrix Ke layout"; 

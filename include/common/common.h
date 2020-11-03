@@ -115,4 +115,28 @@ void full_sym(T* const a, const unsigned int n, bool trans=false) {
   }
 }
 
+template <typename T>
+bool check_sym(const T* const a, const unsigned int n, double tol=1e-6) {
+  unsigned int ind1;
+  unsigned int ind2;
+  for (unsigned int i = 0; i < n; ++i) {
+    for (unsigned int j = 0; j < i; ++j) {
+      ind1 = i*n + j;
+      ind2 = j*n + i;
+      if ((a[ind1]<DP_ZERO) && (a[ind2]<DP_ZERO)) {
+        continue;
+      }
+      double error = abs(a[ind1]/a[ind2]-1);
+      if (error > tol) {
+        LOG(WARNING) << "out of tolerance, a[" 
+          << i << "][" << j << "]: " << a[ind1] 
+          << ", a[" << j << "]["<< i << "]: " << a[ind2]
+          << ", relative error: " << error << ", tol: " << tol;
+        return false;
+      }
+    }
+  }
+  return true;
+}
+
 #endif // COMMON_COMMON_H_
