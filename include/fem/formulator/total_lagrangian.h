@@ -169,7 +169,7 @@ struct TLForm {
         return -1;
       }
       InvDD<T,Dim>::inv_dd(J0, detJ0, invJ0);
-      MatmulNDDDT<T,Dim>::matmul_ndddt(h, invJ0, N, h0);
+      MatmulNDDD<T,Dim>::matmul_nddd(h, invJ0, N, h0);
       h += stride_h;
       MatmulDNND<T,Dim>::matmul_dnnd(Ut, h0, N, u0t);
       LinTransMatTL<T,Dim>::lin_trans_mat_tl(h0, u0t, N, B0tL);
@@ -206,7 +206,7 @@ struct TLForm {
         return -1;
       }
       InvDD<T,Dim>::inv_dd(J0, detJ0, invJ0);
-      MatmulNDDDT<T,Dim>::matmul_ndddt(h, invJ0, N, h0);
+      MatmulNDDD<T,Dim>::matmul_nddd(h, invJ0, N, h0);
       h += stride_h;
       LinTransMat<T,Dim>::lin_trans_mat(h0, N, B);
       Matmul2DNEEEEDN<T,Dim>::matmul2_dne_ee_edn(B, C, N, buf, tmpK);
@@ -250,7 +250,7 @@ struct TLForm {
         return -1;
       }
       InvDD<T,Dim>::inv_dd(J0, detJ0, invJ0);
-      MatmulNDDDT<T,Dim>::matmul_ndddt(h, invJ0, N, h0);
+      MatmulNDDD<T,Dim>::matmul_nddd(h, invJ0, N, h0);
       h += stride_h;
       TransDivMat<T,Dim>::trans_dil_mat(h0, N, tmpB);
       matinc_mul<T>(tmpB, nEntryBdilBar, BdilBar, absDetJ0*weights[i]/V0);
@@ -268,7 +268,7 @@ struct TLForm {
         return -1;
       }
       InvDD<T,Dim>::inv_dd(J0, detJ0, invJ0);
-      MatmulNDDDT<T,Dim>::matmul_ndddt(h, invJ0, N, h0);
+      MatmulNDDD<T,Dim>::matmul_nddd(h, invJ0, N, h0);
       h += stride_h;
       LinTransMat<T,Dim>::lin_trans_mat(h0, N, B);
       TransDivMat<T,Dim>::trans_dil_mat(h0, N, tmpB);
