@@ -52,10 +52,24 @@ class Element:
         self.nodes = nodes
     def get_nodes(self):
         return self.nodes
-    def to_fem(self):
-        return '\n'.join(
-            [node.serialize()+',' for node in self.nodes]
-        )
+    def serialize(self, otype="default"):
+        if otype == "default":
+            return '\n'.join(
+                [node.serialize() for node in self.nodes]
+            )
+        elif otype == "form":
+            return '\n'.join(
+                [node.serialize()+',' for node in self.nodes]
+            )
+        elif otype == "inp":
+            return '\n'.join(
+                [
+                    str(i+1)+','+node.serialize()
+                    for i, node in enumerate(self.nodes)
+                ]
+            )
+        else:
+            raise NotImplementedError
     @staticmethod
     def rotate_3d(elem, origin=Node(0,0,0), alpha=0.0, beta=0.0, gamma=0.0):
         nnodes = []
@@ -102,14 +116,14 @@ c3d20Unit = Element(c3d20rUnitNodes)
 # C3D8
 c3d8UnitNodes = [
     Node(x,y,z) for x,y,z in [
-      [0,0,0],
-      [1,0,0],
-      [1,1,0],
-      [0,1,0],
-      [0,0,1],
-      [1,0,1],
-      [1,1,1],
-      [0,1,1],
+      [0, 0, 0],
+      [1, 0, 0],
+      [1, 1, 0],
+      [0, 1, 0],
+      [0, 0, 1],
+      [1, 0, 1],
+      [1, 1, 1],
+      [0, 1, 1],
     ]
 ]
 c3d8Unit = Element(c3d8UnitNodes)
@@ -122,8 +136,9 @@ if __name__ == '__main__':
     # elem = Element.rotate_3d(
         # c3d8Unit, origin=origin,
         # alpha=alpha, beta=beta, gamma=gamma)
-    # print(elem.to_fem())
+    # print(elem.serialize())
+    otype = "inp"
     elem = Element.rotate_3d(
         c3d20Unit, origin=origin,
         alpha=alpha, beta=beta, gamma=gamma)
-    print(elem.to_fem())
+    print(elem.serialize(otype=otype))

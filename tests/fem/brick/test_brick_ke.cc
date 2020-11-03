@@ -217,8 +217,7 @@ void test_brick_form(
       print_mat<double>(Ke, nRowKe, nRowKe);
     }
   } 
-  std::cout << Ke[43*60+22] << std::endl;
-  std::cout << Ke[22*60+43] << std::endl;
+  std::cout << Ke[59*60+59] << std::endl;
   
   // validate
   double _co[3*20];
@@ -459,6 +458,7 @@ void test_brick_form(
     &mscalmethod
   );
   full_sym<double>(s, 60);
+  std::cout << s[59*60+59] << std::endl;
   bool flag  = validate<double>(Ke, s, 3600, tol);
   // free
   free(X0);
