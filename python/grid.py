@@ -52,8 +52,6 @@ class Element:
         self.nodes = nodes
     def get_nodes(self):
         return self.nodes
-    def to_paraview(self):
-        raise NotImplementedError
     def to_fem(self):
         return '\n'.join(
             [node.serialize()+',' for node in self.nodes]
@@ -73,18 +71,6 @@ class Element:
             nx, ny, nz = xo+ndx, yo+ndy, zo+ndz
             nnodes.append(Node(nx,ny,nz))
         return type(elem)(nnodes)
-
-
-class C3D8(Element):
-    def to_paraview(self):
-        nodes = self.nodes[:2] + self.nodes[3:1:-1] + self.nodes[4:6] + self.nodes[7:5:-1]
-        return '\n'.join(
-            [node.serialize() for node in nodes]
-        )
-
-
-class C3D20(Element):
-    pass
 
 # C3D20
 c3d20rUnitNodes = [
@@ -111,7 +97,7 @@ c3d20rUnitNodes = [
         [0, 1, 0.5],
     ]
 ]
-c3d20Unit = C3D20(c3d20rUnitNodes)
+c3d20Unit = Element(c3d20rUnitNodes)
 
 # C3D8
 c3d8UnitNodes = [
@@ -126,21 +112,18 @@ c3d8UnitNodes = [
       [0,1,1],
     ]
 ]
-c3d8Unit = C3D8(c3d8UnitNodes)
+c3d8Unit = Element(c3d8UnitNodes)
 
 if __name__ == '__main__':
     origin = Node(0.5,0.5,0.5)
     alpha = 0.3
     beta = 1.5
     gamma = -2.1
-    # elem = C3D8.rotate_3d(
+    # elem = Element.rotate_3d(
         # c3d8Unit, origin=origin,
         # alpha=alpha, beta=beta, gamma=gamma)
-    #  print(elem.to_paraview())
     # print(elem.to_fem())
-    elem = C3D20.rotate_3d(
+    elem = Element.rotate_3d(
         c3d20Unit, origin=origin,
         alpha=alpha, beta=beta, gamma=gamma)
     print(elem.to_fem())
-
-
