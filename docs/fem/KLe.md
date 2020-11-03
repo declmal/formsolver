@@ -1,13 +1,12 @@
 ##### Initial Global Coordinate Interpolation
 
 $$
-x_{i} = h_{n} X_{in}
+{}^{0}x_{i} = {}^{0}X_{in} \ h_{n}
 $$
 
 ##### Jacobi Matrix
 
 [*Finite Element Procedures (2nd), P346*]
-
 $$
 {}^{0}\boldsymbol{J} = \left(\begin{matrix}
 {}^{0}x_{0,0} & {}^{0}x_{0,1} & {}^{0}x_{0,2} \\
@@ -20,7 +19,7 @@ $$
 {}^{0}J_{ij} 
 = {}^{0}x_{i,j}
 = \frac{\partial \ {}^{0}x_{i}}{\partial \ r_{j}}
-= h_{n,j} \ {}^{0}X_{in}
+= {}^{0}X_{in} \ h_{n,j}
 $$
 
 $$
@@ -63,36 +62,46 @@ $$
 ##### Interpolation Derivative with Respect to Global Coordinate
 
 $$
-{}_{0}h_{n,j}
-= \frac{\partial \ h_{n}}{\partial \ {}^{0}x_{j}}
+\frac{\partial \ h_{n}}{\partial \ {}^{0}\boldsymbol{x}}
+
+= {}^{0}\boldsymbol{J}^{-1} \
+\frac{\partial \ h_{n}}{\partial \ \boldsymbol{r}}
+$$
+
+$$
+\frac{\partial \ h_{n}}{\partial \ {}^{0}x_{j}}
 = {}^{0}J_{jo}^{-1} \frac{\partial \ h_{n}}{\partial \ r_{o}}
-= {}^{0}J_{jo}^{-1} h_{n,o}
+$$
+
+$$
+{}_{0}h_{n,j}
+= h_{n,o} \ {}^{0}J_{oj}^{-1}
 $$
 
 ##### Displacement Increment Derivative with Respect to Global Coordinate
 
 $$
 u_{i}
-= h_{n} \ U_{in}
+= U_{in} \ h_{n}
 $$
 
 $$
 {}_{0}u_{i,j}
 = \frac{\partial u_{i}}{\partial \ {}^{0}x_{j}}
-= {}_{0}h_{n,j} \ U_{in}
+= U_{in} \ {}_{0}h_{n,j}
 $$
 
 ##### Temporal Displacement Derivative with Respect to Global Coordinate
 
 $$
 {}^{t}u_{i}
-= h_{n} \ {}^{t}U_{in}
+= {}^{t}U_{in} \ h_{n}
 $$
 
 $$
 {}_{0}^{t}u_{i,j}
 = \frac{\partial \ {}^{t}u_{i}}{\partial \ {}^{0}x_{j}}
-= {}_{0}h_{n,j} \ {}^{t}U_{in}
+= {}^{t}U_{in} \ {}_{0}h_{n,j}
 $$
 
 ##### Linear Strain Tensor
@@ -111,13 +120,13 @@ $$
 \Big) \\
 
 &= \frac{1}{2}
+U_{qn}
 \Big(
 {}_{0}h_{n,j} \ \delta_{iq} +
 {}_{0}h_{n,i} \ \delta_{jq} +
 {}_{0}^{t}u_{q,i} \ {}_{0}h_{n,j} +
 {}_{0}h_{n,i} \ {}_{0}^{t}u_{q,j}
-\Big)
-U_{qn} \\
+\Big) \\
 
 \end{align}
 $$
@@ -132,7 +141,8 @@ $$
 $$
 \delta \ {}_{0}^{t}e_{ij}
 
-= {}_{0}e_{ij,pm} \ \delta U_{pm}
+= \frac{\partial \ {}_{0}^{t}e_{ij}}{\partial \ U_{pm}} \
+\delta U_{pm}
 
 = \frac{1}{2}
 \Big(
