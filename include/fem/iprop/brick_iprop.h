@@ -112,20 +112,22 @@ struct BrickInterpPoly {
   static inline T compute_d1_r1(T r0, T r1, T r2);
   static inline T compute_d1_r2(T r0, T r1, T r2);
 };
-template <typename T, unsigned int I>
-struct BrickInterpPoly<T,I,8> {
-  static inline T compute(T r0, T r1, T r2) {
-    return BrickInterpMono<T,I>::compute(r0, r1, r2);
-  }
-  static inline T compute_d1_r0(T r0, T r1, T r2) {
-    return BrickInterpMono<T,I>::compute_d1_r0(r0, r1, r2);
-  }
-  static inline T compute_d1_r1(T r0, T r1, T r2) {
-    return BrickInterpMono<T,I>::compute_d1_r1(r0, r1, r2);
-  }
-  static inline T compute_d1_r2(T r0, T r1, T r2) {
-    return BrickInterpMono<T,I>::compute_d1_r2(r0, r1, r2);
-  }
+
+#define FORM_REGISTER_BRICKINTERPPOLY_GEN(i, n) \
+template <typename T> \
+  struct BrickInterpPoly<T,i,n> { \
+  static inline T compute(T r0, T r1, T r2) { \
+    return BrickInterpMono<T,i>::compute(r0, r1, r2); \
+  } \
+  static inline T compute_d1_r0(T r0, T r1, T r2) { \
+    return BrickInterpMono<T,i>::compute_d1_r0(r0, r1, r2); \
+  } \
+  static inline T compute_d1_r1(T r0, T r1, T r2) { \
+    return BrickInterpMono<T,i>::compute_d1_r1(r0, r1, r2); \
+  } \
+  static inline T compute_d1_r2(T r0, T r1, T r2) { \
+    return BrickInterpMono<T,i>::compute_d1_r2(r0, r1, r2); \
+  } \
 };
 
 #define FORM_REGISTER_BRICKINTERPPOLY_N20_LOWER(i, j, k, l) \
@@ -161,6 +163,25 @@ struct BrickInterpPoly<T,I,8> {
     } \
   };
 
+// C3D8, C3D8R
+FORM_REGISTER_BRICKINTERPPOLY_GEN(0, 8)
+FORM_REGISTER_BRICKINTERPPOLY_GEN(1, 8)
+FORM_REGISTER_BRICKINTERPPOLY_GEN(2, 8)
+FORM_REGISTER_BRICKINTERPPOLY_GEN(3, 8)
+FORM_REGISTER_BRICKINTERPPOLY_GEN(4, 8)
+FORM_REGISTER_BRICKINTERPPOLY_GEN(5, 8)
+FORM_REGISTER_BRICKINTERPPOLY_GEN(6, 8)
+FORM_REGISTER_BRICKINTERPPOLY_GEN(7, 8)
+// C3D8I
+FORM_REGISTER_BRICKINTERPPOLY_GEN(0, 11)
+FORM_REGISTER_BRICKINTERPPOLY_GEN(1, 11)
+FORM_REGISTER_BRICKINTERPPOLY_GEN(2, 11)
+FORM_REGISTER_BRICKINTERPPOLY_GEN(3, 11)
+FORM_REGISTER_BRICKINTERPPOLY_GEN(4, 11)
+FORM_REGISTER_BRICKINTERPPOLY_GEN(5, 11)
+FORM_REGISTER_BRICKINTERPPOLY_GEN(6, 11)
+FORM_REGISTER_BRICKINTERPPOLY_GEN(7, 11)
+// C3D20, C3D20R
 FORM_REGISTER_BRICKINTERPPOLY_N20_LOWER(0, 8, 11, 16)
 FORM_REGISTER_BRICKINTERPPOLY_N20_LOWER(1, 8, 9, 17)
 FORM_REGISTER_BRICKINTERPPOLY_N20_LOWER(2, 9, 10, 18)
@@ -169,36 +190,18 @@ FORM_REGISTER_BRICKINTERPPOLY_N20_LOWER(4, 12, 15, 16)
 FORM_REGISTER_BRICKINTERPPOLY_N20_LOWER(5, 12, 13, 17)
 FORM_REGISTER_BRICKINTERPPOLY_N20_LOWER(6, 13, 14, 18)
 FORM_REGISTER_BRICKINTERPPOLY_N20_LOWER(7, 14, 15, 19)
-
-#define FORM_REGISTER_BRICKINTERPPOLY_N20_HIGHER(i) \
-template <typename T> \
-  struct BrickInterpPoly<T,i,20> { \
-  static inline T compute(T r0, T r1, T r2) { \
-    return BrickInterpMono<T,i>::compute(r0, r1, r2); \
-  } \
-  static inline T compute_d1_r0(T r0, T r1, T r2) { \
-    return BrickInterpMono<T,i>::compute_d1_r0(r0, r1, r2); \
-  } \
-  static inline T compute_d1_r1(T r0, T r1, T r2) { \
-    return BrickInterpMono<T,i>::compute_d1_r1(r0, r1, r2); \
-  } \
-  static inline T compute_d1_r2(T r0, T r1, T r2) { \
-    return BrickInterpMono<T,i>::compute_d1_r2(r0, r1, r2); \
-  } \
-};
-
-FORM_REGISTER_BRICKINTERPPOLY_N20_HIGHER(8)
-FORM_REGISTER_BRICKINTERPPOLY_N20_HIGHER(9)
-FORM_REGISTER_BRICKINTERPPOLY_N20_HIGHER(10)
-FORM_REGISTER_BRICKINTERPPOLY_N20_HIGHER(11)
-FORM_REGISTER_BRICKINTERPPOLY_N20_HIGHER(12)
-FORM_REGISTER_BRICKINTERPPOLY_N20_HIGHER(13)
-FORM_REGISTER_BRICKINTERPPOLY_N20_HIGHER(14)
-FORM_REGISTER_BRICKINTERPPOLY_N20_HIGHER(15)
-FORM_REGISTER_BRICKINTERPPOLY_N20_HIGHER(16)
-FORM_REGISTER_BRICKINTERPPOLY_N20_HIGHER(17)
-FORM_REGISTER_BRICKINTERPPOLY_N20_HIGHER(18)
-FORM_REGISTER_BRICKINTERPPOLY_N20_HIGHER(19)
+FORM_REGISTER_BRICKINTERPPOLY_GEN(8, 20)
+FORM_REGISTER_BRICKINTERPPOLY_GEN(9, 20)
+FORM_REGISTER_BRICKINTERPPOLY_GEN(10, 20)
+FORM_REGISTER_BRICKINTERPPOLY_GEN(11, 20)
+FORM_REGISTER_BRICKINTERPPOLY_GEN(12, 20)
+FORM_REGISTER_BRICKINTERPPOLY_GEN(13, 20)
+FORM_REGISTER_BRICKINTERPPOLY_GEN(14, 20)
+FORM_REGISTER_BRICKINTERPPOLY_GEN(15, 20)
+FORM_REGISTER_BRICKINTERPPOLY_GEN(16, 20)
+FORM_REGISTER_BRICKINTERPPOLY_GEN(17, 20)
+FORM_REGISTER_BRICKINTERPPOLY_GEN(18, 20)
+FORM_REGISTER_BRICKINTERPPOLY_GEN(19, 20)
 
 template <typename T, unsigned int I, unsigned int N> struct BrickInterpDeriv {
   static inline void interp_deriv(T* const h, T r0, T r1, T r2) {

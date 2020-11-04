@@ -481,7 +481,7 @@ void test_brick_form(
       << ", BrickIPropType: " << typeid(BrickIPropType<double>).name()
       << ", BrickTLFormType: " << typeid(BrickTLFormType<double>).name();
   } else {
-    LOG(INFO) << "test_brick_tl_form fail, T: " << typeid(double).name()
+    LOG(FATAL) << "test_brick_tl_form fail, T: " << typeid(double).name()
       << ", BrickIPropType: " << typeid(BrickIPropType<double>).name()
       << ", BrickTLFormType: " << typeid(BrickTLFormType<double>).name();
   }
@@ -864,7 +864,7 @@ void test_brick_form_gen(
       << ", BrickIPropType: " << typeid(BrickIPropType<double>).name()
       << ", BrickTLFormType: " << typeid(BrickTLFormType<double>).name();
   } else {
-    LOG(INFO) << "test_brick_tl_form fail, T: " << typeid(double).name()
+    LOG(FATAL) << "test_brick_tl_form fail, T: " << typeid(double).name()
       << ", BrickIPropType: " << typeid(BrickIPropType<double>).name()
       << ", BrickTLFormType: " << typeid(BrickTLFormType<double>).name();
   }
@@ -875,9 +875,9 @@ int main(int argc, char* argv[]) {
   google::InitGoogleLogging(argv[0]);
   FLAGS_logtostderr = 1;
   // tests
-  // test_brick_form<
-    // fem::Ela3D,fem::C3D20RIProp,fem::C3D20RTLForm>(false, 1e-6, 1);
-  test_brick_form_gen<
-    fem::Ela3D,fem::C3D8IProp,fem::C3D8TLForm>(false, 1e-6, 1);
+  test_brick_form<
+    fem::Ela3D,fem::C3D20RIProp,fem::C3D20RTLForm>(false, 1e-6, 1);
+  // test_brick_form_gen<
+    // fem::Ela3D,fem::C3D8IProp,fem::C3D8TLForm>(false, 1e-6, 1);
   return 0;
 }
