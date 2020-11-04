@@ -144,8 +144,8 @@ c3d8UnitNodes = [
 c3d8Unit = Element(c3d8UnitNodes)
 
 if __name__ == '__main__':
-    th = 0.3
-    elem = Element.perturb(c3d20Unit, th=0.3)
+    th = 0.2
+    elem = Element.perturb(c3d8Unit, th=th)
     origin = Node(0.5,0.5,0.5)
     alpha = 0.3
     beta = 1.5
@@ -153,5 +153,6 @@ if __name__ == '__main__':
     elem = Element.rotate_3d(
         elem, origin=origin,
         alpha=alpha, beta=beta, gamma=gamma)
-    otype = "form"
+    otype = "inp"
     print(elem.serialize(otype=otype))
+

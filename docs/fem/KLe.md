@@ -456,3 +456,86 @@ $$
 
 
 
+#### Incompatible
+
+$$
+u_{i}
+= U_{in} \ h_{n} + 
+U_{in}^{*} \ h_{n}^{*}
+$$
+
+$$
+{}_{0}u_{i,j}
+= \frac{\partial u_{i}}{\partial \ {}^{0}x_{j}}
+= U_{in} \ {}_{0}h_{n,j} + U_{in}^{*} \ {}_{0}h_{n,j}^{*}
+$$
+
+$$
+\begin{align}
+
+{}_{0}e_{ij}
+
+&= \frac{1}{2}
+\Big(
+{}_{0}u_{i,j} +
+{}_{0}u_{j,i}
+\Big) \\
+
+&= \frac{1}{2}
+U_{qn}
+\Big(
+{}_{0}h_{n,j} \ \delta_{iq} +
+{}_{0}h_{n,i} \ \delta_{jq}
+\Big) +
+\frac{1}{2}
+U_{qn}^{*}
+\Big(
+{}_{0}h_{n,j}^{*} \ \delta_{iq} +
+{}_{0}h_{n,i}^{*} \ \delta_{jq}
+\Big)\\
+
+\end{align}
+$$
+
+$$
+{}_{0}e_{ij} = {}_{0}e_{ji}
+$$
+
+
+
+
+$$
+\begin{align}
+
+\delta \ {}_{0}e_{ij}
+
+&= \frac{\partial \ {}_{0}e_{ij}}{\partial \ U_{pm}} \
+\delta U_{pm} + 
+\frac{\partial \ {}_{0}e_{ij}}{\partial \ U_{pm}^{*}} \
+\delta U_{pm}^{*} \\
+
+&= \frac{1}{2}
+\Big(
+{}_{0}h_{m,j} \ \delta_{ip} +
+{}_{0}h_{m,i} \ \delta_{jp}
+\Big) \
+\delta U_{pm} +
+\frac{1}{2}
+\Big(
+{}_{0}h_{m,j}^{*} \ \delta_{ip} +
+{}_{0}h_{m,i}^{*} \ \delta_{jp}
+\Big) \
+\delta U_{pm}^{*}
+\end{align}
+$$
+
+$$
+\delta \ {}_{0}e_{ij} = \delta \ {}_{0}e_{ji}
+$$
+
+
+$$
+{}_{0}^{t}C_{ijrs} \ {}_{0}e_{rs} \ \delta \ {}_{0}e_{ij}
+
+= 
+$$
