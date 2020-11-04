@@ -234,8 +234,8 @@ struct BrickIPropInitializer : IPropInitializer<T> {
     auto NI = N0 * N1 * N2;
     GaussRoots<T,3,N0,N1,N2> gr;
     GaussWeights<T,3,N0,N1,N2> gw;
-    T* r = gr.roots;
-    auto * h = hbuf;
+    auto r = gr.roots;
+    auto h = hbuf;
     auto stride_h = N * 3;
     for (unsigned int i = 0; i < NI; ++i) {
       brick_interp_deriv<T,N>(h, r[0], r[1], r[2]);
