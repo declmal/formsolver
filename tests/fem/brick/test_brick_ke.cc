@@ -596,7 +596,6 @@ void test_brick_form_gen(
       print_mat<double>(Ke, nRowKe, nRowKe);
     }
   } 
-  std::cout << Ke[23*60+23] << std::endl;
   
   // validate
   double _co[3*8];
@@ -605,7 +604,7 @@ void test_brick_form_gen(
   transpose<double>(_co, 3, 8, co);
 
   int kon[20] = {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20}; /* input */
-  char lakonl[8] = "C3D8I"; /* input */
+  char lakonl[8] = "C3D8"; /* input */
   double* p1 = NULL;
   double* p2 = NULL;
   double omx = 0;
@@ -837,13 +836,17 @@ void test_brick_form_gen(
     &mscalmethod
   );
   full_sym<double>(s, 60);
-  std::cout << "1: " << s[23*60+23] << std::endl;
-  std::cout << "2: " << s[2*60+13] << std::endl;
-  std::cout << "3: " << s[9*60+12] << std::endl;
-  std::cout << "4: " << s[2*60+3] << std::endl;
-  std::cout << "5: " << s[22*60+18] << std::endl;
-  bool flag  = validate<double>(Ke, s, 3600, tol);
+  auto ns = (double*)malloc(24*24*sizeof(double));
+  for (unsigned int i = 0; i < 24; ++i) {
+    for (unsigned int j = 0; j < 24; ++j) {
+      auto ind1 = i*24 + j;
+      auto ind2 = i*60 + j;
+      ns[ind1] = s[ind2];
+    }
+  }
+  bool flag = validate<double>(Ke, ns, 24*24, tol);
   // free
+  free(ns);
   free(X0);
   free(Ut);
   free(S0t);
@@ -877,7 +880,7 @@ int main(int argc, char* argv[]) {
   // tests
   test_brick_form<
     fem::Ela3D,fem::C3D20RIProp,fem::C3D20RTLForm>(false, 1e-6, 1);
-  // test_brick_form_gen<
-    // fem::Ela3D,fem::C3D8IProp,fem::C3D8TLForm>(false, 1e-6, 1);
+  test_brick_form_gen<
+    fem::Ela3D,fem::C3D8IProp,fem::C3D8TLForm>(false, 1e-6, 1);
   return 0;
 }

@@ -180,7 +180,6 @@ struct TLForm {
       Matmul2DNFFFFDN<T,Dim>::matmul2_dnf_ff_fdn(B0NL, tile, N, buf, tmpK);
       matinc_mul<T>(tmpK, nEntryKe, Ke, weights[i]*abs(detJ0));
     }
-    printf("hihihihhih\n\n\n\n\n");
     return 0;
   }
 
