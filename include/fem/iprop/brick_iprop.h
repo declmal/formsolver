@@ -181,6 +181,54 @@ FORM_REGISTER_BRICKINTERPPOLY_GEN(4, 11)
 FORM_REGISTER_BRICKINTERPPOLY_GEN(5, 11)
 FORM_REGISTER_BRICKINTERPPOLY_GEN(6, 11)
 FORM_REGISTER_BRICKINTERPPOLY_GEN(7, 11)
+
+template <typename T>
+struct BrickInterpPoly<T,8,11> {
+  static inline T compute(T r0, T r1, T r2) {
+    return BrickInterpFact<T,0>::compute(r0);
+  }
+  static inline T compute_d1_r0(T r0, T r1, T r2) {
+    return BrickInterpFact<T,0>::compute_deriv_1st(r0);
+  }
+  static inline T compute_d1_r1(T r0, T r1, T r2) {
+    return (T)0;
+  }
+  static inline T compute_d1_r2(T r0, T r1, T r2) {
+    return (T)0;
+  }
+};
+
+template <typename T>
+struct BrickInterpPoly<T,9,11> {
+  static inline T compute(T r0, T r1, T r2) {
+    return BrickInterpFact<T,0>::compute(r1);
+  }
+  static inline T compute_d1_r0(T r0, T r1, T r2) {
+    return (T)0;
+  }
+  static inline T compute_d1_r1(T r0, T r1, T r2) {
+    return BrickInterpFact<T,0>::compute_deriv_1st(r1);
+  }
+  static inline T compute_d1_r2(T r0, T r1, T r2) {
+    return (T)0;
+  }
+};
+
+template <typename T>
+struct BrickInterpPoly<T,10,11> {
+  static inline T compute(T r0, T r1, T r2) {
+    return BrickInterpFact<T,0>::compute(r2);
+  }
+  static inline T compute_d1_r0(T r0, T r1, T r2) {
+    return (T)0;
+  }
+  static inline T compute_d1_r1(T r0, T r1, T r2) {
+    return (T)0;
+  }
+  static inline T compute_d1_r2(T r0, T r1, T r2) {
+    return BrickInterpFact<T,0>::compute_deriv_1st(r2);
+  }
+};
 // C3D20, C3D20R
 FORM_REGISTER_BRICKINTERPPOLY_N20_LOWER(0, 8, 11, 16)
 FORM_REGISTER_BRICKINTERPPOLY_N20_LOWER(1, 8, 9, 17)
@@ -212,7 +260,8 @@ template <typename T, unsigned int I, unsigned int N> struct BrickInterpDeriv {
     h[ind+2] = BrickInterpPoly<T,I,N>::compute_d1_r2(r0, r1, r2);
   }
 };
-template <typename T, unsigned int N> struct BrickInterpDeriv<T,0,N> {
+template <typename T, unsigned int N> 
+struct BrickInterpDeriv<T,0,N> {
   static inline void interp_deriv(T* const h, T r0, T r1, T r2) {
     h[0] = BrickInterpPoly<T,0,N>::compute_d1_r0(r0, r1, r2);
     h[1] = BrickInterpPoly<T,0,N>::compute_d1_r1(r0, r1, r2);
@@ -220,7 +269,8 @@ template <typename T, unsigned int N> struct BrickInterpDeriv<T,0,N> {
   } 
 };
 
-template <typename T, unsigned int N> void brick_interp_deriv(
+template <typename T, unsigned int N> 
+void brick_interp_deriv(
   T* const h, T r0, T r1, T r2) {
   BrickInterpDeriv<T,N-1,N>::interp_deriv(h, r0, r1, r2);
 }

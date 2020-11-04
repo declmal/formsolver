@@ -14,6 +14,14 @@ FORM_REGISTER_BRICK_ELEMENT_TL(C3D8, 2, 2, 2, 8, 3)
 FORM_REGISTER_BRICK_ELEMENT_TL(C3D20, 3, 3, 3, 20, 3)
 FORM_REGISTER_BRICK_ELEMENT_TL(C3D20R, 2, 2, 2, 20, 3)
 FORM_REGISTER_BRICK_ELEMENT_TL(C3D8I, 2, 2, 2, 11, 3)
+
+template <typename T>
+struct C3D8IIProp0 {
+  T hbuf0[24];
+  C3D8IIProp0() {
+    brick_interp_deriv<T,8>(hbuf0, 0, 0, 0);
+  }
+};
 } // namespace fem
 
 #endif // FEM_ELEMENT_BRICK_H_

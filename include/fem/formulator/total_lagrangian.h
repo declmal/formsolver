@@ -280,6 +280,50 @@ struct TLForm {
   }
 };
 
+template <typename T>
+struct TLForm<T,8,11,3> {
+  static int form_linear_elem_stiff(
+    const T* const X0, const T* const hbuf, const T* const hbuf0, 
+    const T* const weights,
+    const T* const C, T* const J0, T* const Jc, T* const invJ0, 
+    T* const invJc,
+    T* const h0, T* const B, T* const buf, T* const tmpK,
+    T* const Ke) {
+    print_mat<T>(hbuf0, 8, 3);
+    print_mat<T>(X0, 3, 8);
+    MatmulDNND<T,3>::matmul_dnnd(X0, hbuf0, 8, Jc);
+    auto detJc = DetDD<T,3>::det_dd(Jc);
+    if (abs(detJc) < DetDD<T,3>::tol) {
+      printf("singular jacobian matrix");
+      return -1;
+    }
+    InvDD<T,3>::inv_dd(Jc, detJc, invJc);
+    print_mat<T>(invJc, 3, 3);
+    auto rowKe = 3 * 11;
+    auto nEntryKe = rowKe * rowKe;
+    init_zero<T>(Ke, nEntryKe);
+    auto h = hbuf;
+    auto stride_h = 3 * 11;
+    for (unsigned int i = 0; i < 8; ++i) {
+      MatmulDNND<T,3>::matmul_dnnd(X0, h, 8, J0);
+      auto detJ0 = DetDD<T,3>::det_dd(J0);
+      auto absDetJ0 = abs(detJ0);
+      if ((double)absDetJ0 < DetDD<T,3>::tol) {
+        printf("singular jacobian matrix\n");
+        return -1;
+      }
+      InvDD<T,3>::inv_dd(J0, detJ0, invJ0);
+      MatmulNDDD<T,3>::matmul_nddd(h, invJ0, 8, h0);
+      MatmulNDDD<T,3>::matmul_nddd(h+24, invJc, 3, h0+24);
+      h += stride_h;
+      LinTransMat<T,3>::lin_trans_mat(h0, 11, B);
+      Matmul2DNEEEEDN<T,3>::matmul2_dne_ee_edn(B, C, 11, buf, tmpK);
+      matinc_mul<T>(tmpK, nEntryKe, Ke, weights[i]*absDetJ0);
+    }
+    return 0;
+  }
+};
+
 #define FORM_REGISTER_ELEM_FORM(ElemType, NI, N, Dim) \
   template <typename T> \
   using ElemType##TLForm = TLForm<T,NI,N,Dim>;

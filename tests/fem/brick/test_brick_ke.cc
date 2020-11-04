@@ -488,11 +488,9 @@ void test_brick_form(
 }
 
 template <
-  template <typename> class MatType,
-  template <typename> class BrickIPropType,
-  template <typename> class BrickTLFormType
+  template <typename> class MatType
 >
-void test_brick_form_gen(
+void test_c3d8_tl(
   bool layout=true, double tol=1e-6, unsigned int form=0) {
   double E = 2e5;
   double nu = 0.3;
@@ -500,20 +498,21 @@ void test_brick_form_gen(
   // execute
   double p[2] = {E, nu};
   MatType<double> m(p);
-  BrickIPropType<double> bi;
-  auto Dim = BrickIPropType<double>::get_ndim();
-  auto N = BrickIPropType<double>::get_num_nodes();
+  fem::C3D8IIProp<double> iprop;
+  auto Dim = 3;
+  auto N = 11;
   std::cout << "Dim: " << Dim << ", N: " << N << std::endl;
   // init X0
-  auto nEntryX0 = Dim * N;
+  auto nEntryX0 = Dim * 8;
   auto X0 = (double*)malloc(nEntryX0*sizeof(double));
-  // for debug purpose
-  // print_mat<double>(X0, Dim, N);
-  init_x<double>(X0, Dim, N);
+  init_x<double>(X0, Dim, 8);
   // init hbuf
-  auto hbuf = bi.get_hbuf();
+  auto hbuf = iprop.get_hbuf();
+  // hbuf0
+  fem::C3D8IIProp0<double> iprop0;
+  auto hbuf0 = iprop0.hbuf0;
   // init weights
-  auto weights = bi.get_weights();
+  auto weights = iprop.get_weights();
   // init Ut
   auto nEntryUt = Dim * N;
   auto Ut = (double*)malloc(nEntryUt*sizeof(double));
@@ -527,9 +526,15 @@ void test_brick_form_gen(
   // init J0
   auto nEntryJ0 = Dim * Dim;
   auto J0 = (double*)malloc(nEntryJ0*sizeof(double));
+  // init Jc
+  auto nEntryJc = Dim * Dim;
+  auto Jc = (double*)malloc(nEntryJc*sizeof(double));
   // init invJ0
   auto nEntryInvJ0 = Dim * Dim;
   auto invJ0 = (double*)malloc(nEntryInvJ0*sizeof(double));
+  // init invJc
+  auto nEntryInvJc = Dim * Dim;
+  auto invJc = (double*)malloc(nEntryInvJc*sizeof(double));
   // init BdilBar
   auto nRowBdilBar = 3*Dim - 3;
   auto nColBdilBar = Dim * N;
@@ -573,18 +578,9 @@ void test_brick_form_gen(
   auto Ke = (double*)malloc(nEntryKe*sizeof(double));
   // run
   int ret;
-  if (form == 0) {
-    ret = BrickTLFormType<double>::form_elem_stiff(
-      X0, hbuf, weights, Ut, C0, S0t, J0, invJ0, h0, u0t, B0tL, buf, tmpK, B0NL, tile, Ke);
-  } else if (form == 1) {
-    ret = BrickTLFormType<double>::form_linear_elem_stiff(
-      X0, hbuf, weights, C0, J0, invJ0, h0, B0tL, buf, tmpK, Ke);
-  } else {
-    ret = BrickTLFormType<double>::form_linear_elem_stiff_Bbar(
-      X0, hbuf, weights, C0,
-      J0, invJ0, 
-      BdilBar, tmpB, h0, B0tL, buf, tmpK, Ke);
-  }
+  ret = fem::C3D8ITLForm<double>::form_linear_elem_stiff(
+    X0, hbuf, hbuf0, weights, C0, J0, Jc, invJ0, invJc,
+    h0, B0tL, buf, tmpK, Ke);
   if (!check_sym<double>(Ke, nRowKe, tol)) {
     ret = -1;
   } else {
@@ -604,7 +600,7 @@ void test_brick_form_gen(
   transpose<double>(_co, 3, 8, co);
 
   int kon[20] = {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20}; /* input */
-  char lakonl[8] = "C3D8"; /* input */
+  char lakonl[8] = "C3D8I"; /* input */
   double* p1 = NULL;
   double* p2 = NULL;
   double omx = 0;
@@ -836,22 +832,24 @@ void test_brick_form_gen(
     &mscalmethod
   );
   full_sym<double>(s, 60);
-  auto ns = (double*)malloc(24*24*sizeof(double));
-  for (unsigned int i = 0; i < 24; ++i) {
-    for (unsigned int j = 0; j < 24; ++j) {
-      auto ind1 = i*24 + j;
+  auto ns = (double*)malloc(33*33*sizeof(double));
+  for (unsigned int i = 0; i < 33; ++i) {
+    for (unsigned int j = 0; j < 33; ++j) {
+      auto ind1 = i*33 + j;
       auto ind2 = i*60 + j;
       ns[ind1] = s[ind2];
     }
   }
-  bool flag = validate<double>(Ke, ns, 24*24, tol);
+  bool flag = validate<double>(Ke, ns, 33*33, tol);
   // free
   free(ns);
   free(X0);
   free(Ut);
   free(S0t);
   free(J0);
+  free(Jc);
   free(invJ0);
+  free(invJc);
   free(BdilBar);
   free(tmpB);
   free(h0);
@@ -863,13 +861,9 @@ void test_brick_form_gen(
   free(tile);
   free(Ke);
   if (flag) {
-    LOG(INFO) << "test_brick_tl_form succeed, T: " << typeid(double).name()
-      << ", BrickIPropType: " << typeid(BrickIPropType<double>).name()
-      << ", BrickTLFormType: " << typeid(BrickTLFormType<double>).name();
+    LOG(INFO) << "test_brick_tl_form succeed, T: " << typeid(double).name();
   } else {
-    LOG(FATAL) << "test_brick_tl_form fail, T: " << typeid(double).name()
-      << ", BrickIPropType: " << typeid(BrickIPropType<double>).name()
-      << ", BrickTLFormType: " << typeid(BrickTLFormType<double>).name();
+    LOG(FATAL) << "test_brick_tl_form fail, T: " << typeid(double).name();
   }
 }
 
@@ -880,7 +874,6 @@ int main(int argc, char* argv[]) {
   // tests
   test_brick_form<
     fem::Ela3D,fem::C3D20RIProp,fem::C3D20RTLForm>(false, 1e-6, 1);
-  test_brick_form_gen<
-    fem::Ela3D,fem::C3D8IProp,fem::C3D8TLForm>(false, 1e-6, 1);
+  test_c3d8_tl<fem::Ela3D>(false, 1e-6, 1);
   return 0;
 }
