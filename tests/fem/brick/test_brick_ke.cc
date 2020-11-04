@@ -2,7 +2,9 @@
 #include <fem/mat/elastic.h>
 #include <fem/element/brick.h>
 #include "common_brick.h"
-#include <iostream>
+#include <iostream> // for debug
+#include <string>
+#include <string.h>
 
 extern "C" {
   void e_c3d_(
@@ -115,7 +117,7 @@ template <
   template <typename> class BrickTLFormType
 >
 void test_brick_form(
-  bool layout=true, double tol=1e-6, unsigned int form=0) {
+  std::string etype, bool layout=true, double tol=1e-6, unsigned int form=0) {
   double E = 2e5;
   double nu = 0.3;
 
@@ -217,7 +219,6 @@ void test_brick_form(
       print_mat<double>(Ke, nRowKe, nRowKe);
     }
   } 
-  std::cout << Ke[59*60+59] << std::endl;
   
   // validate
   double _co[3*20];
@@ -226,7 +227,8 @@ void test_brick_form(
   transpose<double>(_co, 3, 20, co);
 
   int kon[20] = {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20}; /* input */
-  char lakonl[8] = "C3D20R"; /* input */
+  char lakonl[8]; /* input */
+  strcpy(lakonl, etype.c_str());
   double* p1 = NULL;
   double* p2 = NULL;
   double omx = 0;
@@ -458,7 +460,6 @@ void test_brick_form(
     &mscalmethod
   );
   full_sym<double>(s, 60);
-  std::cout << s[59*60+59] << std::endl;
   bool flag  = validate<double>(Ke, s, 3600, tol);
   // free
   free(X0);
@@ -501,7 +502,6 @@ void test_c3d8_tl(
   fem::C3D8IIProp<double> iprop;
   auto Dim = 3;
   auto N = 11;
-  std::cout << "Dim: " << Dim << ", N: " << N << std::endl;
   // init X0
   auto nEntryX0 = Dim * 8;
   auto X0 = (double*)malloc(nEntryX0*sizeof(double));
@@ -873,7 +873,7 @@ int main(int argc, char* argv[]) {
   FLAGS_logtostderr = 1;
   // tests
   test_brick_form<
-    fem::Ela3D,fem::C3D20RIProp,fem::C3D20RTLForm>(false, 1e-6, 1);
+    fem::Ela3D,fem::C3D20RIProp,fem::C3D20RTLForm>("C3D20R", false, 1e-6, 1);
   test_c3d8_tl<fem::Ela3D>(false, 1e-6, 1);
   return 0;
 }
