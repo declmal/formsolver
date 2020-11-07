@@ -1,9 +1,9 @@
 import os
 import math
 import numpy as np
-import scipy
-from scipy.spatial import KDTree
+
 from os import path
+from rtree import index
 
 
 class Coord:
@@ -14,6 +14,9 @@ class Coord:
 
     def get_coord(self):
         return self.x, self.y, self.z
+
+    def get_coord_bbox(self):
+        return self.get_coord() + self.get_coord()
 
     @staticmethod
     def get_mid_coord(coord1, coord2):
@@ -35,27 +38,32 @@ class Node:
 
     def to_inp(self):
         x, y, z = self.get_coord()
-        return ','.join([str(self.nodeId), str(x), str(y), str(z)])
+        return ','.join([str(self.nodeId+1), str(x), str(y), str(z)])
 
 
 class NodeSet:
     def __init__(self, dstTol=1e-6):
         self.nodeLst = []
         self.dstTol = dstTol
+        p = index.Property()
+        p.dimension = 3
+        self.idx = index.Index(properties=p)
 
     def insert_node(self, coord):
         cx, cy, cz = coord.get_coord()
-        minDst, nodeId = -1, -1
-        for node in self.nodeLst:
-            nx, ny, nz = node.get_coord()
+        coordBbox = coord.get_coord_bbox()
+        hits = list(self.idx.nearest(coordBbox, 1, objects=True))
+        if hits:
+            nx, ny, nz, _, _, _ = hits[0].bbox
             dx, dy, dz = nx-cx, ny-cy, nz-cz
             dst = math.sqrt(dx*dx + dy*dy + dz*dz)
-            if minDst == -1 or dst < minDst:
-                minDst, nodeId = dst, node.get_id()
-        if minDst > self.dstTol or minDst == -1:
-            nodeId = len(self.nodeLst)
-            node = Node(coord, nodeId)
-            self.nodeLst.append(node)
+            if dst < self.dstTol:
+                return hits[0].id
+        nodeId = len(self.nodeLst)
+        node = Node(coord, nodeId)
+        self.nodeLst.append(node)
+        self.idx.insert(nodeId, coordBbox)
+        print(coordBbox)
         return nodeId
 
     def __iter__(self):
@@ -68,8 +76,8 @@ class Element:
         self.nodeIds = nodeIds
 
     def to_inp(self):
-        return ','.join([
-            str(self.elemId)] +
+        return ','.join(
+            [str(self.elemId+1)] +
             [str(nodeId) for nodeId in self.nodeIds]
         )
 
@@ -217,7 +225,7 @@ class Model:
         inpContent += '\n'.join(
             [node.to_inp() for node in self.nodeSet]
         )
-        inpContent = "*Element\n"
+        inpContent += "*Element\n"
         inpContent += '\n'.join(
             [elem.to_inp() for elem in self.elemSet]
         )
