@@ -40,6 +40,15 @@ class Node:
         x, y, z = self.get_coord()
         return ','.join([str(self.nodeId+1), str(x), str(y), str(z)])
 
+    def to_vtk_point(self):
+        return ' '.join([str(c) for c in self.get_coord()])
+
+    def to_vtk_cell(self):
+        return ' '.join([str(1), str(self.nodeId)])
+
+    def to_vtk_cell_type(self):
+        return str(1)
+
 
 class NodeSet:
     def __init__(self, dstTol=1e-6):
@@ -66,6 +75,9 @@ class NodeSet:
         print(coordBbox)
         return nodeId
 
+    def get_size(self):
+        return len(self.nodeLst)
+
     def __iter__(self):
         return iter(self.nodeLst)
 
@@ -81,6 +93,20 @@ class Element:
             [str(nodeId+1) for nodeId in self.nodeIds]
         )
 
+    def to_vtk_cell(self):
+        return ' '.join(
+            [str(len(self.nodeIds))] + \
+            [str(nodeId) for nodeId in self.nodeIds]
+        )
+
+    @classmethod
+    def to_vtk_cell_type(cls):
+        raise NotImplementedError
+
+    @classmethod
+    def get_num_points(cls):
+        raise NotImplementedError
+
     @staticmethod
     def get_type():
         raise NotImplementedError
@@ -94,6 +120,14 @@ class C3D8(Element):
     def __init__(self, elemId, nodeIds):
         assert len(nodeIds) == 8
         super().__init__(elemId, nodeIds)
+
+    @classmethod
+    def to_vtk_cell_type(cls):
+        return str(12)
+
+    @classmethod
+    def get_num_points(cls):
+        return 8
 
     @staticmethod
     def get_type():
@@ -115,6 +149,14 @@ class C3D20(Element):
     def __init__(self, elemId, nodeIds):
         assert len(nodeIds) == 20
         super().__init__(elemId, nodeIds)
+
+    @classmethod
+    def to_vtk_cell_type(cls):
+        return str(25)
+
+    @classmethod
+    def get_num_points(cls):
+        return 20
 
     @staticmethod
     def get_type():
@@ -156,6 +198,9 @@ class ElemSet:
         elem = elemType.to_elem(nodeSet, coords, elemId)
         self.elemLst.append(elem)
 
+    def get_size(self):
+        return len(self.elemLst)
+
     def __iter__(self):
         return iter(self.elemLst)
 
@@ -181,7 +226,7 @@ class TunnelGeoType(GeoType):
     def create_mesh(self, elemType):
         dy = self.depth / self.num_layers
         dr = (self.r_out-self.r_in) / self.num_loops
-        dphi = 360 / self.num_slices
+        dphi = np.pi*2 / self.num_slices
         ox, oy, oz = self.orgCoord.get_coord()
         cy = oy
         elemSet = ElemSet()
@@ -236,16 +281,59 @@ class Model:
         with open(modelPath, 'w') as f:
             f.write(inpContent)
 
+    def to_vtk(self, modelName="model", modelDir=path.expanduser("~/.model")):
+        numElems = self.elemSet.get_size()
+        numNodes = self.nodeSet.get_size()
+        content = [
+            "# vtk DataFile Version 2.0",
+            modelName,
+            "ASCII",
+            "DATASET UNSTRUCTURED_GRID",
+            ' '.join([
+                "POINTS", str(self.nodeSet.get_size()), "double"
+            ]),
+            '\n'.join([
+                node.to_vtk_point() for node in self.nodeSet
+            ]) + '\n',
+            ' '.join([
+                "CELLS",
+                str(numNodes+numElems),
+                str(
+                    numNodes*2 + \
+                    numElems*(1+elemType.get_num_points())
+                )
+            ]),
+            '\n'.join([
+                node.to_vtk_cell() for node in self.nodeSet
+            ]),
+            '\n'.join([
+                elem.to_vtk_cell() for elem in self.elemSet
+            ]) + '\n',
+            ' '.join([
+                "CELL_TYPES",
+                str(numNodes+numElems),
+            ]),
+            '\n'.join([
+                node.to_vtk_cell_type() for node in self.nodeSet
+            ]),
+            '\n'.join([
+                elem.to_vtk_cell_type() for elem in self.elemSet
+            ]),
+        ]
+        modelPath = path.join(modelDir, modelName+'.vtk')
+        with open(modelPath, "w") as f:
+            f.write('\n'.join(content))
+
     def to_json(self, modelName="model", modelDir=path.expanduser("~/.model")):
         pass
 
 if __name__ == "__main__":
     tunnelGeoAttrs = {
-        'num_layers': 50,
+        'num_layers': 500,
         'num_loops': 3,
-        'num_slices': 5,
+        'num_slices': 350,
     }
     geo = TunnelGeoType(**tunnelGeoAttrs)
     elemType = C3D20
     model = Model(geo, elemType)
-    model.to_inp()
+    model.to_vtk()
