@@ -78,7 +78,7 @@ class Element:
     def to_inp(self):
         return ','.join(
             [str(self.elemId+1)] +
-            [str(nodeId) for nodeId in self.nodeIds]
+            [str(nodeId+1) for nodeId in self.nodeIds]
         )
 
     @staticmethod
@@ -218,6 +218,7 @@ class TunnelGeoType(GeoType):
 
 class Model:
     def __init__(self, geo, elemType):
+        self.elemType = elemType
         self.elemSet, self.nodeSet = geo.create_mesh(elemType)
 
     def to_inp(self, modelName="model", modelDir=path.expanduser("~/.model")):
@@ -225,7 +226,9 @@ class Model:
         inpContent += '\n'.join(
             [node.to_inp() for node in self.nodeSet]
         )
-        inpContent += "*Element\n"
+        inpContent += "\n" + ','.join([
+            "*Element","TYPE={}".format(elemType.get_type())
+        ]) + "\n"
         inpContent += '\n'.join(
             [elem.to_inp() for elem in self.elemSet]
         )
@@ -237,7 +240,12 @@ class Model:
         pass
 
 if __name__ == "__main__":
-    geo = TunnelGeoType()
+    tunnelGeoAttrs = {
+        'num_layers': 50,
+        'num_loops': 3,
+        'num_slices': 5,
+    }
+    geo = TunnelGeoType(**tunnelGeoAttrs)
     elemType = C3D20
     model = Model(geo, elemType)
     model.to_inp()
