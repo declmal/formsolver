@@ -168,7 +168,7 @@ class C3D20(Element):
             Coord.get_mid_coord(coords[0],coords[1]),
             Coord.get_mid_coord(coords[1],coords[2]),
             Coord.get_mid_coord(coords[2],coords[3]),
-            Coord.get_mid_coord(coords[3],coords[1]),
+            Coord.get_mid_coord(coords[3],coords[0]),
             Coord.get_mid_coord(coords[4],coords[5]),
             Coord.get_mid_coord(coords[5],coords[6]),
             Coord.get_mid_coord(coords[6],coords[7]),
@@ -253,6 +253,16 @@ class TunnelGeoType(GeoType):
                     cphi = nphi
                 cr = nr
             cy = ny
+        numNodes = nodeSet.get_size()
+        elemTypeName = elemType.get_type()
+        numNodesRef = 0
+        if elemTypeName.startswith("C3D8"):
+            numNodesRef += (self.num_layers+1) * (self.num_loops+1) * self.num_slices
+        elif elemTypeName.startswith("C3D20"):
+            numNodesRef += (self.num_layers+1) * (self.num_loops+1) * self.num_slices * 2
+            numNodesRef += (self.num_layers+1) * self.num_loops * self.num_slices
+            numNodesRef += self.num_layers * (self.num_loops+1) * self.num_slices
+        assert numNodes == numNodesRef
         return elemSet, nodeSet
 
     def _get_coord(self, y, r, phi):
