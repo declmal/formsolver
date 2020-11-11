@@ -339,11 +339,12 @@ class Model:
 
 if __name__ == "__main__":
     tunnelGeoAttrs = {
-        'num_layers': 500,
+        'depth': 1000,
+        'num_layers': 5,
         'num_loops': 3,
         'num_slices': 350,
     }
     geo = TunnelGeoType(**tunnelGeoAttrs)
-    elemType = C3D20
+    elemType = C3D8
     model = Model(geo, elemType)
     model.to_vtk()
