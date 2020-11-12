@@ -1,6 +1,7 @@
 import os
 import math
 import numpy as np
+import subprocess
 
 from os import path
 from rtree import index
@@ -193,9 +194,9 @@ class ElemSet:
     def __init__(self):
         self.elemLst = []
 
-    def create_elem(self, elemType, nodeSet, coords):
+    def create_elem(self, ElemType, nodeSet, coords):
         elemId = len(self.elemLst)
-        elem = elemType.to_elem(nodeSet, coords, elemId)
+        elem = ElemType.to_elem(nodeSet, coords, elemId)
         self.elemLst.append(elem)
 
     def get_size(self):
@@ -206,38 +207,33 @@ class ElemSet:
 
 
 class GeoType:
-    def create_mesh(self):
-        raise NotImplementedError
+    def __init__(self, geoName, ElemType):
+        self.name = geoName
+        self.ElemType = ElemType
+        self.elemSet = ElemSet()
+        self.nodeSet = NodeSet()
 
 
-class TunnelGeoType(GeoType):
+class TunnelLining(GeoType):
     def __init__(
-        self, depth=100000, num_layers=500, r_out=9000, r_in=8500,
+        self, geoName, ElemType,
+        depth=100000, num_layers=500, r_out=9000, r_in=8500,
         num_loops=3, num_slices=50, orgCoord=Coord(0,0,0)):
-        print("num element:", num_layers*num_loops*num_slices)
-        self.depth = depth
-        self.num_layers = num_layers
-        self.r_out = r_out
-        self.r_in = r_in
-        self.num_loops = num_loops
-        self.num_slices = num_slices
-        self.orgCoord = orgCoord
-
-    def create_mesh(self, elemType):
-        dy = self.depth / self.num_layers
-        dr = (self.r_out-self.r_in) / self.num_loops
-        dphi = np.pi*2 / self.num_slices
-        ox, oy, oz = self.orgCoord.get_coord()
+        super().__init__(geoName, ElemType)
+        print("geo name: {}, num element: {}".format(
+            geoName, num_layers*num_loops*num_slices))
+        dy = depth / num_layers
+        dr = (r_out-r_in) / num_loops
+        dphi = np.pi*2 / num_slices
+        ox, oy, oz = orgCoord.get_coord()
         cy = oy
-        elemSet = ElemSet()
-        nodeSet = NodeSet()
-        for i in range(self.num_layers):
+        for i in range(num_layers):
             ny = cy + dy
-            cr = self.r_in
-            for j in range(self.num_loops):
+            cr = r_in
+            for j in range(num_loops):
                 nr = cr + dr
                 cphi = 0
-                for k in range(self.num_slices):
+                for k in range(num_slices):
                     nphi = cphi + dphi
                     coords = [
                         self._get_coord(cy, cr, cphi),
@@ -249,102 +245,236 @@ class TunnelGeoType(GeoType):
                         self._get_coord(ny, nr, nphi),
                         self._get_coord(ny, nr, cphi),
                     ]
-                    elemSet.create_elem(elemType, nodeSet, coords)
+                    self.elemSet.create_elem(ElemType, self.nodeSet, coords)
                     cphi = nphi
                 cr = nr
             cy = ny
-        numNodes = nodeSet.get_size()
-        elemTypeName = elemType.get_type()
+        numNodes = self.nodeSet.get_size()
+        ElemTypeName = ElemType.get_type()
         numNodesRef = 0
-        if elemTypeName.startswith("C3D8"):
-            numNodesRef += (self.num_layers+1) * (self.num_loops+1) * self.num_slices
-        elif elemTypeName.startswith("C3D20"):
-            numNodesRef += (self.num_layers+1) * (self.num_loops+1) * self.num_slices * 2
-            numNodesRef += (self.num_layers+1) * self.num_loops * self.num_slices
-            numNodesRef += self.num_layers * (self.num_loops+1) * self.num_slices
+        if ElemTypeName.startswith("C3D8"):
+            numNodesRef += (num_layers+1) * (num_loops+1) * num_slices
+        elif ElemTypeName.startswith("C3D20"):
+            numNodesRef += (num_layers+1) * (num_loops+1) * num_slices * 2
+            numNodesRef += (num_layers+1) * num_loops * num_slices
+            numNodesRef += num_layers * (num_loops+1) * num_slices
         assert numNodes == numNodesRef
-        return elemSet, nodeSet
 
     def _get_coord(self, y, r, phi):
         x = r * np.sin(phi)
         z = r * np.cos(phi)
         return Coord(x, y, z)
 
+class GMSHItem:
+    def __init__(self, gid):
+        self.gid = gid
+
+    def get_gid(self):
+        return self.gid
+
+
+class PointGMSH2D(Coord, GMSHItem):
+    def __init__(self, gid, x, y, esize):
+        Coord.__init__(self, x, y, 0)
+        GMSHItem.__init__(self, gid)
+        self.esize = esize
+
+    def get_esize(self):
+        return self.esize
+
+
+class LineGMSH(GMSHItem):
+    def __init__(self, gid, ipt1, ipt2):
+        self.gid = gid
+        self.ipt1 = ipt1
+        self.ipt2 = ipt2
+
+    def get_ipt(self):
+        return self.ipt1, self.ipt2
+
+
+class SurroundingRock(GeoType):
+    def __init__(
+        self, geoName, ElemType,
+        radius=1, num_elem_arc=40, side_length=2, num_elem_side=24):
+        super().__init__(geoName, ElemType)
+        contents = []
+        # points
+        esize_arc = 2 * 0.5 * np.pi * radius / num_elem_arc
+        esize_side = 2 * side_length / num_elem_side
+        points = [
+            PointGMSH2D(0, radius, 0, esize_arc),
+            PointGMSH2D(1, 0, 0, esize_side),
+            PointGMSH2D(2, 0, radius, esize_arc),
+            PointGMSH2D(3, 0, side_length, esize_side),
+            PointGMSH2D(4, side_length, side_length, esize_side),
+            PointGMSH2D(5, side_length, 0, esize_side),
+        ]
+        for point in points:
+            gid = point.get_gid()
+            x, y, _ = point.get_coord()
+            esize = point.get_esize()
+            content = "Point({}) = {{{}, {}, 0, {}}};".format(
+                gid, x, y, esize)
+            contents.append(content)
+        # circle
+        contents.append("Circle(6) = {0, 1, 2};")
+        # lines
+        lines = [
+            LineGMSH(7, 2, 3),
+            LineGMSH(8, 3, 4),
+            LineGMSH(9, 4, 5),
+            LineGMSH(10, 5, 0),
+        ]
+        for line in lines:
+            gid = line.get_gid()
+            ipt1, ipt2 = line.get_ipt()
+            content = "Line({}) = {{{}, {}}};".format(gid, ipt1, ipt2)
+            contents.append(content)
+        # line loop
+        contents.append("Line Loop(11) = {6, 7, 8, 9, 10};")
+        # plane surface
+        contents.append("Plane Surface(12) = {11};")
+        # gmsh configs
+        contents.append('Mesh.RecombinationAlgorithm = 1; // blossom')
+        contents.append('Mesh.RecombineAll = 1; // turns on quads')
+        contents.append('Mesh.SubdivisionAlgorithm = 1; // quadrangles only')
+        contents.append('Mesh.CharacteristicLengthExtendFromBoundary = 1;')
+        contents.append('Mesh.CharacteristicLengthMin = 0;')
+        contents.append('Mesh.CharacteristicLengthMax = 1e+022;')
+        contents.append('Mesh.CharacteristicLengthFromPoints = 1;')
+        contents.append('Mesh.Algorithm = 8; // delquad = delauny for quads')
+        ElemTypeName = ElemType.get_type()
+        if ElemTypeName.startswith("C3D8"):
+            contents.append('Mesh.ElementOrder = 1; // linear or second set here')
+        elif ElemTypeName.startswith("C3D20"):
+            contents.append('Mesh.ElementOrder = 2; // linear or second set here')
+            contents.append(
+                'Mesh.SecondOrderIncomplete = 1; ' + \
+                '// no face node w/ 2nd order')
+        else:
+            assert False
+        contents.append('Mesh.SaveGroupsOfNodes = 1; // save node groups')
+        # write to geo
+        gmshDir = path.join(os.getcwd(), "build", "gmsh")
+        os.makedirs(gmshDir, exist_ok=True)
+        geoPath = path.join(gmshDir, geoName+".geo")
+        with open(geoPath, 'w') as f:
+            f.write('\n'.join(contents))
+        # gmsh
+        ext = 'vtk'
+        outPath = path.join(gmshDir, geoName+'.'+ext)
+        runstr = "gmsh {} -2 -o {} -format {}".format(geoPath, outPath, ext)
+        subprocess.check_call(runstr, timeout=20, shell=True)
+        # parse mesh file
+        self.nodeSet = NodeSet()
+        num_points = 0
+        with open(outPath, 'r') as f:
+            lines = f.readlines()
+        for i, line in enumerate(lines):
+            if line.startswith("POINTS"):
+                num_points = eval(line.split(' ')[1])
+                break
+        assert num_points > 0
+        coords = []
+        for j in range(num_points):
+            i += 1
+            x, y, z = [eval(v) for v in lines[i].split(' ')]
+            coord = Coord(x, y, z)
+            coords.append(coord)
+        print(len(coords))
+        exit()
+
 
 class Model:
-    def __init__(self, geo, elemType):
-        self.elemType = elemType
-        self.elemSet, self.nodeSet = geo.create_mesh(elemType)
+    def __init__(self):
+        self.geoLst = []
+
+    def add_geo(self, geo):
+        self.geoLst.append(geo)
 
     def to_inp(self, modelName="model", modelDir=path.expanduser("~/.model")):
-        inpContent = "*Node\n"
-        inpContent += '\n'.join(
-            [node.to_inp() for node in self.nodeSet]
-        )
-        inpContent += "\n" + ','.join([
-            "*Element","TYPE={}".format(elemType.get_type())
-        ]) + "\n"
-        inpContent += '\n'.join(
-            [elem.to_inp() for elem in self.elemSet]
-        )
-        modelPath = path.join(modelDir, modelName+'.inp')
-        with open(modelPath, 'w') as f:
-            f.write(inpContent)
+        for geo in self.geoLst:
+            inpContent = "*Node\n"
+            inpContent += '\n'.join(
+                [node.to_inp() for node in geo.nodeSet]
+            )
+            inpContent += "\n" + ','.join([
+                "*Element","TYPE={}".format(geo.ElemType.get_type())
+            ]) + "\n"
+            inpContent += '\n'.join(
+                [elem.to_inp() for elem in geo.elemSet]
+            )
+            geoPath = path.join(modelDir, modelName+'-'+geo.name+'.inp')
+            with open(geoPath, 'w') as f:
+                f.write(inpContent)
 
     def to_vtk(self, modelName="model", modelDir=path.expanduser("~/.model")):
-        numElems = self.elemSet.get_size()
-        numNodes = self.nodeSet.get_size()
-        content = [
-            "# vtk DataFile Version 2.0",
-            modelName,
-            "ASCII",
-            "DATASET UNSTRUCTURED_GRID",
-            ' '.join([
-                "POINTS", str(self.nodeSet.get_size()), "double"
-            ]),
-            '\n'.join([
-                node.to_vtk_point() for node in self.nodeSet
-            ]) + '\n',
-            ' '.join([
-                "CELLS",
-                str(numNodes+numElems),
-                str(
-                    numNodes*2 + \
-                    numElems*(1+elemType.get_num_points())
-                )
-            ]),
-            '\n'.join([
-                node.to_vtk_cell() for node in self.nodeSet
-            ]),
-            '\n'.join([
-                elem.to_vtk_cell() for elem in self.elemSet
-            ]) + '\n',
-            ' '.join([
-                "CELL_TYPES",
-                str(numNodes+numElems),
-            ]),
-            '\n'.join([
-                node.to_vtk_cell_type() for node in self.nodeSet
-            ]),
-            '\n'.join([
-                elem.to_vtk_cell_type() for elem in self.elemSet
-            ]),
-        ]
-        modelPath = path.join(modelDir, modelName+'.vtk')
-        with open(modelPath, "w") as f:
-            f.write('\n'.join(content))
+        for geo in self.geoLst:
+            numElems = geo.elemSet.get_size()
+            numNodes = geo.nodeSet.get_size()
+            content = [
+                "# vtk DataFile Version 2.0",
+                modelName,
+                "ASCII",
+                "DATASET UNSTRUCTURED_GRID",
+                ' '.join([
+                    "POINTS", str(geo.nodeSet.get_size()), "double"
+                ]),
+                '\n'.join([
+                    node.to_vtk_point() for node in geo.nodeSet
+                ]) + '\n',
+                ' '.join([
+                    "CELLS",
+                    str(numNodes+numElems),
+                    str(
+                        numNodes*2 + \
+                        numElems*(1+geo.ElemType.get_num_points())
+                    )
+                ]),
+                '\n'.join([
+                    node.to_vtk_cell() for node in geo.nodeSet
+                ]),
+                '\n'.join([
+                    elem.to_vtk_cell() for elem in geo.elemSet
+                ]) + '\n',
+                ' '.join([
+                    "CELL_TYPES",
+                    str(numNodes+numElems),
+                ]),
+                '\n'.join([
+                    node.to_vtk_cell_type() for node in geo.nodeSet
+                ]),
+                '\n'.join([
+                    elem.to_vtk_cell_type() for elem in geo.elemSet
+                ]),
+            ]
+            geoPath = path.join(modelDir, modelName+'-'+geo.name+'.vtk')
+            with open(geoPath, "w") as f:
+                f.write('\n'.join(content))
 
     def to_json(self, modelName="model", modelDir=path.expanduser("~/.model")):
         pass
 
 if __name__ == "__main__":
-    tunnelGeoAttrs = {
+    model = Model()
+    # surrounding rock
+    geoName = "SurroundingRock"
+    ElemType = C3D8
+    geoAttrs = {
+    }
+    geo = SurroundingRock(geoName, ElemType, **geoAttrs)
+    model.add_geo(geo)
+    # tunnel lining
+    geoName = "TunnelLining"
+    ElemType = C3D8
+    geoAttrs = {
         'depth': 1000,
         'num_layers': 5,
         'num_loops': 3,
         'num_slices': 350,
     }
-    geo = TunnelGeoType(**tunnelGeoAttrs)
-    elemType = C3D8
-    model = Model(geo, elemType)
+    geo = TunnelLining(geoName, ElemType, **geoAttrs)
+    model.add_geo(geo)
+    # output
     model.to_vtk()
