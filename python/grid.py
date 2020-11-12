@@ -1,7 +1,9 @@
 import os
 import math
-import numpy as np
+import logging
 import subprocess
+import numpy as np
+import utils
 
 from os import path
 from rtree import index
@@ -18,6 +20,9 @@ class Coord:
 
     def get_coord_bbox(self):
         return self.get_coord() + self.get_coord()
+
+    def __str__(self):
+        return "({}, {}, {})".format(self.x, self.y, self.z)
 
     @staticmethod
     def get_mid_coord(coord1, coord2):
@@ -73,7 +78,7 @@ class NodeSet:
         node = Node(coord, nodeId)
         self.nodeLst.append(node)
         self.idx.insert(nodeId, coordBbox)
-        print(coordBbox)
+        # print(coordBbox)
         return nodeId
 
     def get_size(self):
@@ -207,7 +212,11 @@ class ElemSet:
 
 
 class GeoType:
-    def __init__(self, geoName, ElemType):
+    def __init__(self, geoName, ElemType, **kwargs):
+        attrs = kwargs.get('attrs')
+        logger = logging.getLogger("form.grid.{}".format(geoName))
+        for k, v in attrs.items():
+            logger.info("attribute: {:>15}, value: {}".format(k, v))
         self.name = geoName
         self.ElemType = ElemType
         self.elemSet = ElemSet()
@@ -217,15 +226,14 @@ class GeoType:
 class TunnelLining(GeoType):
     def __init__(
         self, geoName, ElemType,
-        depth=100000, num_layers=500, r_out=9000, r_in=8500,
-        num_loops=3, num_slices=50, orgCoord=Coord(0,0,0)):
-        super().__init__(geoName, ElemType)
-        print("geo name: {}, num element: {}".format(
-            geoName, num_layers*num_loops*num_slices))
+        depth=100000, num_layers=500,
+        r_out=9000, r_in=8500, num_loops=3, num_slices=50,
+        org_coord=Coord(0,0,0), **kwargs):
+        super().__init__(geoName, ElemType, **kwargs)
         dy = depth / num_layers
         dr = (r_out-r_in) / num_loops
         dphi = np.pi*2 / num_slices
-        ox, oy, oz = orgCoord.get_coord()
+        ox, oy, oz = org_coord.get_coord()
         cy = oy
         for i in range(num_layers):
             ny = cy + dy
@@ -304,8 +312,15 @@ class QuadVtk:
 class SurroundingRock(GeoType):
     def __init__(
         self, geoName, ElemType,
-        radius=1, num_elem_arc=40, side_length=2, num_elem_side=24):
-        super().__init__(geoName, ElemType)
+        depth=100000, num_layers=500,
+        radius=8500, num_elem_arc=45,
+        side_length=17000, num_elem_side=24,
+        l_top=8500, num_elem_top=45,
+        l_right=8000, num_elem_right=45,
+        l_bottom=7500, num_elem_bottom=40,
+        l_left=7000, num_elem_left=40,
+        org_coord=Coord(0,0,0), **kwargs):
+        super().__init__(geoName, ElemType, **kwargs)
         contents = []
         # points
         esize_arc = 2 * 0.5 * np.pi * radius / num_elem_arc
@@ -374,7 +389,7 @@ class SurroundingRock(GeoType):
         outPath = path.join(gmshDir, geoName+'.'+ext)
         runstr = "gmsh {} -2 -o {} -format {}".format(geoPath, outPath, ext)
         subprocess.check_call(runstr, timeout=20, shell=True)
-        # parse vtk file
+        # parse vtk file and check validity
         self.nodeSet = NodeSet()
         num_points = 0
         with open(outPath, 'r') as f:
@@ -384,12 +399,12 @@ class SurroundingRock(GeoType):
                 num_points = eval(line.split(' ')[1])
                 break
         assert num_points > 0
-        coords = []
+        coords_2d = []
         for j in range(num_points):
             i += 1
             x, y, z = [eval(v) for v in lines[i].split(' ')]
             coord = Coord(x, y, z)
-            coords.append(coord)
+            coords_2d.append(coord)
         num_cells = 0
         for j in range(i, len(lines)):
             if lines[j].startswith("CELLS"):
@@ -399,8 +414,8 @@ class SurroundingRock(GeoType):
         quads = []
         for i in range(num_cells):
             j += 1
-            if lines[j].startswith("4"):
-                quad = QuadVtk([eval(v) for v in lines[j].split(' ')][1:])
+            if lines[j].startswith("4") or lines[j].startswith("8"):
+                quad = QuadVtk([eval(v) for v in lines[j].split(' ')][1:5])
                 quads.append(quad)
         for i in range(j, len(lines)):
             if lines[i].startswith("CELL_TYPES"):
@@ -411,11 +426,132 @@ class SurroundingRock(GeoType):
         for j in range(num_cell_types):
             i += 1
             quad_type = eval(lines[i])
-            if quad_type not in [1, 3]:
+            if quad_type not in [1, 3, 21]:
                 quad_types.append(quad_type)
         assert len(quad_types) == len(quads) and \
-            all([quad_type == 9 for quad_type in quad_types])
-        exit()
+            all([quad_type == 9 for quad_type in quad_types]) or \
+            all([quad_type == 23 for quad_type in quad_types])
+        xs, zs = set(), set()
+        for quad in quads:
+            for cid in quad.get_coordIds():
+                x, z, _ = coords_2d[cid].get_coord()
+                if z == side_length:
+                    xs.add(x)
+                if x == side_length:
+                    zs.add(z)
+        xs, zs = sorted(list(xs)), sorted(list(zs))
+        ds = side_length / num_elem_side
+        check_xs = [self._check_equal(xs[i+1]-xs[i], ds) \
+            for i in range(len(xs)-1)]
+        check_zs = [self._check_equal(zs[i+1]-zs[i], ds) \
+            for i in range(len(zs)-1)]
+        assert len(xs) > 1 and len(zs) > 1 and all(check_xs) and all(check_zs), \
+            "len xs: {}, len zs: {}, xs: {}, zs: {}, ds: {}".format(
+                len(xs), len(zs), xs, zs, ds)
+        for quad in quads:
+            for cid in quad.get_coordIds():
+                x, z, _ = coords_2d[cid].get_coord()
+                if z == side_length:
+                    coords_2d[cid] = Coord(round(x/ds)*ds, z, 0)
+                if x == side_length:
+                    coords_2d[cid] = Coord(x, round(z/ds)*ds, 0)
+        # create points
+        dy = depth / num_layers
+        ox, oy, oz = org_coord.get_coord()
+        cy = oy
+        dphi = np.pi / 2
+        ls = [l_top, l_right, l_bottom, l_left]
+        num_elems = [
+            num_elem_top, num_elem_right, num_elem_bottom, num_elem_left]
+        for i in range(num_layers):
+            ny = cy + dy
+            cphi = 0
+            for j in range(4):
+                # div j-0
+                for quad in quads:
+                    coords = []
+                    for y in [cy, ny]:
+                        for cid in quad.get_coordIds():
+                            dx, dz, _ = coords_2d[cid].get_coord()
+                            ndx, ndz = self._rotate(dx, dz, cphi)
+                            x, z = ndx+ox, ndz+oz
+                            coords.append(Coord(x,y,z))
+                    self.elemSet.create_elem(ElemType, self.nodeSet, coords)
+                # div j-1, j-2, j-3
+                for lx, num_x, lz, num_z, x, z in [
+                    (
+                        side_length,
+                        num_elem_side,
+                        ls[j],
+                        num_elems[j],
+                        0,
+                        side_length
+                    ),
+                    (
+                        ls[(j+1)%4],
+                        num_elems[(j+1)%4],
+                        side_length,
+                        num_elem_side,
+                        side_length,
+                        0
+                    ),
+                    (
+                        ls[(j+1)%4],
+                        num_elems[(j+1)%4],
+                        ls[j],
+                        num_elems[j],
+                        side_length,
+                        side_length,
+                    ),
+                ]:
+                    dx = lx / num_x
+                    dz = lz / num_z
+                    for k in range(num_x):
+                        for l in range(num_z):
+                            coords = [
+                                self._get_coord(
+                                    x+k*dx, z+l*dz, ox, oz, cphi, cy),
+                                self._get_coord(
+                                    x+(k+1)*dx, z+l*dz, ox, oz, cphi, cy),
+                                self._get_coord(
+                                    x+(k+1)*dx, z+(l+1)*dz, ox, oz, cphi, cy),
+                                self._get_coord(
+                                    x+k*dx, z+(l+1)*dz, ox, oz, cphi, cy),
+                                self._get_coord(
+                                    x+k*dx, z+l*dz, ox, oz, cphi, ny),
+                                self._get_coord(
+                                    x+(k+1)*dx, z+l*dz, ox, oz, cphi, ny),
+                                self._get_coord(
+                                    x+(k+1)*dx, z+(l+1)*dz, ox, oz, cphi, ny),
+                                self._get_coord(
+                                    x+k*dx, z+(l+1)*dz, ox, oz, cphi, ny),
+                            ]
+                            self.elemSet.create_elem(
+                                ElemType, self.nodeSet, coords)
+                cphi += dphi
+            cy = ny
+
+    def _rotate(self, dx, dz, phi):
+        cs = np.cos(phi)
+        si = np.sin(phi)
+        rot_mat = np.array([[cs,si],[-si,cs]])
+        v = np.array([dx, dz])
+        nv = np.matmul(rot_mat, v)
+        ndx, ndz = nv.tolist()
+        return ndx, ndz
+
+    def _check_equal(self, v, ref_v, tol=4e-6):
+        return abs(v-ref_v) <= tol
+
+    def _get_coord(self, dx, dz, ox, oz, phi, y):
+        cs = np.cos(phi)
+        si = np.sin(phi)
+        rot_mat = np.array([[cs,si],[-si,cs]])
+        v = np.array([dx, dz])
+        nv = np.matmul(rot_mat, v)
+        ndx, ndz = nv.tolist()
+        return Coord(ox+ndx, y, oz+ndz)
+
 
 
 class Model:
@@ -489,24 +625,58 @@ class Model:
         pass
 
 if __name__ == "__main__":
+    utils.log_init()
+    logger = logging.getLogger("form.grid")
+    # geometric attributes
     model = Model()
+    depth = 1000
+    r_in = 8500
+    r_out = 9000
+    esize_bd = 500
+    esize_r_out = 350
+    esize_layer = 200
+    ElemType = C3D8
+    org_coord = Coord(0,0,0)
     # surrounding rock
     geoName = "SurroundingRock"
-    ElemType = C3D8
+    side_length = 1.3 * r_out
+    l_top = 8500
+    l_right = 8000
+    l_bottom = 7500
+    l_left = 6000
     geoAttrs = {
+        'depth': depth,
+        'num_layers': round(depth/esize_layer),
+        'radius': r_out,
+        'num_elem_arc': round(np.pi/2*r_out/esize_r_out),
+        'side_length': side_length,
+        'num_elem_side': round(0.5*side_length/esize_bd)*2,
+        'l_top': l_top,
+        'num_elem_top': round(l_top/esize_bd),
+        'l_right': l_right,
+        'num_elem_right': round(l_right/esize_bd),
+        'l_bottom': l_bottom,
+        'num_elem_bottom': round(l_bottom/esize_bd),
+        'l_left': l_left,
+        'num_elem_left': round(l_left/esize_bd),
+        'org_coord': org_coord,
     }
-    geo = SurroundingRock(geoName, ElemType, **geoAttrs)
+    geo = SurroundingRock(geoName, ElemType, **geoAttrs, attrs=geoAttrs)
     model.add_geo(geo)
     # tunnel lining
     geoName = "TunnelLining"
-    ElemType = C3D8
+    esize_slice = 160
+    esize_loop = 160
     geoAttrs = {
-        'depth': 1000,
-        'num_layers': 5,
-        'num_loops': 3,
-        'num_slices': 350,
+        'depth': depth,
+        'num_layers': round(depth/esize_layer),
+        'r_out': r_out,
+        'r_in': r_in,
+        'num_loops': round((r_out-r_in)/esize_slice),
+        'num_slices': round(0.25*np.pi*(r_in+r_out)/esize_loop) * 4,
+        'org_coord': org_coord,
     }
-    geo = TunnelLining(geoName, ElemType, **geoAttrs)
+    geo = TunnelLining(geoName, ElemType, **geoAttrs, attrs=geoAttrs)
     model.add_geo(geo)
     # output
     model.to_vtk()

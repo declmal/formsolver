@@ -4,3 +4,4 @@ lib
 
 tests/config.cmake
 config.cmake
+__pycache__
