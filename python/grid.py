@@ -293,6 +293,14 @@ class LineGMSH(GMSHItem):
         return self.ipt1, self.ipt2
 
 
+class QuadVtk:
+    def __init__(self, coordIds):
+        self.coordIds = coordIds
+
+    def get_coordIds(self):
+        return self.coordIds
+
+
 class SurroundingRock(GeoType):
     def __init__(
         self, geoName, ElemType,
@@ -361,12 +369,12 @@ class SurroundingRock(GeoType):
         geoPath = path.join(gmshDir, geoName+".geo")
         with open(geoPath, 'w') as f:
             f.write('\n'.join(contents))
-        # gmsh
+        # gmsh to vtk
         ext = 'vtk'
         outPath = path.join(gmshDir, geoName+'.'+ext)
         runstr = "gmsh {} -2 -o {} -format {}".format(geoPath, outPath, ext)
         subprocess.check_call(runstr, timeout=20, shell=True)
-        # parse mesh file
+        # parse vtk file
         self.nodeSet = NodeSet()
         num_points = 0
         with open(outPath, 'r') as f:
@@ -382,7 +390,31 @@ class SurroundingRock(GeoType):
             x, y, z = [eval(v) for v in lines[i].split(' ')]
             coord = Coord(x, y, z)
             coords.append(coord)
-        print(len(coords))
+        num_cells = 0
+        for j in range(i, len(lines)):
+            if lines[j].startswith("CELLS"):
+                num_cells = eval(lines[j].split(' ')[1])
+                break
+        assert num_cells > 0
+        quads = []
+        for i in range(num_cells):
+            j += 1
+            if lines[j].startswith("4"):
+                quad = QuadVtk([eval(v) for v in lines[j].split(' ')][1:])
+                quads.append(quad)
+        for i in range(j, len(lines)):
+            if lines[i].startswith("CELL_TYPES"):
+                num_cell_types = eval(lines[i].split(' ')[1])
+                break
+        assert num_cells == num_cell_types
+        quad_types = []
+        for j in range(num_cell_types):
+            i += 1
+            quad_type = eval(lines[i])
+            if quad_type not in [1, 3]:
+                quad_types.append(quad_type)
+        assert len(quad_types) == len(quads) and \
+            all([quad_type == 9 for quad_type in quad_types])
         exit()
 
 
