@@ -429,12 +429,9 @@ class SurroundingRock(GeoType):
                 break
         assert num_cells == num_cell_types
         quad_types = []
-        num_mid_points = 0
         for j in range(num_cell_types):
             i += 1
             quad_type = eval(lines[i])
-            if quad_type == 21:
-                num_mid_points += 1
             if quad_type not in [1, 3, 21]:
                 quad_types.append(quad_type)
         assert len(quad_types) == len(quads) and \
@@ -572,7 +569,7 @@ class SurroundingRock(GeoType):
         if ElemTypeName.startswith("C3D8"):
             numNodesRef += numEndNodesPlane * (num_layers+1)
         elif ElemTypeName.startswith("C3D20"):
-            numMidNodesPlane = num_mid_points * 4
+            numMidNodesPlane = (len(coords_2d)-1-len(ids)) * 4
             for j in range(4):
                 for num_x, num_z in [
                     (num_elem_side, num_elems[j]),
