@@ -7,6 +7,7 @@ import utils
 
 from os import path
 from rtree import index
+from utils import timethis
 
 
 class Coord:
@@ -153,7 +154,7 @@ class C3D8I(C3D8):
 
 class C3D20(Element):
     def __init__(self, elemId, nodeIds):
-        assert len(nodeIds) == 20
+        assert len(nodeIds) == 20, len(nodeIds)
         super().__init__(elemId, nodeIds)
 
     @classmethod
@@ -224,12 +225,14 @@ class GeoType:
 
 
 class TunnelLining(GeoType):
+    @timethis
     def __init__(
         self, geoName, ElemType,
         depth=100000, num_layers=500,
         r_out=9000, r_in=8500, num_loops=3, num_slices=50,
         org_coord=Coord(0,0,0), **kwargs):
         super().__init__(geoName, ElemType, **kwargs)
+        # create elems
         dy = depth / num_layers
         dr = (r_out-r_in) / num_loops
         dphi = np.pi*2 / num_slices
@@ -257,16 +260,18 @@ class TunnelLining(GeoType):
                     cphi = nphi
                 cr = nr
             cy = ny
-        numNodes = self.nodeSet.get_size()
-        ElemTypeName = ElemType.get_type()
+        # check elems
         numNodesRef = 0
+        ElemTypeName = ElemType.get_type()
         if ElemTypeName.startswith("C3D8"):
             numNodesRef += (num_layers+1) * (num_loops+1) * num_slices
         elif ElemTypeName.startswith("C3D20"):
             numNodesRef += (num_layers+1) * (num_loops+1) * num_slices * 2
             numNodesRef += (num_layers+1) * num_loops * num_slices
             numNodesRef += num_layers * (num_loops+1) * num_slices
-        assert numNodes == numNodesRef
+        numNodes = self.nodeSet.get_size()
+        assert numNodes == numNodesRef, \
+            "num_nodes: {}, numNodesRef: {}".format(numNodes, numNodesRef)
 
     def _get_coord(self, y, r, phi):
         x = r * np.sin(phi)
@@ -310,6 +315,7 @@ class QuadVtk:
 
 
 class SurroundingRock(GeoType):
+    @timethis
     def __init__(
         self, geoName, ElemType,
         depth=100000, num_layers=500,
@@ -423,39 +429,57 @@ class SurroundingRock(GeoType):
                 break
         assert num_cells == num_cell_types
         quad_types = []
+        num_mid_points = 0
         for j in range(num_cell_types):
             i += 1
             quad_type = eval(lines[i])
+            if quad_type == 21:
+                num_mid_points += 1
             if quad_type not in [1, 3, 21]:
                 quad_types.append(quad_type)
         assert len(quad_types) == len(quads) and \
             all([quad_type == 9 for quad_type in quad_types]) or \
             all([quad_type == 23 for quad_type in quad_types])
-        xs, zs = set(), set()
+        xs, zs, xs0, zs0, ids = set(), set(), set(), set(), set()
         for quad in quads:
             for cid in quad.get_coordIds():
+                ids.add(cid)
                 x, z, _ = coords_2d[cid].get_coord()
-                if z == side_length:
-                    xs.add(x)
                 if x == side_length:
                     zs.add(z)
-        xs, zs = sorted(list(xs)), sorted(list(zs))
+                if z == side_length:
+                    xs.add(x)
+                if x == 0:
+                    zs0.add(z)
+                if z == 0:
+                    xs0.add(x)
+        assert len(xs) == len(zs) == num_elem_side+1, \
+            "len(xs): {}, len(zs): {}, num_elem_side: {}".format(
+                len(xs), len(zs), num_elem_side)
+        assert len(xs0) == len(zs0) and len(xs0) > 1
+        #  xs, zs = sorted(list(xs)), sorted(list(zs))
+        # assert len(xs) > 1 and len(zs) > 1
+        # check_xs = [self._check_equal(xs[i+1]-xs[i], ds) \
+            # for i in range(len(xs)-1)]
+        # check_zs = [self._check_equal(zs[i+1]-zs[i], ds) \
+            # for i in range(len(zs)-1)]
+        # assert all(check_xs) and all(check_zs), \
+            # "len xs: {}, len zs: {}, xs: {}, zs: {}, ds: {}".format(
+                # len(xs), len(zs), xs, zs, ds)
         ds = side_length / num_elem_side
-        check_xs = [self._check_equal(xs[i+1]-xs[i], ds) \
-            for i in range(len(xs)-1)]
-        check_zs = [self._check_equal(zs[i+1]-zs[i], ds) \
-            for i in range(len(zs)-1)]
-        assert len(xs) > 1 and len(zs) > 1 and all(check_xs) and all(check_zs), \
-            "len xs: {}, len zs: {}, xs: {}, zs: {}, ds: {}".format(
-                len(xs), len(zs), xs, zs, ds)
+        ds0 = (side_length-radius) / (len(xs0)-1)
         for quad in quads:
             for cid in quad.get_coordIds():
                 x, z, _ = coords_2d[cid].get_coord()
-                if z == side_length:
-                    coords_2d[cid] = Coord(round(x/ds)*ds, z, 0)
                 if x == side_length:
                     coords_2d[cid] = Coord(x, round(z/ds)*ds, 0)
-        # create points
+                if z == side_length:
+                    coords_2d[cid] = Coord(round(x/ds)*ds, z, 0)
+                if x == 0:
+                    coords_2d[cid] = Coord(x, radius+round((z-radius)/ds0)*ds0, 0)
+                if z == 0:
+                    coords_2d[cid] = Coord(radius+round((x-radius)/ds0)*ds0, z, 0)
+        # create elems
         dy = depth / num_layers
         ox, oy, oz = org_coord.get_coord()
         cy = oy
@@ -473,9 +497,8 @@ class SurroundingRock(GeoType):
                     for y in [cy, ny]:
                         for cid in quad.get_coordIds():
                             dx, dz, _ = coords_2d[cid].get_coord()
-                            ndx, ndz = self._rotate(dx, dz, cphi)
-                            x, z = ndx+ox, ndz+oz
-                            coords.append(Coord(x,y,z))
+                            coord = self._get_coord(dx, dz, ox, oz, cphi, y)
+                            coords.append(coord)
                     self.elemSet.create_elem(ElemType, self.nodeSet, coords)
                 # div j-1, j-2, j-3
                 for lx, num_x, lz, num_z, x, z in [
@@ -530,15 +553,42 @@ class SurroundingRock(GeoType):
                                 ElemType, self.nodeSet, coords)
                 cphi += dphi
             cy = ny
-
-    def _rotate(self, dx, dz, phi):
-        cs = np.cos(phi)
-        si = np.sin(phi)
-        rot_mat = np.array([[cs,si],[-si,cs]])
-        v = np.array([dx, dz])
-        nv = np.matmul(rot_mat, v)
-        ndx, ndz = nv.tolist()
-        return ndx, ndz
+        # check elems
+        numNodesRef = 0
+        numEndNodesPlane = len(ids) * 4
+        for j in range(4):
+            for num_x, num_z in [
+                (num_elem_side, num_elems[j]),
+                (num_elems[(j+1)%4], num_elem_side),
+                (num_elems[(j+1)%4], num_elems[j]),
+            ]:
+                numEndNodesPlane += (num_x+1) * (num_z+1)
+        for j in range(4):
+            numEndNodesPlane -= \
+                2*(num_elems[j]+1) + (num_elems[(j+1)%4]+1) + \
+                2*(num_elem_side+1) + len(xs0)
+        numEndNodesPlane += 8
+        ElemTypeName = ElemType.get_type()
+        if ElemTypeName.startswith("C3D8"):
+            numNodesRef += numEndNodesPlane * (num_layers+1)
+        elif ElemTypeName.startswith("C3D20"):
+            numMidNodesPlane = num_mid_points * 4
+            for j in range(4):
+                for num_x, num_z in [
+                    (num_elem_side, num_elems[j]),
+                    (num_elems[(j+1)%4], num_elem_side),
+                    (num_elems[(j+1)%4], num_elems[j]),
+                ]:
+                    numMidNodesPlane += (num_x+1)*num_z + num_x*(num_z+1)
+            for j in range(4):
+                numMidNodesPlane -= \
+                    2*num_elems[j] + num_elems[(j+1)%4] + \
+                    2*num_elem_side + len(xs0) - 1
+            numNodesRef += numEndNodesPlane * (2*num_layers+1)
+            numNodesRef += numMidNodesPlane * (num_layers+1)
+        numNodes = self.nodeSet.get_size()
+        assert numNodes == numNodesRef, \
+            "num_nodes: {}, numNodesRef: {}".format(numNodes, numNodesRef)
 
     def _check_equal(self, v, ref_v, tol=4e-6):
         return abs(v-ref_v) <= tol
@@ -553,7 +603,6 @@ class SurroundingRock(GeoType):
         return Coord(ox+ndx, y, oz+ndz)
 
 
-
 class Model:
     def __init__(self):
         self.geoLst = []
@@ -561,6 +610,7 @@ class Model:
     def add_geo(self, geo):
         self.geoLst.append(geo)
 
+    @timethis
     def to_inp(self, modelName="model", modelDir=path.expanduser("~/.model")):
         for geo in self.geoLst:
             inpContent = "*Node\n"
@@ -577,6 +627,7 @@ class Model:
             with open(geoPath, 'w') as f:
                 f.write(inpContent)
 
+    @timethis
     def to_vtk(self, modelName="model", modelDir=path.expanduser("~/.model")):
         for geo in self.geoLst:
             numElems = geo.elemSet.get_size()
@@ -625,17 +676,17 @@ class Model:
         pass
 
 if __name__ == "__main__":
+    # log init
     utils.log_init()
     logger = logging.getLogger("form.grid")
     # geometric attributes
     model = Model()
-    depth = 1000
+    depth = 1200
     r_in = 8500
     r_out = 9000
     esize_bd = 500
     esize_r_out = 350
-    esize_layer = 200
-    ElemType = C3D8
+    ElemType = C3D20
     org_coord = Coord(0,0,0)
     # surrounding rock
     geoName = "SurroundingRock"
@@ -644,9 +695,10 @@ if __name__ == "__main__":
     l_right = 8000
     l_bottom = 7500
     l_left = 6000
+    esize_layer_rock = 400
     geoAttrs = {
         'depth': depth,
-        'num_layers': round(depth/esize_layer),
+        'num_layers': round(depth/esize_layer_rock),
         'radius': r_out,
         'num_elem_arc': round(np.pi/2*r_out/esize_r_out),
         'side_length': side_length,
@@ -667,9 +719,10 @@ if __name__ == "__main__":
     geoName = "TunnelLining"
     esize_slice = 160
     esize_loop = 160
+    esize_layer_lining = 160
     geoAttrs = {
         'depth': depth,
-        'num_layers': round(depth/esize_layer),
+        'num_layers': round(depth/esize_layer_lining),
         'r_out': r_out,
         'r_in': r_in,
         'num_loops': round((r_out-r_in)/esize_slice),
